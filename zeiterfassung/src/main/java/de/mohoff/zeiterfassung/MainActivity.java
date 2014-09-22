@@ -1,33 +1,37 @@
 package de.mohoff.zeiterfassung;
 
+import android.content.Intent;
+import android.graphics.Camera;
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.mapbox.mapboxsdk.overlay.UserLocationOverlay;
-import com.mapbox.mapboxsdk.views.MapView;
+import android.view.View;
+import android.widget.Button;
+import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.model.*;
 
 
 public class MainActivity extends ActionBarActivity {
 
-    //MapView mapView = (MapView) this.findViewById(R.id.mapview);
-    //UserLocationOverlay userLocationOverlay = new UserLocationOverlay(this, mapView);
-
+    Button goToMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //MapView mapView = new MapView(this, "moson.hn35hbji");
-        //this.setContentView(mapView);
-
-        //userLocationOverlay.enableMyLocation();
-        //userLocationOverlay.setDrawAccuracyEnabled(true);
-        //mapView.getOverlays().add(userLocationOverlay);
+        goToMap = (Button) findViewById(R.id.button);
+        goToMap.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Intent intent = new Intent(MainActivity.this, Map.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

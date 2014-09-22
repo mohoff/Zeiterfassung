@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ZeiterfassungWithGradle.iml" filepath="$PROJECT_DIR$/ZeiterfassungWithGradle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ZeiterfassungWithMap.iml" filepath="$PROJECT_DIR$/ZeiterfassungWithMap.iml" />
       <module fileurl="file://$PROJECT_DIR$/zeiterfassung/zeiterfassung.iml" filepath="$PROJECT_DIR$/zeiterfassung/zeiterfassung.iml" />
     </modules>
   </component>
