@@ -13,16 +13,25 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
+import java.util.ArrayList;
 
 
 public class Map extends ActionBarActivity implements LocationChangeListener{
     LocationUpdater lu;
 
     GoogleMap map;
-    LatLng userLocation;
+    LatLng mostRecentUserLocation = null;
+    ArrayList<Location> userLocations = new ArrayList<Location>();
+    ArrayList<Marker> markers = new ArrayList<Marker>();
     Marker markerUserLocation;
     Marker markerCandidate = null;
-    Circle circle;
+    Circle circle = null;
+
+    private int amountOfTemporarySavedLocations = 10;
+    private CircularFifoQueue locationCache = new CircularFifoQueue<Location>(amountOfTemporarySavedLocations); // fifo based queue
+
     EditText et;
     int radius;
 
@@ -31,6 +40,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         lu = LocationUpdater.getInstance(this);
         lu.setTheListener(this);
@@ -73,12 +83,13 @@ public class Map extends ActionBarActivity implements LocationChangeListener{
         et.addTextChangedListener(new TextWatcher(){
             public void afterTextChanged(Editable s) {
                 updateRadiusFromEditText();
-                circle.setRadius(radius);
+                if(circle != null) {
+                    circle.setRadius(radius);
+                }
             }
             public void beforeTextChanged(CharSequence s, int start, int count, int after){}
             public void onTextChanged(CharSequence s, int start, int before, int count){}
         });
-
 
         map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
@@ -100,17 +111,69 @@ public class Map extends ActionBarActivity implements LocationChangeListener{
 
             }
         });
+
+        // store userLocations temporarly in bundle, to repopulate map after screen rotation
+        if(savedInstanceState != null){
+            if(savedInstanceState.containsKey("userLocations")){
+                userLocations = savedInstanceState.getParcelableArrayList("userLocations");
+                for(int i=0; i<userLocations.size(); i++){
+                    drawMarkerForLocation(userLocations.get(i));
+                }
+            }
+            //if(savedInstanceState.containsKey("mostRecentUserLocation")){
+            //    double lat = savedInstanceState.getDoubleArray("mostRecentUserLocation")[0];
+            //    double lng = savedInstanceState.getDoubleArray("mostRecentUserLocation")[1];
+            //    mostRecentUserLocation = new LatLng(lat, lng);
+            //}
+        }
+    }
+
+
+
+    public void handleLocationUpdate(Location loc){
+        locationCache.add(loc);
+        drawMarkerForLocation(loc);
+        if(!markers.isEmpty()){
+            markers.get(markers.size()-2).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+        }
+
+
+        getInterpolatedPosition();
+    }
+
+    public LatLng getInterpolatedPosition(){
+        float[] score = new float[amountOfTemporarySavedLocations];
+        for(int i=0; i<locationCache.size(); i++){
+            Location currentLoc = (Location) locationCache.get(i);
+            float timeWeight = (float) (1-((float)(i+1)/(float)amountOfTemporarySavedLocations)*0.5);
+            float accuracyWeight;
+            if(currentLoc.getAccuracy() <= 30){
+                accuracyWeight = 0;
+            } else {
+                accuracyWeight = (currentLoc.getAccuracy()-30)/10f;
+            }
+            //float speedWeight = currentLoc.getSpeed() / 10f;
+            score[i] = timeWeight / accuracyWeight;
+        }
+        for(int i=0; i<locationCache.size(); i++){
+            Location currentLoc = (Location)locationCache.get(i);
+
+        }
+
     }
 
     public void drawMarkerForLocation(Location loc){
         LatLng latLng = new LatLng(loc.getLatitude(), loc.getLongitude());
-        map.addMarker(new MarkerOptions()
+        markerUserLocation = map.addMarker(new MarkerOptions()
                         .position(latLng)
                         .draggable(false)
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET))
+                        .title("acc " + String.valueOf(loc.getAccuracy()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
+                        .snippet(loc.getExtras().toString())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
         );
+        userLocations.add(loc);
+        markers.add(markerUserLocation);
     }
-
 
     public void updateRadiusFromEditText(){
         String inputString = et.getText().toString();
@@ -155,17 +218,18 @@ public class Map extends ActionBarActivity implements LocationChangeListener{
             if (map != null) {
                 // The Map is verified. It is now safe to manipulate the map.
                 try {
-                    userLocation = new LatLng(LocationUpdater.mostRecentLocation.getLatitude(), LocationUpdater.mostRecentLocation.getLongitude());
+                    mostRecentUserLocation = new LatLng(LocationUpdater.mostRecentLocation.getLatitude(), LocationUpdater.mostRecentLocation.getLongitude());
+                    markers.add(map.addMarker(new MarkerOptions()
+                                    .position(mostRecentUserLocation)
+                                    .draggable(false)
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+                    ));
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(mostRecentUserLocation, 15);
+                    map.animateCamera(cu);
+
                 } catch(Exception e){
                     System.out.println("fehler beim abrufen der mostRecentLocation");
                 }
-                markerUserLocation = map.addMarker(new MarkerOptions()
-                                .position(userLocation)
-                                .draggable(false)
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
-                );
-                CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(userLocation, 15);
-                map.animateCamera(cu);
             }
         }
     }
@@ -177,5 +241,18 @@ public class Map extends ActionBarActivity implements LocationChangeListener{
             //handle click here
             markerIBM.hideInfoWindow();
         }*/
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        //if(mostRecentUserLocation != null){
+        //    double[] latLng = {mostRecentUserLocation.latitude, mostRecentUserLocation.longitude};
+        //    outState.putDoubleArray("mostRecentUserLocation", latLng);
+        //}
+        if(!userLocations.isEmpty()){
+            outState.putParcelableArrayList("userLocations", userLocations);
+        }
+
+        super.onSaveInstanceState(outState);
     }
 }

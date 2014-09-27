@@ -51,7 +51,7 @@ public class LocationUpdater {
 
     public void delegateDrawMarker(Location loc){
         if (locChangeListener != null) {
-            locChangeListener.drawMarkerForLocation(loc);
+            locChangeListener.handleLocationUpdate(loc);
         }
     }
 
