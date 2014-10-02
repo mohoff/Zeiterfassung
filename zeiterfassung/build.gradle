@@ -36,4 +36,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:20.+'
     compile 'com.google.android.gms:play-services:5.+'
     compile 'org.apache.commons:commons-collections4:4.0'
+    compile 'com.j256.ormlite:ormlite-core:4.48'
+    compile 'com.j256.ormlite:ormlite-android:4.48'
 }

@@ -136,30 +136,42 @@ public class Map extends ActionBarActivity implements LocationChangeListener{
         if(!markers.isEmpty()){
             markers.get(markers.size()-2).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
         }
-
-
-        getInterpolatedPosition();
+        drawMarkerForLatLng(getInterpolatedPosition());
     }
 
     public LatLng getInterpolatedPosition(){
-        float[] score = new float[amountOfTemporarySavedLocations];
-        for(int i=0; i<locationCache.size(); i++){
+        int cacheSize = locationCache.size();
+        float[] score = new float[cacheSize];
+        float scoreSum = 0;
+
+        for(int i=0; i<cacheSize; i++){
             Location currentLoc = (Location) locationCache.get(i);
-            float timeWeight = (float) (1-((float)(i+1)/(float)amountOfTemporarySavedLocations)*0.5);
-            float accuracyWeight;
-            if(currentLoc.getAccuracy() <= 30){
-                accuracyWeight = 0;
-            } else {
-                accuracyWeight = (currentLoc.getAccuracy()-30)/10f;
+            double baseFactor = ((double)(i+1)/(double)cacheSize) + 0.5; // [0.5, 1.5]
+
+            double accuracyPenalty = 0.0;
+            if(currentLoc.getAccuracy() > 30){  // dont apply penalty if accuracy is <= 30m
+                float x = currentLoc.getAccuracy()/100;
+                accuracyPenalty = 0.5*x / (1+Math.pow(x, 2));       //    0.5*x/(1+x^2) // bei x=2 schon fast gesättigt (0.5)
+                // maybe change factor of 0.5 to 1 or 0.75?
+            } else if(currentLoc.getAccuracy() == 0.0){     // if no accuracy provided
+                accuracyPenalty = 0.3;
             }
-            //float speedWeight = currentLoc.getSpeed() / 10f;
-            score[i] = timeWeight / accuracyWeight;
+
+            score[i] = (float)(baseFactor - accuracyPenalty);
+            scoreSum += score[i];
+
         }
+
+        // weighted arithmethic mean, http://en.wikipedia.org/wiki/Weighted_arithmetic_mean > Mathematical definition
+        double latSumZaehler = 0, lngSumZaehler = 0;
+
         for(int i=0; i<locationCache.size(); i++){
             Location currentLoc = (Location)locationCache.get(i);
-
+            latSumZaehler += currentLoc.getLatitude() * score[i];
+            lngSumZaehler += currentLoc.getLongitude() * score[i];
         }
-
+        LatLng result = new LatLng(latSumZaehler/scoreSum, lngSumZaehler/scoreSum);
+        return result;
     }
 
     public void drawMarkerForLocation(Location loc){
@@ -173,6 +185,16 @@ public class Map extends ActionBarActivity implements LocationChangeListener{
         );
         userLocations.add(loc);
         markers.add(markerUserLocation);
+    }
+
+    public void drawMarkerForLatLng(LatLng latLng){
+        map.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .draggable(false)
+                        //.title("acc " + String.valueOf(loc.getAccuracy()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
+                        //.snippet(loc.getExtras().toString())
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+        );
     }
 
     public void updateRadiusFromEditText(){

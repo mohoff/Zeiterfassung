@@ -1,0 +1,26 @@
+#
+# generated on 2014/09/29 12:23:29
+#
+# --table-start--
+dataClass=de.mohoff.zeiterfassung.datamodel.Timeslot
+tableName=timeslots
+# --table-fields-start--
+# --field-start--
+fieldName=_id
+id=true
+# --field-end--
+# --field-start--
+fieldName=starttime
+# --field-end--
+# --field-start--
+fieldName=endtime
+# --field-end--
+# --field-start--
+fieldName=activity
+# --field-end--
+# --field-start--
+fieldName=location
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
