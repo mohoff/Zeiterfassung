@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung;
+package de.mohoff.zeiterfassung.activities;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -13,13 +13,18 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
+import de.mohoff.zeiterfassung.LocationChangeListener;
+import de.mohoff.zeiterfassung.LocationUpdateHandler;
+import de.mohoff.zeiterfassung.LocationUpdater;
+import de.mohoff.zeiterfassung.R;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.util.ArrayList;
 
 
-public class Map extends ActionBarActivity implements LocationChangeListener{
+public class Map extends ActionBarActivity implements LocationChangeListener {
     LocationUpdater lu;
+    LocationUpdateHandler luh;
 
     GoogleMap map;
     LatLng mostRecentUserLocation = null;
@@ -43,9 +48,11 @@ public class Map extends ActionBarActivity implements LocationChangeListener{
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         lu = LocationUpdater.getInstance(this);
-        lu.setTheListener(this);
+        luh = LocationUpdateHandler.getInstance(this);
 
         setUpMapIfNeeded();
+        lu.addTheListener(this);
+
 
         et = (EditText) findViewById(R.id.editText);
         updateRadiusFromEditText();
@@ -128,51 +135,23 @@ public class Map extends ActionBarActivity implements LocationChangeListener{
         }
     }
 
-
-
     public void handleLocationUpdate(Location loc){
         locationCache.add(loc);
         drawMarkerForLocation(loc);
         if(!markers.isEmpty()){
             markers.get(markers.size()-2).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
         }
-        drawMarkerForLatLng(getInterpolatedPosition());
-    }
-
-    public LatLng getInterpolatedPosition(){
-        int cacheSize = locationCache.size();
-        float[] score = new float[cacheSize];
-        float scoreSum = 0;
-
-        for(int i=0; i<cacheSize; i++){
-            Location currentLoc = (Location) locationCache.get(i);
-            double baseFactor = ((double)(i+1)/(double)cacheSize) + 0.5; // [0.5, 1.5]
-
-            double accuracyPenalty = 0.0;
-            if(currentLoc.getAccuracy() > 30){  // dont apply penalty if accuracy is <= 30m
-                float x = currentLoc.getAccuracy()/100;
-                accuracyPenalty = 0.5*x / (1+Math.pow(x, 2));       //    0.5*x/(1+x^2) // bei x=2 schon fast gesättigt (0.5)
-                // maybe change factor of 0.5 to 1 or 0.75?
-            } else if(currentLoc.getAccuracy() == 0.0){     // if no accuracy provided
-                accuracyPenalty = 0.3;
-            }
-
-            score[i] = (float)(baseFactor - accuracyPenalty);
-            scoreSum += score[i];
-
+        try {
+            // may cause racecondition with second listener implemenatation (following line might get old interpolated position)
+            drawMarkerForLatLng(luh.getInterpolatedPosition());
+        } catch(Exception e){
+            e.printStackTrace();
         }
 
-        // weighted arithmethic mean, http://en.wikipedia.org/wiki/Weighted_arithmetic_mean > Mathematical definition
-        double latSumZaehler = 0, lngSumZaehler = 0;
 
-        for(int i=0; i<locationCache.size(); i++){
-            Location currentLoc = (Location)locationCache.get(i);
-            latSumZaehler += currentLoc.getLatitude() * score[i];
-            lngSumZaehler += currentLoc.getLongitude() * score[i];
-        }
-        LatLng result = new LatLng(latSumZaehler/scoreSum, lngSumZaehler/scoreSum);
-        return result;
     }
+
+
 
     public void drawMarkerForLocation(Location loc){
         LatLng latLng = new LatLng(loc.getLatitude(), loc.getLongitude());
@@ -191,7 +170,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener{
         map.addMarker(new MarkerOptions()
                         .position(latLng)
                         .draggable(false)
-                        //.title("acc " + String.valueOf(loc.getAccuracy()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
+                        //.title("acc " + String.valueOf(loc.getAccuracyPenalty()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
                         //.snippet(loc.getExtras().toString())
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
         );

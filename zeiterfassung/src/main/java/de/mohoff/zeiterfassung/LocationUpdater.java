@@ -9,10 +9,11 @@ import android.widget.Toast;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class LocationUpdater {
-    private LocationChangeListener locChangeListener;
+    private ArrayList<LocationChangeListener> locChangeListener = new ArrayList<LocationChangeListener>();
 
     private static int amountOfTemporarySavedLocations = 10;
     private static int timeBetweenMeasures = 1000 * 60; // in ms
@@ -21,7 +22,7 @@ public class LocationUpdater {
     private static Context ctx;
     private android.location.LocationManager locationmanager;
     private LocationListener locationListener;
-    private String locationProviderType = android.location.LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
+    private static String locationProviderType = android.location.LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
 
     public static Location mostRecentLocation = null;
     //private RecordEntity currentLocationReference;
@@ -45,15 +46,23 @@ public class LocationUpdater {
     }
 
     // Listener
-    public void setTheListener(LocationChangeListener listener) {
-        locChangeListener = listener;
+    public void addTheListener(LocationChangeListener listener) {
+        locChangeListener.add(listener);
     }
 
     public void delegateDrawMarker(Location loc){
-        if (locChangeListener != null) {
-            locChangeListener.handleLocationUpdate(loc);
+        if(!locChangeListener.isEmpty()) {
+            for(LocationChangeListener lcl : locChangeListener){
+                lcl.handleLocationUpdate(loc);
+            }
         }
     }
+
+    public static Location getLastKnownLocation(Context ctx){
+        LocationManager lm = (android.location.LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+        return lm.getLastKnownLocation(locationProviderType);
+    }
+
 
     private LocationUpdater() {
         this.locationmanager = (android.location.LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
@@ -150,37 +159,6 @@ public class LocationUpdater {
 
     public boolean isGPSEnabled(){
         return this.locationmanager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-    }
-
-    /*
-    public RecordEntity getRecordMatching(Location candidate){
-        for(TrackUsage tl : tuc.getTrackLocations()){
-            for(Location testAgainst : tl.getAllLocations()){
-                int maxDistance = tl.getRadius(); // not so good, because every location needs it own radius...
-                int calculatedDistance = calculateDistance(testAgainst, candidate);
-                if(calculatedDistance < maxDistance){
-                    return tl.getRecordByLocation(testAgainst);
-                }
-            }
-        }
-        return null;
-    }
-    */
-    static public int calculateDistance(Location loc1, Location loc2){
-        int earthRadius = 6371; // km
-
-        double loc1LatInRadians = Math.toRadians(loc1.getLatitude());
-        double loc2LatInRadians = Math.toRadians(loc2.getLatitude());
-        double latDiffInRadians = Math.toRadians(loc1.getLatitude() - loc2.getLatitude());
-        double lngDiffInRadians = Math.toRadians(loc1.getLongitude() - loc2.getLongitude());
-
-        double a = Math.sin(latDiffInRadians/2) * Math.sin(latDiffInRadians/2) +
-                Math.cos(loc1LatInRadians) * Math.cos(loc2LatInRadians) *
-                        Math.sin(lngDiffInRadians/2) * Math.sin(lngDiffInRadians/2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        double distance = earthRadius * c;
-
-        return (int) distance;
     }
 
 

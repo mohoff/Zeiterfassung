@@ -1,28 +1,37 @@
-package de.mohoff.zeiterfassung;
+package de.mohoff.zeiterfassung.activities;
 
 import android.content.Intent;
-import android.graphics.Camera;
-import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import com.google.android.gms.maps.*;
-import com.google.android.gms.maps.model.*;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import de.mohoff.zeiterfassung.LocationUpdateHandler;
+import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.database.DatabaseHelper;
 
 
 public class MainActivity extends ActionBarActivity {
 
-    Button goToMap;
+    private Button goToMap;
+    private Button addNewTLA;
+    private LocationUpdateHandler luh;
+    private DatabaseHelper dbHelper = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getDbHelper();
+
+
+
+        //luh = LocationUpdateHandler.getInstance(this);
 
         goToMap = (Button) findViewById(R.id.button);
+        addNewTLA = (Button) findViewById(R.id.buttonTLA);
         goToMap.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 Intent intent = new Intent(MainActivity.this, Map.class);
@@ -30,7 +39,30 @@ public class MainActivity extends ActionBarActivity {
                 finish();
             }
         });
+        addNewTLA.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Intent intent = new Intent(MainActivity.this, AddTargetLocationArea.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (dbHelper != null) {
+            OpenHelperManager.releaseHelper();
+            dbHelper = null;
+        }
+    }
+
+    private DatabaseHelper getDbHelper() {
+        if (dbHelper == null) {
+            dbHelper =
+                    OpenHelperManager.getHelper(this, DatabaseHelper.class);
+        }
+        return dbHelper;
     }
 
     @Override
@@ -51,4 +83,6 @@ public class MainActivity extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 }

@@ -3,7 +3,7 @@ package de.mohoff.zeiterfassung.datamodel;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "timeslots", daoClass = Timeslot.class)
+@DatabaseTable(tableName = "timeslots")//, daoClass = Timeslot.class)
 public class Timeslot {
     @DatabaseField(generatedId = true) // autoincrement primary key
     private int _id;

@@ -26,7 +26,7 @@
             android:value="AIzaSyCx5PyDoEPO1iaL_Nu3yIlRPmFxZ5G8Rpo" />
 
         <activity
-            android:name="de.mohoff.zeiterfassung.MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,8 +35,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="de.mohoff.zeiterfassung.Map"
+            android:name=".activities.Map"
             android:label="@string/title_activity_map" >
+        </activity>
+        <activity
+            android:name=".activities.AddTargetLocationArea"
+            android:label="@string/title_activity_add_tla" >
         </activity>
     </application>
 

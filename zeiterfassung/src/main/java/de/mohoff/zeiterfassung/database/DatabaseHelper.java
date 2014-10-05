@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung;
+package de.mohoff.zeiterfassung.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -6,11 +6,14 @@ import android.util.Log;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
 
 import java.sql.SQLException;
@@ -23,7 +26,7 @@ import java.util.*;
  */
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     // name of the database file for your application -- change to something appropriate for your app
-    private static final String DATABASE_NAME = "timeslots.db";
+    private static final String DATABASE_NAME = "database.db";
 
     // any time you make changes to your database objects, you may have to increase the database version
     private static final int DATABASE_VERSION = 1;
@@ -31,8 +34,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private int amountOfTimeslots = 0;
 
     // the DAO object we use to access the SimpleData table
-    private Dao<Timeslot, Integer> dao = null;
-    private RuntimeExceptionDao<Timeslot, Integer> runtimeExceptionDao = null;
+    private Dao<Timeslot, Integer> timeslotDAO = null;
+    private RuntimeExceptionDao<Timeslot, Integer> timeslotREDAO = null;
+    private Dao<TargetLocationArea, Integer> targetareasDAO = null;
+    private RuntimeExceptionDao<TargetLocationArea, Integer> targetareasREDAO = null;
 
 
     public DatabaseHelper(Context context) {
@@ -43,38 +48,60 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         // approach 1, so we can give better return values
         int result = -1;
         try {
-            Dao<Timeslot, Integer> dao = getDao();
-            result = (int)dao.countOf();
+            getTimeslotDAO();
+            result = (int)timeslotDAO.countOf();
         } catch(SQLException e){
             e.printStackTrace();
         }
         return result;
 
         // approach 2
-        /*RuntimeExceptionDao<Timeslot, Integer> dao2 = getTimeslotDao();
+        /*RuntimeExceptionDao<Timeslot, Integer> dao2 = getTimeslotREDAO();
         return (int) dao2.countOf();*/
     }
 
     public int startNewTimeslot(int minutes, String activityName, String locationName){
-        RuntimeExceptionDao<Timeslot, Integer> dao = getTimeslotDao();
+        getTimeslotREDAO();
         Timeslot ts = new Timeslot(minutes, activityName, locationName);
         int result = -1;
-        result = dao.create(ts);
+        result = timeslotREDAO.create(ts);
         amountOfTimeslots++;
 
         return result;
     }
 
+    // in deployment: split activity- and location-creation
+    public int createNewTargetLocationArea(double latitude, double longitude, int radius, String activity, String location){
+        getTargetLocationAreaREDAO();
+        TargetLocationArea tla = new TargetLocationArea((float)latitude, (float)longitude, radius, activity, location);
+        int result = -1;
+        result = targetareasREDAO.create(tla);
+
+        return result;
+    }
+
+    public int deleteTargetLocationAreaBy(String activity, String location){
+        DeleteBuilder<TargetLocationArea, Integer> deleteBuilder = targetareasREDAO.deleteBuilder();
+        try {
+            deleteBuilder.where().eq("activityName", activity).and().eq("locationName", location);
+            deleteBuilder.delete();
+            return 1;
+        } catch(SQLException e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     public int sealCurrentTimeslot(int minutes){
-        RuntimeExceptionDao<Timeslot, Integer> dao = getTimeslotDao();
+        getTimeslotREDAO();
 
         // approach 1
-        Timeslot toUpdate = dao.queryForId(getAmountOfTimeslots());     // does this work? does it count from 0 or 1 or not even autoincrement?
+        Timeslot toUpdate = timeslotREDAO.queryForId(getAmountOfTimeslots());     // does this work? does it count from 0 or 1 or not even autoincrement?
         toUpdate.setEndtime(minutes);
-        dao.update(toUpdate);
+        timeslotREDAO.update(toUpdate);
 
         // approach 2
-        UpdateBuilder<Timeslot, Integer> updateBuilder = dao.updateBuilder();
+        UpdateBuilder<Timeslot, Integer> updateBuilder = timeslotREDAO.updateBuilder();
         try {
             updateBuilder.updateColumnValue("endtime", minutes);
             updateBuilder.where().isNull("endtime");        // only update the rows where password is null
@@ -96,6 +123,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             Log.i(DatabaseHelper.class.getName(), "onCreate");
             TableUtils.createTable(connectionSource, Timeslot.class);
+            TableUtils.createTable(connectionSource, TargetLocationArea.class);
         } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
             throw new RuntimeException(e);
@@ -110,6 +138,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             Log.i(DatabaseHelper.class.getName(), "onUpgrade");
             TableUtils.dropTable(connectionSource, Timeslot.class, true);
+            TableUtils.dropTable(connectionSource, TargetLocationArea.class, true);
             // after we drop the old databases, we create the new ones
             onCreate(db, connectionSource);
         } catch (SQLException e) {
@@ -121,21 +150,33 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
      * Returns the Database Access Object (DAO) for our SimpleData class. It will create it or just give the cached
      * value.
      */
-    public Dao<Timeslot, Integer> getDao() throws SQLException {
-        if (dao == null) {
-            dao = getDao(Timeslot.class);
+    public Dao<Timeslot, Integer> getTimeslotDAO() throws SQLException {
+        if (timeslotDAO == null) {
+            timeslotDAO = getDao(Timeslot.class);
         }
-        return dao;
+        return timeslotDAO;
+    }
+    public Dao<TargetLocationArea, Integer> getTargetLocationAreaDAO() throws SQLException {
+        if (targetareasDAO == null) {
+            targetareasDAO = getDao(TargetLocationArea.class);
+        }
+        return targetareasDAO;
     }
     /**
      * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our SimpleData class. It will
      * create it or just give the cached value. RuntimeExceptionDao only through RuntimeExceptions.
      */
-    public RuntimeExceptionDao<Timeslot, Integer> getTimeslotDao() {
-        if (runtimeExceptionDao == null) {
-            runtimeExceptionDao = getRuntimeExceptionDao(Timeslot.class);
+    public RuntimeExceptionDao<Timeslot, Integer> getTimeslotREDAO() {
+        if (timeslotREDAO == null) {
+            timeslotREDAO = getRuntimeExceptionDao(Timeslot.class);
         }
-        return runtimeExceptionDao;
+        return timeslotREDAO;
+    }
+    public RuntimeExceptionDao<TargetLocationArea, Integer> getTargetLocationAreaREDAO() {
+        if (targetareasREDAO == null) {
+            targetareasREDAO = getRuntimeExceptionDao(TargetLocationArea.class);
+        }
+        return targetareasREDAO;
     }
     /**
      * Close the database connections and clear any cached DAOs.
@@ -143,20 +184,22 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     @Override
     public void close() {
         super.close();
-        dao = null;
-        runtimeExceptionDao = null;
+        timeslotDAO = null;
+        timeslotREDAO = null;
+        targetareasDAO = null;
+        targetareasREDAO = null;
     }
 
 
     public List<Timeslot> getTimeslotsBetween(int starttime, int endtime){
-        RuntimeExceptionDao<Timeslot, Integer> dao = getTimeslotDao();
+        getTimeslotREDAO();
         List<Timeslot> timeslots = new ArrayList<Timeslot>();
 
-        QueryBuilder<Timeslot, Integer> queryBuilder = dao.queryBuilder();
+        QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
         try{
             queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
-            timeslots = dao.query(preparedQuery);
+            timeslots = timeslotREDAO.query(preparedQuery);
         } catch (SQLException e){
             e.printStackTrace();
         }
@@ -164,15 +207,28 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return timeslots;
     }
 
+    public List<TargetLocationArea> getTargetLocationAreas(){
+        getTargetLocationAreaREDAO();
+        List<TargetLocationArea> tla = new ArrayList<TargetLocationArea>();
+
+        try {
+            tla = targetareasREDAO.queryForAll();
+        } catch (Exception e){
+            e.printStackTrace();
+            tla = null;
+        }
+        return tla;
+    }
+
     public List<Timeslot> getTimeslotsBetweenActivity(int starttime, int endtime, String activityName){
-        RuntimeExceptionDao<Timeslot, Integer> dao = getTimeslotDao();
+        getTimeslotREDAO();
         List<Timeslot> timeslots = new ArrayList<Timeslot>();
 
-        QueryBuilder<Timeslot, Integer> queryBuilder = dao.queryBuilder();
+        QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
         try{
             queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime).and().eq("activity", activityName);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
-            timeslots = dao.query(preparedQuery);
+            timeslots = timeslotREDAO.query(preparedQuery);
         } catch (SQLException e){
             e.printStackTrace();
         }
@@ -181,14 +237,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     public List<Timeslot> getTimeslotsBetweenLocation(int starttime, int endtime, String locationName){
-        RuntimeExceptionDao<Timeslot, Integer> dao = getTimeslotDao();
+        getTimeslotREDAO();
         List<Timeslot> timeslots = new ArrayList<Timeslot>();
 
-        QueryBuilder<Timeslot, Integer> queryBuilder = dao.queryBuilder();
+        QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
         try{
             queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime).and().eq("location", locationName);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
-            timeslots = dao.query(preparedQuery);
+            timeslots = timeslotREDAO.query(preparedQuery);
         } catch (SQLException e){
             e.printStackTrace();
         }
@@ -197,14 +253,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     public List<Timeslot> getTimeslotsBetweenActivityLocation(int starttime, int endtime, String activityName, String locationName){
-        RuntimeExceptionDao<Timeslot, Integer> dao = getTimeslotDao();
+        getTimeslotREDAO();
         List<Timeslot> timeslots = new ArrayList<Timeslot>();
 
-        QueryBuilder<Timeslot, Integer> queryBuilder = dao.queryBuilder();
+        QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
         try{
             queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime).and().eq("activity", activityName).and().eq("location", locationName);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
-            timeslots = dao.query(preparedQuery);
+            timeslots = timeslotREDAO.query(preparedQuery);
         } catch (SQLException e){
             e.printStackTrace();
         }
