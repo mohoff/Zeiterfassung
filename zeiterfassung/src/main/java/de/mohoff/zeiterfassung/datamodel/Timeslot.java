@@ -8,9 +8,9 @@ public class Timeslot {
     @DatabaseField(generatedId = true) // autoincrement primary key
     private int _id;
     @DatabaseField(canBeNull = false, unique = true)
-    private int starttime; // in seconds
+    private long starttime; // in seconds
     @DatabaseField
-    private int endtime; // in seconds
+    private long endtime; // in seconds
     @DatabaseField(canBeNull = false)
     private String activity;
     @DatabaseField(canBeNull = false)
@@ -19,7 +19,7 @@ public class Timeslot {
 
     public Timeslot(){}
 
-    public Timeslot(int starttime, String activity, String location){
+    public Timeslot(long starttime, String activity, String location){
         this.starttime = starttime;
         this.activity = activity;
         this.location = location;
@@ -33,19 +33,19 @@ public class Timeslot {
         this._id = _id;
     }
 
-    public int getStarttime() {
+    public long getStarttime() {
         return starttime;
     }
 
-    public void setStarttime(int starttime) {
+    public void setStarttime(long starttime) {
         this.starttime = starttime;
     }
 
-    public int getEndtime() {
+    public long getEndtime() {
         return endtime;
     }
 
-    public void setEndtime(int endtime) {
+    public void setEndtime(long endtime) {
         this.endtime = endtime;
     }
 

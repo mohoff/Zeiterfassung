@@ -1,6 +1,5 @@
-package de.mohoff.zeiterfassung.googlemaps;
+package de.mohoff.zeiterfassung.legacy;
 
-import android.graphics.Camera;
 import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;

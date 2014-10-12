@@ -42,6 +42,20 @@
             android:name=".activities.AddTargetLocationArea"
             android:label="@string/title_activity_add_tla" >
         </activity>
+
+        <service
+            android:name=".LocationService"
+            android:exported="false" >
+        </service>
+
+        <activity
+            android:name=".activities.ManageTLA"
+            android:label="@string/title_activity_manage_tl" >
+        </activity>
+        <activity
+            android:name=".activities.ManageTLADetail"
+            android:label="@string/title_activity_manage_tladetail" >
+        </activity>
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung;
+package de.mohoff.zeiterfassung.legacy;
 
 import android.content.Context;
 import android.location.Location;
@@ -6,17 +6,15 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.Toast;
-import org.apache.commons.collections4.queue.CircularFifoQueue;
+import de.mohoff.zeiterfassung.LocationChangeListener;
 
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class LocationUpdater {
     private ArrayList<LocationChangeListener> locChangeListener = new ArrayList<LocationChangeListener>();
 
-    private static int amountOfTemporarySavedLocations = 10;
-    private static int timeBetweenMeasures = 1000 * 60; // in ms
+    public static int timeBetweenMeasures = 1000 * 60; // in ms
 
     private static LocationUpdater lm = null;
     private static Context ctx;
@@ -27,7 +25,6 @@ public class LocationUpdater {
     public static Location mostRecentLocation = null;
     //private RecordEntity currentLocationReference;
 
-    private CircularFifoQueue lastLocations = new CircularFifoQueue<Location>(amountOfTemporarySavedLocations); // fifo based queue
     private int counter = 0;
     private int positives = 0;
     private float percentagePositives;
@@ -75,63 +72,10 @@ public class LocationUpdater {
 
             this.locationListener = new LocationListener() {
                 public void onLocationChanged(Location location) {
-                    // this method gets invoked every 20 sec (see attribute timeBetweenMeasures
-                    // implement seperate CachedLocationHandler
+                    // this method gets invoked every X sec (see attribute timeBetweenMeasures
 
                     mostRecentLocation = location;
-
                     delegateDrawMarker(location);
-
-
-
-                    /*
-                    lastLocations.add(location);
-                    counter++;
-
-                    if(counter%5 == 0){
-                        Iterator iterator = lastLocations.iterator();
-
-
-                        while(iterator.hasNext()){
-                            Location loc = (Location) iterator.next();
-                            //if(getRecordMatching(loc) != null) {
-                            //   positives++;
-                            //}
-
-                        }
-                        percentagePositives = (float) positives / lastLocations.size();
-
-
-
-
-
-
-                        if(percentagePositives > 0.9){
-                            if(!openTimeslot){
-                                long startTime = System.currentTimeMillis()/1000 - timeBetweenMeasures/1000 * (lastLocations.size()-1);
-                                //currentLocationReference = getRecordMatching(location);
-                                // location hat getTimestamp methode...
-                                //db.startNewTimeslot(startTime, currentLocationReference.getUsageName(), currentLocationReference.getLocationName());
-                                //float slope = getAverageSlope();
-                            }
-                            openTimeslot = true;
-                            // start GPS to verify user entered location (not possible when GPS isn't enabled by the user manually)
-                        } else if (percentagePositives < 0.1){
-                            if(openTimeslot){
-                                long endTime = System.currentTimeMillis()/1000 - timeBetweenMeasures/1000 * (lastLocations.size()-1);
-                                //db.endCurrentTimeslot(endTime);
-                                //float slope = getAverageSlope();
-                            }
-                            openTimeslot = false;
-                            // start GPS to verify user entered location (not possible when GPS isn't enabled by the user manually)
-                        }
-
-
-                        positives = 0;
-                        counter = 0;
-
-                    }
-                    */
                 }
 
                 public void onStatusChanged(String provider, int status, Bundle extras) {}

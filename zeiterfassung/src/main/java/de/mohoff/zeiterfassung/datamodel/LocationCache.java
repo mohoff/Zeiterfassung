@@ -7,28 +7,34 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
  * Created by Moritz on 03.10.2014.
  */
 public class LocationCache {
-    private static int amountOfTemporarySavedLocations = 10;
-    private static float interpolationVariance = 5;
+    public int amountOfTemporarySavedLocations;
+    private static float interpolationVariance = 1;
 
     private CircularFifoQueue locationCache; // fifo based queue
-    private LatLng interpolatedPosition;
+    private CircularFifoQueue interpolatedCache; // fifo based queue
+    private Loc interpolatedPosition;
     // interpolated position cache anlegen
 
 
     public LocationCache(int amountOfFields){
         amountOfTemporarySavedLocations = amountOfFields;
         locationCache = new CircularFifoQueue<Loc>(amountOfTemporarySavedLocations);
+        interpolatedCache = new CircularFifoQueue<Loc>(amountOfTemporarySavedLocations);
     }
 
     public float validateInBoundsForTLA(TargetLocationArea tla){
         float result = 0;
-        int positives = 0;
-        for(Loc loc : interpolatedCache){
-            // to do
+        float positives = 0;
+
+        for(int i=0; i<interpolatedCache.size(); i++){
+            Loc loc = (Loc)interpolatedCache.get(i);
+            int distanceToTLABorder = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude())) - tla.getRadius();
+            if(distanceToTLABorder < 0){
+                positives++;
+            }
         }
 
-
-        return 0f;
+        return positives/(float)interpolatedCache.size();
     }
 
     public static double getPenaltyFromAccuracy(double acc){
@@ -50,9 +56,11 @@ public class LocationCache {
 
     }
 
+    public boolean isFull(){
+        return locationCache.size() == locationCache.maxSize();
+    }
 
-
-    public LatLng getInterpolatedPosition() {
+    public Loc getInterpolatedPosition() {
         return interpolatedPosition;
     }
 
@@ -76,7 +84,8 @@ public class LocationCache {
             lngSumZaehler += loc.getLongitude() * score[i];
         }
 
-        interpolatedPosition = new LatLng(latSumZaehler/scoreSum, lngSumZaehler/scoreSum);
+        interpolatedPosition = new Loc(latSumZaehler/scoreSum, lngSumZaehler/scoreSum);
+        interpolatedCache.add(interpolatedPosition);
         /*
         for(int i=0; i<cacheSize; i++){
             Location currentLoc = (Location) locationCache.get(i);

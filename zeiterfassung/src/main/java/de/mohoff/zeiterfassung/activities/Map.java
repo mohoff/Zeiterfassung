@@ -1,12 +1,11 @@
 package de.mohoff.zeiterfassung.activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
@@ -14,8 +13,8 @@ import android.widget.EditText;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
 import de.mohoff.zeiterfassung.LocationChangeListener;
-import de.mohoff.zeiterfassung.LocationUpdateHandler;
-import de.mohoff.zeiterfassung.LocationUpdater;
+import de.mohoff.zeiterfassung.legacy.LocationUpdateHandler;
+import de.mohoff.zeiterfassung.legacy.LocationUpdater;
 import de.mohoff.zeiterfassung.R;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
@@ -34,7 +33,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
     Marker markerCandidate = null;
     Circle circle = null;
 
-    private int amountOfTemporarySavedLocations = 10;
+    private int amountOfTemporarySavedLocations = 5;
     private CircularFifoQueue locationCache = new CircularFifoQueue<Location>(amountOfTemporarySavedLocations); // fifo based queue
 
     EditText et;
@@ -53,9 +52,10 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
         setUpMapIfNeeded();
         lu.addTheListener(this);
 
-
+        /*
         et = (EditText) findViewById(R.id.editText);
         updateRadiusFromEditText();
+        */
 
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -86,7 +86,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
                 }
             }
         });
-
+        /*
         et.addTextChangedListener(new TextWatcher(){
             public void afterTextChanged(Editable s) {
                 updateRadiusFromEditText();
@@ -97,7 +97,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
             public void beforeTextChanged(CharSequence s, int start, int count, int after){}
             public void onTextChanged(CharSequence s, int start, int before, int count){}
         });
-
+        */
         map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
             public void onMarkerDragStart(Marker arg0) {
@@ -143,7 +143,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
         }
         try {
             // may cause racecondition with second listener implemenatation (following line might get old interpolated position)
-            drawMarkerForLatLng(luh.getInterpolatedPosition());
+            drawMarkerForLatLng(luh.getInterpolatedPositionInLatLng());
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -175,7 +175,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
         );
     }
-
+    /*
     public void updateRadiusFromEditText(){
         String inputString = et.getText().toString();
         try{
@@ -184,7 +184,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
             radius = -1;
         }
     }
-
+    */
     @Override
     protected void onResume() {
         super.onResume();
@@ -203,11 +203,26 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+
+        switch(item.getItemId()) {
+            case R.id.home:
+            case android.R.id.home:
+                Intent intent = new Intent(Map.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+                //overridePendingTransition(R.anim.enter_from_left, R.anim.exit_out_right);
+                return true;
+            case R.id.action_settings:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+        /*int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);*/
     }
 
     private void setUpMapIfNeeded() {

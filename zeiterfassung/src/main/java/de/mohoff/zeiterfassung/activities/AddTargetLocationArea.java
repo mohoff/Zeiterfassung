@@ -1,6 +1,8 @@
 package de.mohoff.zeiterfassung.activities;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
@@ -8,23 +10,25 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.*;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.*;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import de.mohoff.zeiterfassung.LocationUpdater;
+import de.mohoff.zeiterfassung.legacy.LocationUpdater;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class AddTargetLocationArea extends ActionBarActivity{
@@ -135,7 +139,7 @@ public class AddTargetLocationArea extends ActionBarActivity{
     public void drawExistingTargetLocationAreas(){
         getDbHelper();
 
-        for(TargetLocationArea tla : dbHelper.getTargetLocationAreas()){
+        for(TargetLocationArea tla : dbHelper.getTLAs()){
             LatLng latLng = new LatLng(tla.getLatitude(), tla.getLongitude());
             markers.add(map.addMarker(new MarkerOptions()
                             .position(latLng)
@@ -186,16 +190,14 @@ public class AddTargetLocationArea extends ActionBarActivity{
         item.setVisible(false);
     }
 
-    private void insertCandidateIntoDB(){
+    private int insertCandidateIntoDB(String activityName, String locationName){
         getDbHelper();
-        int status = dbHelper.createNewTargetLocationArea(candidateMarker.getPosition().latitude, candidateMarker.getPosition().longitude, radius, "work", "ibm");
-        if(status == 1){
-            Toast toast = Toast.makeText(this, "db insert successful", Toast.LENGTH_LONG);
-            toast.show();
-        } else {
-            Toast toast = Toast.makeText(this, "db insert failed", Toast.LENGTH_LONG);
-            toast.show();
-        }
+        double lat = candidateMarker.getPosition().latitude;
+        double lng = candidateMarker.getPosition().longitude;
+        int rad = radius;
+
+        int status = dbHelper.createNewTargetLocationArea(lat, lng, rad, activityName, locationName);
+        return status;
     }
 
     private void cancelCandidate(){
@@ -217,6 +219,61 @@ public class AddTargetLocationArea extends ActionBarActivity{
         return true;
     }
 
+    public void showDetailPopup(){
+        getDbHelper();
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View layout = inflater.inflate(R.layout.activity_add_tla_popup, null);
+
+        final Spinner spinner = (Spinner)layout.findViewById(R.id.spinner);
+
+        List<String> spinnerList = dbHelper.getDistinctActivityNames();
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerList);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spinnerAdapter);
+
+        final EditText locationInput = (EditText)findViewById(R.id.editText);
+
+        AlertDialog dialog;
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setTitle("Choose Activity and Location Name");
+        dialogBuilder.setView(layout);
+        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        final Context ctx = this;
+        dialogBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String chosenActivityName = spinner.getSelectedItem().toString();
+                String chosenLocationName = locationInput.getText().toString();
+                // validate locationName input. empty string not allowed
+                if(chosenLocationName.equals("")){
+                    Toast toast = Toast.makeText(ctx, "empty string not allowed for location name", Toast.LENGTH_LONG);
+                    toast.show();
+                    return;
+                }
+
+                // try to insert into DB. user feedback with toasts
+                if(insertCandidateIntoDB(chosenActivityName, chosenLocationName) != 1){
+                    Toast toast = Toast.makeText(ctx, "db insert failed. input not unique? try again!", Toast.LENGTH_LONG);
+                    toast.show();
+                    return;
+                } else {
+                    Toast toast = Toast.makeText(ctx, "db insert successful", Toast.LENGTH_LONG);
+                    toast.show();
+                    dialog.dismiss();
+                    cancelCandidate();
+                }
+            }
+        });
+        dialog = dialogBuilder.create();
+        dialog.show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -233,7 +290,8 @@ public class AddTargetLocationArea extends ActionBarActivity{
             case R.id.action_settings:
                 return true;
             case R.id.action_save:
-                insertCandidateIntoDB();
+                showDetailPopup();
+                //insertCandidateIntoDB();
                 return true;
             case R.id.action_cancel:
                 cancelCandidate();

@@ -8,5 +8,7 @@
     <string name="action_cancel">Cancel</string>
     <string name="title_activity_map">Map</string>
     <string name="title_activity_add_tla">Add New TargetLocationArea</string>
+    <string name="title_activity_manage_tl">ManageTLA</string>
+    <string name="title_activity_manage_tladetail">ManageTLADetail</string>
 
 </resources>

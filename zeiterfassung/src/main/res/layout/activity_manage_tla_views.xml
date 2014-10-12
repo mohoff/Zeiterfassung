@@ -1,0 +1,68 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dip">
+
+    <ImageView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="10dip"
+            android:layout_marginLeft="10dip"
+            android:src="@drawable/status_locationservice"
+            />
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/icon" android:layout_toEndOf="@+id/icon">
+        <TextView
+                android:id="@+id/locationName"
+                android:layout_width="223dp"
+                android:layout_height="wrap_content"
+
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@id/icon"
+                android:gravity="center_vertical"
+                android:text="location"
+                android:textSize="30sp"
+                />
+        <TextView
+                android:id="@+id/activityName"
+                android:layout_width="226dp"
+                android:layout_height="20dip"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_toRightOf="@id/icon"
+                android:singleLine="true"
+                android:text="activity"
+        />
+    </LinearLayout>
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent" android:layout_alignParentBottom="false"
+            android:layout_alignParentRight="true" android:layout_alignParentEnd="true">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:id="@+id/radius" android:text="Radius: 100m" android:layout_gravity="right"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="lat:"
+                android:id="@+id/lat" android:layout_gravity="right"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="lng:"
+                android:id="@+id/lng" android:layout_gravity="right"/>
+    </LinearLayout>
+
+
+</RelativeLayout>

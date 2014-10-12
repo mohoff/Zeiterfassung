@@ -1,9 +1,12 @@
 package de.mohoff.zeiterfassung.database;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
+import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.stmt.DeleteBuilder;
@@ -60,9 +63,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return (int) dao2.countOf();*/
     }
 
-    public int startNewTimeslot(int minutes, String activityName, String locationName){
+    public int startNewTimeslot(long millis, String activityName, String locationName){
         getTimeslotREDAO();
-        Timeslot ts = new Timeslot(minutes, activityName, locationName);
+        Timeslot ts = new Timeslot(millis, activityName, locationName);
         int result = -1;
         result = timeslotREDAO.create(ts);
         amountOfTimeslots++;
@@ -92,18 +95,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int sealCurrentTimeslot(int minutes){
+    public int sealCurrentTimeslot(long millis){ // seals newest TS
         getTimeslotREDAO();
 
         // approach 1
         Timeslot toUpdate = timeslotREDAO.queryForId(getAmountOfTimeslots());     // does this work? does it count from 0 or 1 or not even autoincrement?
-        toUpdate.setEndtime(minutes);
+        toUpdate.setEndtime(millis);
         timeslotREDAO.update(toUpdate);
 
         // approach 2
         UpdateBuilder<Timeslot, Integer> updateBuilder = timeslotREDAO.updateBuilder();
         try {
-            updateBuilder.updateColumnValue("endtime", minutes);
+            updateBuilder.updateColumnValue("endtime", millis);
             updateBuilder.where().isNull("endtime");        // only update the rows where password is null
             updateBuilder.update();
             return 1;
@@ -207,7 +210,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return timeslots;
     }
 
-    public List<TargetLocationArea> getTargetLocationAreas(){
+    public List<TargetLocationArea> getTLAs(){
         getTargetLocationAreaREDAO();
         List<TargetLocationArea> tla = new ArrayList<TargetLocationArea>();
 
@@ -218,6 +221,40 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             tla = null;
         }
         return tla;
+    }
+
+    public Cursor getCursorForTLAs(){
+        Cursor c = null;
+        QueryBuilder<TargetLocationArea, Integer> queryBuilder = targetareasREDAO.queryBuilder();
+        //qb.where()...;
+
+        try {
+            PreparedQuery<TargetLocationArea> query = queryBuilder.prepare();
+            CloseableIterator<TargetLocationArea> iterator = targetareasDAO.iterator(query);
+            AndroidDatabaseResults results =
+                    (AndroidDatabaseResults)iterator.getRawResults();
+            c = results.getRawCursor();
+            iterator.closeQuietly();
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+        return c;
+    }
+
+    public List<String> getDistinctActivityNames(){
+        getTargetLocationAreaREDAO();
+        List<String> activities = new ArrayList<String>();
+
+        QueryBuilder<TargetLocationArea, Integer> queryBuilder = targetareasREDAO.queryBuilder();
+        try{
+            List<TargetLocationArea> matches = queryBuilder.distinct().selectColumns("activityName").query();
+            for(TargetLocationArea tla : matches){
+                activities.add(tla.getActivityName());
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return activities;
     }
 
     public List<Timeslot> getTimeslotsBetweenActivity(int starttime, int endtime, String activityName){

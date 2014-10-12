@@ -4,7 +4,7 @@ public class Loc {
 
     private double latitude;            // mandatory
     private double longitude;           // mandatory
-    private int timestampInMinutes;     // mandatory
+    private long timestampInMillis;     // mandatory
     private double accuracyPenalty;
     private int altitude;
     private int speed;
@@ -14,23 +14,23 @@ public class Loc {
         this.longitude = longitude;
     }
 
-    public Loc(double latitude, double longitude, int timestampInMinutes) {
+    public Loc(double latitude, double longitude, long timestampInMillis) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.timestampInMinutes = timestampInMinutes;
+        this.timestampInMillis = timestampInMillis;
     }
 
-    public Loc(double latitude, double longitude, int timestampInMinutes, double accuracyPenalty) {
+    public Loc(double latitude, double longitude, long timestampInMillis, double accuracyPenalty) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.timestampInMinutes = timestampInMinutes;
+        this.timestampInMillis = timestampInMillis;
         this.accuracyPenalty = accuracyPenalty;
     }
 
-    public Loc(double latitude, double longitude, int timestampInMinutes, double accuracyPenalty, int altitude, int speed) {
+    public Loc(double latitude, double longitude, long timestampInMillis, double accuracyPenalty, int altitude, int speed) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.timestampInMinutes = timestampInMinutes;
+        this.timestampInMillis = timestampInMillis;
         this.accuracyPenalty = accuracyPenalty;
         this.altitude = altitude;
         this.speed = speed;
@@ -110,12 +110,12 @@ public class Loc {
         this.altitude = altitude;
     }
 
-    public int getTimestampInMinutes() {
-        return timestampInMinutes;
+    public long getTimestampInMillis() {
+        return timestampInMillis;
     }
 
-    public void setTimestampInMinutes(int timestampInMinutes) {
-        this.timestampInMinutes = timestampInMinutes;
+    public void setTimestampInMillis(long timestampInMinutes) {
+        this.timestampInMillis = timestampInMillis;
     }
 
 
