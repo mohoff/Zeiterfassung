@@ -65,20 +65,47 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public int startNewTimeslot(long millis, String activityName, String locationName){
         getTimeslotREDAO();
-        Timeslot ts = new Timeslot(millis, activityName, locationName);
-        int result = -1;
-        result = timeslotREDAO.create(ts);
-        amountOfTimeslots++;
 
-        return result;
+        // check if timeslots are unsealed and already existing for passed activityName and locationName
+        List<Timeslot> existingTimeslotsForActAndLoc = new ArrayList<Timeslot>();
+        QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
+        try{
+            queryBuilder.where().eq("endtime", 0).and().eq("activity", activityName).and().eq("location", locationName);
+            PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
+            existingTimeslotsForActAndLoc = timeslotREDAO.query(preparedQuery); // assumed there is only one "open" timeslot allowed for any time t
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        if(existingTimeslotsForActAndLoc.isEmpty()){
+            // timeslot not yet created/open
+            Timeslot ts = new Timeslot(millis, activityName, locationName);
+            int result = -1;
+            result = timeslotREDAO.create(ts);
+            amountOfTimeslots++;
+            return result;
+        } else {
+            // timeslot with this locationName and activityName is already open --> don't create new one
+            return -1;
+        }
     }
 
     // in deployment: split activity- and location-creation
     public int createNewTargetLocationArea(double latitude, double longitude, int radius, String activity, String location){
         getTargetLocationAreaREDAO();
+
         TargetLocationArea tla = new TargetLocationArea((float)latitude, (float)longitude, radius, activity, location);
         int result = -1;
-        result = targetareasREDAO.create(tla);
+
+        try {
+            getTargetLocationAreaDAO();
+            result = targetareasDAO.create(tla);
+        } catch(SQLException e){
+
+        }
+
+
+        //result = targetareasREDAO.create(tla);
 
         return result;
     }
@@ -116,6 +143,20 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
+    public int sealThisTimeslot(Timeslot ts, long millis){
+        getTimeslotREDAO();
+        ts.setEndtime(millis);
+        return timeslotREDAO.update(ts);
+    }
+
+    public void _createSampleTLAs(){
+        int status;
+        status = createNewTargetLocationArea(48.743715, 9.095967, 50, "home", "allmandring 26d");
+        status = createNewTargetLocationArea(48.742120 ,9.101002, 100, "uni", "hdm raum 011");
+        status = createNewTargetLocationArea(48.745847, 9.105381, 50, "sbahn", "station uni");
+        status = createNewTargetLocationArea(48.665458, 9.037194, 150, "work", "ibm boeblingen");
+    }
+
 
     /**
      * This is called when the database is first created. Usually you should call createTable statements here to create
@@ -131,6 +172,17 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
             throw new RuntimeException(e);
         }
+
+
+
+        // allmandring 26d:     48.743715 , 9.095967
+        // hdm:                 48.742120 , 9.101002
+        // sbahn station uni:   48.745847 , 9.105381
+        // ibm bb:              48.665458 , 9.037194
+
+
+
+
     }
     /**
      * This is called when your application is upgraded and it has a higher version number. This allows you to adjust
@@ -208,6 +260,22 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
 
         return timeslots;
+    }
+
+    public List<Timeslot> getAllUnsealedTimeslots(){
+        getTimeslotREDAO();
+        List<Timeslot> unsealed = new ArrayList<Timeslot>();
+
+        QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
+        try{
+            queryBuilder.where().eq("endtime", 0);
+            PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
+            unsealed = timeslotREDAO.query(preparedQuery);
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return unsealed;
     }
 
     public List<TargetLocationArea> getTLAs(){

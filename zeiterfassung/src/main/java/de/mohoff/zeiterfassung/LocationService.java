@@ -21,14 +21,15 @@ import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
+import de.mohoff.zeiterfassung.datamodel.Timeslot;
 import de.mohoff.zeiterfassung.legacy.LocationUpdater;
 
-import java.util.List;
+import java.util.*;
 
 public class LocationService extends Service {
     private final LocalBinder binder = new LocalBinder();
 
-    public static int timeBetweenMeasures = 1000 * 60; // in ms
+    public static int timeBetweenMeasures = 1000 * 5; // in ms // 1000 * 60;
     private static float boundaryTreshold = 0.8f;
     private static int amountOfTemporarySavedLocations = 5;
     private static String locationProviderType = android.location.LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
@@ -44,6 +45,8 @@ public class LocationService extends Service {
     private boolean inBound = false;
     private int numberOfUpdates = 0;
     private TargetLocationArea nearestTLA = null;
+    private List<TargetLocationArea> TLAs = new ArrayList<TargetLocationArea>();
+    private List<TargetLocationArea> inBoundTLAs = new ArrayList<TargetLocationArea>();
 
     @Override
     public boolean stopService(Intent name) {
@@ -58,6 +61,9 @@ public class LocationService extends Service {
     }
     @Override
     public IBinder onBind(Intent intent) {
+        getHelper();
+        databaseHelper._createSampleTLAs();
+
         return binder;
         //throw new UnsupportedOperationException("Not yet implemented");
     }
@@ -69,7 +75,7 @@ public class LocationService extends Service {
         locCache = new LocationCache(amountOfTemporarySavedLocations);
 
         Notification notification = new Notification.Builder(this)
-                .setContentTitle("Location Trackin")
+                .setContentTitle("Location Tracking")
                 .setContentText("Location Tracking active")
                 .setSmallIcon(R.drawable.status_locationservice)
                 .setOngoing(false)
@@ -90,6 +96,7 @@ public class LocationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         locationmanager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         this.mostRecentLocation = locationmanager.getLastKnownLocation(locationProviderType);
+        updateTLAs();
 
         if (isNetworkEnabled()){
             locationListener = new LocationListener() {
@@ -99,6 +106,9 @@ public class LocationService extends Service {
                     // implement seperate CachedLocationHandler
                     Toast toast = Toast.makeText(LocationService.this, "onLocationChanged() called", Toast.LENGTH_LONG);
                     //toast.show();
+
+
+
                     handleLocationUpdate(location);
                 }
 
@@ -143,6 +153,22 @@ public class LocationService extends Service {
         return this.locationmanager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
+    public void updateTLAs(){
+        getHelper();
+        this.TLAs = databaseHelper.getTLAs();
+    }
+
+    public void updateInBoundTLAs(){
+        inBoundTLAs.clear();
+
+        for(TargetLocationArea tla : TLAs){
+            float prox = locCache.getCurrentInBoundProxFor(tla);
+            if(prox > boundaryTreshold){
+                inBoundTLAs.add(tla);
+            }
+        }
+    }
+
     public void updateNearestTLA(Loc currentLoc){
         getHelper();
         Loc loc = currentLoc; //convertLatLngToLoc(currentLoc);
@@ -159,17 +185,65 @@ public class LocationService extends Service {
         }
     }
 
-    public void handleLocationUpdate(Location loc){
-        // markers get drawn in Map-Activity
-        Loc currentLoc = convertLocationToLoc(loc);
-        locCache.addLocationUpdate(currentLoc);
-        float locationsInBound = 0;
+    public void showToastWithMsg(String msg){
+        Toast toast = Toast.makeText(LocationService.this, msg, Toast.LENGTH_LONG);
+        toast.show();
+    }
 
-        if(numberOfUpdates%2 == 0) {     // update nearest location every 2 minutes
-            updateNearestTLA(locCache.getInterpolatedPosition());
+    public void updateTLAsAndTimeslots(){
+        updateInBoundTLAs();
+
+        // compare inBoundTLAs with "open" DB entries
+        List<Timeslot> unsealedTimeslots = databaseHelper.getAllUnsealedTimeslots();
+        List<Timeslot> satisfiedTimeslots = new ArrayList<Timeslot>();
+
+        // start timeslots + retrieve timeslots which should get sealed
+        for(TargetLocationArea tla : inBoundTLAs){
+            for(Timeslot ts : unsealedTimeslots){
+                if((ts.getActivity().equals(tla.getActivityName())) && (ts.getLocation().equals(tla.getLocationName()))){
+                    satisfiedTimeslots.add(ts);
+                    break;
+                    // match, no update required
+                }
+            }
+            int status = databaseHelper.startNewTimeslot(getNormalizedTimestamp(), tla.getActivityName(), tla.getLocationName());
+            if(status == 1){
+                showToastWithMsg("new timeslot in DB started");
+            } else {
+                showToastWithMsg("error starting new timelsot in DB");
+            }
         }
 
+        // seal timeslots
+        unsealedTimeslots.removeAll(satisfiedTimeslots); // unsealedTimeslots ist jetzt List für unsatisfied Timeslots
+        for(Timeslot shouldSeal : unsealedTimeslots){
+            int status = databaseHelper.sealThisTimeslot(shouldSeal, getNormalizedTimestamp());
+            if(status == 1){
+                showToastWithMsg("timeslot successfully sealed in DB");
+            } else {
+                showToastWithMsg("error sealing timelsot in DB");
+            }
+        }
+    }
+
+
+    public void handleLocationUpdate(Location loc){
+        Loc currentLoc = convertLocationToLoc(loc);
+        locCache.addLocationUpdate(currentLoc);
+        boolean cacheIsFull = locCache.isFull();
+        numberOfUpdates++;
+
+        if((numberOfUpdates%1 == 0) && cacheIsFull){
+            updateTLAsAndTimeslots();
+        }
+
+
+
+        // LEGACY
+        /*
+        float locationsInBound = 0;
         locationsInBound = locCache.validateInBoundsForTLA(nearestTLA);
+
         // check if user entered TLA
         boolean tmp = locCache.isFull();
         if((locationsInBound > boundaryTreshold) && (!inBound) && (locCache.isFull())){
@@ -195,7 +269,7 @@ public class LocationService extends Service {
             inBound = false;
             sendMessageViaBroadcast("openTimeslotSealed", timestampToPersist, nearestTLA.getActivityName(), nearestTLA.getLocationName());
         }
-        numberOfUpdates++;
+        */
     }
 
     // broadcast custom events
@@ -213,6 +287,10 @@ public class LocationService extends Service {
     public static long getPastTimestampForBoundaryEvents(Loc loc){
         //return loc.getTimestampInMillis() - (int)((amountOfTemporarySavedLocations-amountOfTemporarySavedLocations*boundaryTreshold) * LocationUpdater.timeBetweenMeasures);
         return loc.getTimestampInMillis() - amountOfTemporarySavedLocations * LocationUpdater.timeBetweenMeasures;
+    }
+
+    public static long getNormalizedTimestamp(){
+        return System.currentTimeMillis() - (long)(boundaryTreshold * amountOfTemporarySavedLocations * LocationUpdater.timeBetweenMeasures);
     }
 
     public Loc getInterpolatedPosition() {

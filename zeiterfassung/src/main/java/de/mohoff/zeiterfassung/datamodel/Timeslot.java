@@ -10,7 +10,7 @@ public class Timeslot {
     @DatabaseField(canBeNull = false, unique = true)
     private long starttime; // in seconds
     @DatabaseField
-    private long endtime; // in seconds
+    private long endtime = 0; // in seconds
     @DatabaseField(canBeNull = false)
     private String activity;
     @DatabaseField(canBeNull = false)

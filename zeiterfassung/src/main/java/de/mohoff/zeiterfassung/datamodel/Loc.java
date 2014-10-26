@@ -57,17 +57,17 @@ public class Loc {
         int earthRadius = 6371; // km
 
         double loc1LatInRadians = Math.toRadians(this.getLatitude());
-        double loc2LatInRadians = Math.toRadians(this.getLatitude());
-        double latDiffInRadians = Math.toRadians(targetLoc.getLatitude() - targetLoc.getLatitude());
-        double lngDiffInRadians = Math.toRadians(targetLoc.getLongitude() - targetLoc.getLongitude());
+        double loc2LatInRadians = Math.toRadians(targetLoc.getLatitude());
+        double latDiffInRadians = Math.toRadians(targetLoc.getLatitude() - this.getLatitude());
+        double lngDiffInRadians = Math.toRadians(targetLoc.getLongitude() - this.getLongitude());
 
         double a = Math.sin(latDiffInRadians/2) * Math.sin(latDiffInRadians/2) +
                 Math.cos(loc1LatInRadians) * Math.cos(loc2LatInRadians) *
                         Math.sin(lngDiffInRadians/2) * Math.sin(lngDiffInRadians/2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        double distance = earthRadius * c;
+        double distance = earthRadius * c * 1000;
 
-        return (int) distance;
+        return (int) distance; // * 1000 for km?
     }
 
     public double getLatitude() {

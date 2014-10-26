@@ -37,6 +37,22 @@ public class LocationCache {
         return positives/(float)interpolatedCache.size();
     }
 
+    public float getCurrentInBoundProxFor(TargetLocationArea tla){
+        float positives = 0;
+        float all = locationCache.maxSize();
+
+        for(int i=0; i<interpolatedCache.size(); i++){
+            Loc loc = (Loc)interpolatedCache.get(i);
+            //int distanceDebug = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude()));
+            int distanceTLABorderToUser = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude())) - tla.getRadius();
+            if(distanceTLABorderToUser < 0){
+                positives++;
+            }
+        }
+        return positives/all;
+    }
+
+
     public static double getPenaltyFromAccuracy(double acc){
         double accuracyPenalty = 0.0;
         if(acc > 30){  // dont apply penalty if accuracy is <= 30m
