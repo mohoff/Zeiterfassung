@@ -1,6 +1,8 @@
 package de.mohoff.zeiterfassung.activities;
 
 import android.content.*;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
@@ -41,12 +43,15 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         getDbHelper();
 
+        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
+
         /*// START SERVICE
         Intent i = new Intent(this, LocationService.class);
         // potentially add data to the intent
         //i.putExtra("KEY1", "Value to be used by the service");
         this.startService(i);
         */
+
 
         sdf = new SimpleDateFormat("dd.MM.yyyy - HH:mm");
         outputTV = (TextView) findViewById(R.id.textView2);

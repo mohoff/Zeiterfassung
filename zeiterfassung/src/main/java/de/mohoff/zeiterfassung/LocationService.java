@@ -29,7 +29,7 @@ import java.util.*;
 public class LocationService extends Service {
     private final LocalBinder binder = new LocalBinder();
 
-    public static int timeBetweenMeasures = 1000 * 5; // in ms // 1000 * 60;
+    public static int timeBetweenMeasures = 1000 * 60; // in ms // 1000 * 60;
     private static float boundaryTreshold = 0.8f;
     private static int amountOfTemporarySavedLocations = 5;
     private static String locationProviderType = android.location.LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
@@ -217,7 +217,8 @@ public class LocationService extends Service {
         // seal timeslots
         unsealedTimeslots.removeAll(satisfiedTimeslots); // unsealedTimeslots ist jetzt List für unsatisfied Timeslots
         for(Timeslot shouldSeal : unsealedTimeslots){
-            int status = databaseHelper.sealThisTimeslot(shouldSeal, getNormalizedTimestamp());
+            int id = shouldSeal.get_id();
+            int status = databaseHelper.sealThisTimeslot(id, getNormalizedTimestamp());
             if(status == 1){
                 showToastWithMsg("timeslot successfully sealed in DB");
             } else {

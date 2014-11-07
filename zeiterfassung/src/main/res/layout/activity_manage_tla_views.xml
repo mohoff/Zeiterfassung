@@ -1,68 +1,88 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:background="#ff03426A"
+                  android:paddingLeft="10dip"
+                  android:paddingRight="10dip"
+                  android:paddingTop="5dip"
+                  android:paddingBottom="5dip"
+                  android:id="@+id/activityWrapper">
+
+        <RelativeLayout
+                android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dip">
+                android:layout_height="fill_parent"
+                android:gravity="center_vertical"
+                android:id="@+id/activityWrapperLeft">
+            <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/activityName"
+                    android:text="ACTIVITY NAME"
+                    android:textColor="#99FFFFFF"
+                    android:layout_marginLeft="10dip"
+                    android:textCursorDrawable="@null"
+                    android:layout_toRightOf="@+id/activityIcon"/>
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:src="@drawable/status_locationservice"
+                    android:id="@+id/activityIcon"
+                    android:layout_alignParentLeft="true"
+                    />
+                    <!--android:background="#00000000"/>-->
+            <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/deleteActivityButton"
+                    android:src="@drawable/ic_action_discard"
+                    android:background="#00000000"
+                    android:layout_alignParentRight="true"/>
+        </RelativeLayout>
 
-    <ImageView
-            android:id="@+id/icon"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="10dip"
-            android:layout_marginLeft="10dip"
-            android:src="@drawable/status_locationservice"
-            />
 
+    </LinearLayout>
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/icon" android:layout_toEndOf="@+id/icon">
-        <TextView
-                android:id="@+id/locationName"
-                android:layout_width="223dp"
-                android:layout_height="wrap_content"
-
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@id/icon"
-                android:gravity="center_vertical"
-                android:text="location"
-                android:textSize="30sp"
-                />
-        <TextView
-                android:id="@+id/activityName"
-                android:layout_width="226dp"
-                android:layout_height="20dip"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_toRightOf="@id/icon"
-                android:singleLine="true"
-                android:text="activity"
-        />
+            android:layout_height="fill_parent"
+            android:background="#ff24587A"
+            android:id="@+id/locationWrapper" android:padding="10dip">
+        <!--<LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+            <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent" android:layout_weight="9">
+                <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/editText2" android:text="allmandring 26d"/>
+            </RelativeLayout>
+            <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent" android:layout_weight="1"
+                    android:gravity="center_vertical">
+                <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/imageButton2" android:background="#00000000"
+                        android:src="@drawable/ic_action_edit"/>
+                <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/imageButton3" android:src="@drawable/ic_action_discard"
+                        android:background="#00000000"/>
+            </LinearLayout>
+        </LinearLayout>-->
     </LinearLayout>
-
-    <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent" android:layout_alignParentBottom="false"
-            android:layout_alignParentRight="true" android:layout_alignParentEnd="true">
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:id="@+id/radius" android:text="Radius: 100m" android:layout_gravity="right"/>
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="lat:"
-                android:id="@+id/lat" android:layout_gravity="right"/>
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="lng:"
-                android:id="@+id/lng" android:layout_gravity="right"/>
-    </LinearLayout>
-
-
-</RelativeLayout>
+</LinearLayout>

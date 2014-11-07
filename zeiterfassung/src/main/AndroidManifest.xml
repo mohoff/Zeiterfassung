@@ -50,7 +50,8 @@
 
         <activity
             android:name=".activities.ManageTLA"
-            android:label="@string/title_activity_manage_tl" >
+            android:label="@string/title_activity_manage_tl"
+            android:windowSoftInputMode="adjustPan"> <!-- listView- vs editView-focus workaround -->
         </activity>
         <activity
             android:name=".activities.ManageTLADetail"

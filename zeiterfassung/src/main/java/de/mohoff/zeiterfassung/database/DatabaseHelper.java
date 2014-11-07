@@ -143,15 +143,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int sealThisTimeslot(Timeslot ts, long millis){
+    public int sealThisTimeslot(int id, long millis){
         getTimeslotREDAO();
-        ts.setEndtime(millis);
-        return timeslotREDAO.update(ts);
+
+        Timeslot toSeal = timeslotREDAO.queryForId(getAmountOfTimeslots());
+        toSeal.setEndtime(millis);
+        return timeslotREDAO.update(toSeal);
     }
 
     public void _createSampleTLAs(){
         int status;
-        status = createNewTargetLocationArea(48.743715, 9.095967, 50, "home", "allmandring 26d");
+        status = createNewTargetLocationArea(48.743715, 9.095967, 50, "home", "vaihingen allmandring 26d");
+        status = createNewTargetLocationArea(48.243962, 9.928635, 75, "home", "burgrieden mittelweg 10");
         status = createNewTargetLocationArea(48.742120 ,9.101002, 100, "uni", "hdm raum 011");
         status = createNewTargetLocationArea(48.745847, 9.105381, 50, "sbahn", "station uni");
         status = createNewTargetLocationArea(48.665458, 9.037194, 150, "work", "ibm boeblingen");

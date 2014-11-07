@@ -3,6 +3,7 @@ package de.mohoff.zeiterfassung.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -45,6 +46,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
 
         lu = LocationUpdater.getInstance(this);
         luh = LocationUpdateHandler.getInstance(this);

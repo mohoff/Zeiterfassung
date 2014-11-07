@@ -1,6 +1,8 @@
 package de.mohoff.zeiterfassung.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -27,14 +29,17 @@ public class ManageTLA extends ActionBarActivity {
         setContentView(R.layout.activity_manage_tla);
         getDbHelper();
 
+        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
 
-
-        adapter = new ListAdapterTLA(this, getAllTLAs());
+        adapter = new ListAdapterTLA(this);
         final ListView lv = (ListView) findViewById(R.id.listView);
+        lv.setItemsCanFocus(true);
+        lv.setClickable(false);
         lv.setAdapter(adapter);
+
         //setListAdapter(adapter);
 
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(ManageTLA.this, ManageTLADetail.class);
@@ -42,7 +47,7 @@ public class ManageTLA extends ActionBarActivity {
                 startActivity(intent);
                 //overridePendingTransition(R.anim.enter_from_right, R.anim.exit_out_left);
             }
-        });
+        });*/
 
     }
 

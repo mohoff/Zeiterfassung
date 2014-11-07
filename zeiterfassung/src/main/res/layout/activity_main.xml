@@ -36,15 +36,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ausgabe:"
-            android:id="@+id/textView"
+            android:id="@+id/activityName"
             android:layout_below="@+id/buttonManageTLA" android:layout_alignLeft="@+id/buttonManageTLA"
             android:layout_alignStart="@+id/buttonManageTLA"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/textView2"
-            android:layout_below="@+id/textView" android:layout_alignLeft="@+id/textView"
-            android:layout_alignStart="@+id/textView"/>
+            android:layout_below="@+id/activityName" android:layout_alignLeft="@+id/activityName"
+            android:layout_alignStart="@+id/activityName"/>
 
 
 </RelativeLayout>
