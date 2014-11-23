@@ -3,6 +3,7 @@ package de.mohoff.zeiterfassung.activities;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -29,7 +30,9 @@ public class ManageTLA extends ActionBarActivity {
         setContentView(R.layout.activity_manage_tla);
         getDbHelper();
 
-        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         adapter = new ListAdapterTLA(this);
         final ListView lv = (ListView) findViewById(R.id.listView);
@@ -68,10 +71,19 @@ public class ManageTLA extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        /*int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
+        }*/
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //NavUtils.navigateUpFromSameTask(this);
+                super.onBackPressed();
+                //this.finish();
+                return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 

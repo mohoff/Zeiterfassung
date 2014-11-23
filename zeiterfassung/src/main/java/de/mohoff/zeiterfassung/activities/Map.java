@@ -45,8 +45,8 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
 
         lu = LocationUpdater.getInstance(this);
         luh = LocationUpdateHandler.getInstance(this);

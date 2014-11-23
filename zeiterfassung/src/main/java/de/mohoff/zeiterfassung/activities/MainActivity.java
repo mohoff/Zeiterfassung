@@ -13,10 +13,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import de.mohoff.zeiterfassung.LocationService;
+import de.mohoff.zeiterfassung.LocationServiceNewAPI;
 import de.mohoff.zeiterfassung.legacy.LocationUpdateHandler;
 import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.legacy.TimeslotEventListener;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 
 import java.text.SimpleDateFormat;
@@ -33,7 +32,7 @@ public class MainActivity extends ActionBarActivity {
     private LocationUpdateHandler luh;
     private DatabaseHelper dbHelper = null;
 
-    private LocationService service;
+    private LocationServiceNewAPI service;
     private LocationServiceConnection lsc = null;
     private MainActivity refThis = this;
 
@@ -43,7 +42,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         getDbHelper();
 
-        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
 
         /*// START SERVICE
         Intent i = new Intent(this, LocationService.class);
@@ -77,7 +76,7 @@ public class MainActivity extends ActionBarActivity {
         stopLocationService.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 unbindLocationService();
-                service.stopService(new Intent(MainActivity.this, LocationService.class));
+                service.stopService(new Intent(MainActivity.this, LocationServiceNewAPI.class));
             }
         });
         manageTLAs.setOnClickListener(new View.OnClickListener(){
@@ -150,11 +149,11 @@ public class MainActivity extends ActionBarActivity {
 
 
     private void connectToLocationService() {
-        startService(new Intent(this, LocationService.class)); // Calling startService() first prevents it from being killed on unbind()
+        startService(new Intent(this, LocationServiceNewAPI.class)); // Calling startService() first prevents it from being killed on unbind()
         lsc = new LocationServiceConnection();  // connect to it
 
         boolean result = bindService(
-            new Intent(this, LocationService.class),
+            new Intent(this, LocationServiceNewAPI.class),
             lsc,
             BIND_AUTO_CREATE
         );
@@ -176,8 +175,8 @@ public class MainActivity extends ActionBarActivity {
 
     protected class LocationServiceConnection implements ServiceConnection {
         public void onServiceConnected(ComponentName name, IBinder service) {
-            LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
-            MainActivity.this.service = (LocationService) binder.getService();
+            LocationServiceNewAPI.LocalBinder binder = (LocationServiceNewAPI.LocalBinder) service;
+            MainActivity.this.service = (LocationServiceNewAPI) binder.getService();
         }
 
         @Override

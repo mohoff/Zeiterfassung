@@ -15,6 +15,8 @@ import android.os.IBinder;
 
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
+
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
@@ -98,6 +100,11 @@ public class LocationService extends Service {
         this.mostRecentLocation = locationmanager.getLastKnownLocation(locationProviderType);
         updateTLAs();
 
+        /*LocationRequest locReq = LocationRequest.create();
+        locReq.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locReq.setFastestInterval(1000*30); // 30s
+        locReq.setInterval(1000*60);*/
+
         if (isNetworkEnabled()){
             locationListener = new LocationListener() {
                 public void onLocationChanged(Location location) {
@@ -122,6 +129,14 @@ public class LocationService extends Service {
                 }
             };
             locationmanager.requestLocationUpdates(locationProviderType, timeBetweenMeasures, 0, locationListener); // every 1000*20 msec
+
+
+
+            //mLocationClient.requestLocationUpdates(mLocationRequest, this);
+
+
+
+
         }
         return Service.START_STICKY;
     }

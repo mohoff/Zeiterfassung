@@ -1,53 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<pre-dex-items>
+<items version="2" >
 
     <item
-        dex="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\pre-dexed\debug\ormlite-core-4.48-927d9c1b24fe560d831a3bb69cb61f9c6fc16805.jar"
-        jar="C:\Users\Moritz\.gradle\caches\modules-2\files-2.1\com.j256.ormlite\ormlite-core\4.48\e579bd2905d0399af5029aaaf9817d5fa0ca88a5\ormlite-core-4.48.jar"
+        jar="C:\Users\IBM_ADMIN\.gradle\caches\modules-2\files-2.1\com.j256.ormlite\ormlite-android\4.48\afa06f539a4026c10b247386312aa67404b80a16\ormlite-android-4.48.jar"
         jumboMode="false"
-        revision="20.0.0"
-        sha1="e579bd2905d0399af5029aaaf9817d5fa0ca88a5"/>
+        revision="21.1.1"
+        sha1="afa06f539a4026c10b247386312aa67404b80a16">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\ormlite-android-4.48-46fd07b757a15fd9318c371e5b19dff22ea56867.jar" />
+    </item>
     <item
-        dex="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\pre-dexed\debug\classes-37c3b72849518d8e14407469455519f7bae6258a.jar"
-        jar="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\exploded-aar\com.android.support\support-v4\20.0.0\classes.jar"
+        jar="C:\Android\android-sdk\extras\android\m2repository\com\android\support\support-annotations\21.0.2\support-annotations-21.0.2.jar"
         jumboMode="false"
-        revision="20.0.0"
-        sha1="8694693636ab36910c8100ce527c258ff3ebece0"/>
+        revision="21.1.1"
+        sha1="99373741f99a0556ee293c41e8faa1ca3ae8a4e6">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\support-annotations-21.0.2-989cd3adee40071cd4927e30b8b8a0290ce05f0a.jar" />
+    </item>
     <item
-        dex="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\pre-dexed\debug\commons-collections4-4.0-0c844a2db9648e13f90d87669410d19520d78869.jar"
-        jar="C:\Users\Moritz\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-collections4\4.0\da217367fd25e88df52ba79e47658d4cf928b0d1\commons-collections4-4.0.jar"
+        jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.android.support\appcompat-v7\21.0.2\classes.jar"
         jumboMode="false"
-        revision="20.0.0"
-        sha1="da217367fd25e88df52ba79e47658d4cf928b0d1"/>
+        revision="21.1.1"
+        sha1="7ae2d38807a43b2f2185ff4089a92c790b579e54">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\classes-1d290f7e44395e8994259ba228b3a06faccc1e22.jar" />
+    </item>
     <item
-        dex="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\pre-dexed\debug\support-annotations-20.0.0-9ade5ec4e43d9f0dedde29f0e205b2f48594e1c0.jar"
-        jar="C:\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\20.0.0\support-annotations-20.0.0.jar"
+        jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.2\libs\internal_impl-21.0.2.jar"
         jumboMode="false"
-        revision="20.0.0"
-        sha1="9d9013e9ff35fc3756411e62873c363c70c638fa"/>
+        revision="21.1.1"
+        sha1="962e8b12569c56dbdcf8367eb4eac8bb129cd18f">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\internal_impl-21.0.2-4652f6c29e8df469b288d0914569b97568ef6823.jar" />
+    </item>
     <item
-        dex="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\pre-dexed\debug\classes-e5a01f691520a82322ccb798d3c2c4eeb77530d1.jar"
-        jar="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\exploded-aar\com.google.android.gms\play-services\5.2.08\classes.jar"
+        jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.2\classes.jar"
         jumboMode="false"
-        revision="20.0.0"
-        sha1="1ed7a7a05185651f9af41ad93711cb96b66f331c"/>
+        revision="21.1.1"
+        sha1="d1bf02de1c56d942e7a9d093b8610ba1ef4128e3">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\classes-feb04ab17ac264d381093b5c6939cc6179c12b2e.jar" />
+    </item>
     <item
-        dex="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\pre-dexed\debug\internal_impl-20.0.0-f8c51797228ce4272da8b67103a37da85a691cc9.jar"
-        jar="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\exploded-aar\com.android.support\support-v4\20.0.0\libs\internal_impl-20.0.0.jar"
+        jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.google.android.gms\play-services\6.1.71\classes.jar"
         jumboMode="false"
-        revision="20.0.0"
-        sha1="e40b3078e3fbd353c9f44da8df25a8fc0078209d"/>
+        revision="21.1.1"
+        sha1="0f6d5c1ef2e982c3b7858408e3df389cf5d202da">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\classes-155f4818d088472a7164dcb1c37ffe3eebbbba4a.jar" />
+    </item>
     <item
-        dex="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\pre-dexed\debug\ormlite-android-4.48-a6ac849ece527f2b3632eb613a2ff5e3c3ae404c.jar"
-        jar="C:\Users\Moritz\.gradle\caches\modules-2\files-2.1\com.j256.ormlite\ormlite-android\4.48\afa06f539a4026c10b247386312aa67404b80a16\ormlite-android-4.48.jar"
+        jar="C:\Users\IBM_ADMIN\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-collections4\4.0\da217367fd25e88df52ba79e47658d4cf928b0d1\commons-collections4-4.0.jar"
         jumboMode="false"
-        revision="20.0.0"
-        sha1="afa06f539a4026c10b247386312aa67404b80a16"/>
+        revision="21.1.1"
+        sha1="da217367fd25e88df52ba79e47658d4cf928b0d1">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\commons-collections4-4.0-88b71cf298ee48472e855154188543df6118c9ab.jar" />
+    </item>
     <item
-        dex="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\pre-dexed\debug\classes-298e8ca7c54e77f07298ff5ea62e98f0ac4cf5da.jar"
-        jar="C:\Users\Moritz\GitHub\ZeiterfassungWithMap\zeiterfassung\build\intermediates\exploded-aar\com.android.support\appcompat-v7\20.0.0\classes.jar"
+        jar="C:\Users\IBM_ADMIN\.gradle\caches\modules-2\files-2.1\com.j256.ormlite\ormlite-core\4.48\e579bd2905d0399af5029aaaf9817d5fa0ca88a5\ormlite-core-4.48.jar"
         jumboMode="false"
-        revision="20.0.0"
-        sha1="f21927d22fe31889ecce94dd697a2e75b137e0ef"/>
+        revision="21.1.1"
+        sha1="e579bd2905d0399af5029aaaf9817d5fa0ca88a5">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\ormlite-core-4.48-309afcf91a7735221184107d8d8e5a51cb1ef88a.jar" />
+    </item>
 
-</pre-dex-items>
+</items>

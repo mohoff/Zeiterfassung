@@ -43,15 +43,24 @@
             android:label="@string/title_activity_add_tla" >
         </activity>
 
+        <!--
         <service
             android:name=".LocationService"
+            android:exported="false" >
+        </service>-->
+        <service
+            android:name=".LocationServiceNewAPI"
             android:exported="false" >
         </service>
 
         <activity
             android:name=".activities.ManageTLA"
             android:label="@string/title_activity_manage_tl"
-            android:windowSoftInputMode="adjustPan"> <!-- listView- vs editView-focus workaround -->
+            android:parentActivityName=".activities.MainActivity"
+            android:windowSoftInputMode="adjustPan"><!-- listView- vs editView-focus workaround -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.MainActivity" />
         </activity>
         <activity
             android:name=".activities.ManageTLADetail"
