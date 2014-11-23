@@ -5,10 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     card_view:cardCornerRadius="4dp"
-    card_view:cardElevation="4dp"
+    card_view:cardElevation="2dp"
     card_view:cardUseCompatPadding="true"
     card_view:contentPadding="10dp"
-    android:layout_margin="5dp">
+    card_view:cardBackgroundColor="#fff"
+    android:layout_marginTop="5dp"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,13 +27,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_action_discard"/>
+                android:src="@drawable/ic_action_discard"
+                android:tint="#22000000"/>
             <TextView
                 android:id="@+id/activity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:text="ACTIVITY NAME"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginLeft="10dip"
                 android:layout_toRightOf="@id/icon"
@@ -40,11 +45,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="LOCATION"
-
                 android:gravity="center_vertical"
                 android:layout_below="@id/activity"
                 android:layout_alignLeft="@+id/activity"
-                android:layout_marginTop="5dp"/>
+                android:layout_marginTop="0dp"/>
         </RelativeLayout>
         <TextView
             android:id="@+id/startTime"

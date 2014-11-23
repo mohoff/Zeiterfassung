@@ -38,8 +38,10 @@ public class CardAdapterMainActivity extends RecyclerView.Adapter<CardAdapterMai
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public CardAdapterMainActivity(ArrayList<Timeslot> dummyData) {
-        this.dummyData = dummyData;
+    public CardAdapterMainActivity() {
+        //this.dummyData = dummyData;
+        this.dummyData.add(new Timeslot(1416759002267L, 1416760002267L, "activity1", "act1, location1"));
+        this.dummyData.add(new Timeslot(1416754002267L, 1416758002267L, "activity2", "act2, location1"));
     }
 
     // Create new views (invoked by the layout manager)
@@ -68,9 +70,9 @@ public class CardAdapterMainActivity extends RecyclerView.Adapter<CardAdapterMai
         holder.icon.setImageResource(R.drawable.ic_action_edit_location);
         holder.activity.setText(dummyData.get(position).getActivity());
         holder.location.setText(dummyData.get(position).getLocation());
-        holder.startTime.setText(dummyData.get(position).getStarttimeReadable());
-        holder.duration.setText(dummyData.get(position).getEndtimeReadable());
-        holder.endTime.setText(dummyData.get(position).getDurationReadable()); // e.g. "1h 2min"
+        holder.startTime.setText(Timeslot.getTimeReadableTime(dummyData.get(position).getStarttime()));
+        holder.endTime.setText(Timeslot.getTimeReadableTime(dummyData.get(position).getEndtime()));
+        holder.duration.setText(Timeslot.getDurationReadable(dummyData.get(position).getStarttime(), dummyData.get(position).getEndtime())); // e.g. "1d 2h 14min"
     }
 
     // Return the size of your dataset (invoked by the layout manager)

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <color name="background_white">#ffffffff</color>
+    <color name="almost_black">#ff111111</color>
+
     <string name="app_name">ZeiterfassungWithGradle</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -10,5 +13,7 @@
     <string name="title_activity_add_tla">Add New TargetLocationArea</string>
     <string name="title_activity_manage_tl">ManageTLA</string>
     <string name="title_activity_manage_tladetail">ManageTLADetail</string>
+    <string name="drawer_open">drawer open</string>
+    <string name="drawer_close">drawer close</string>
 
 </resources>
