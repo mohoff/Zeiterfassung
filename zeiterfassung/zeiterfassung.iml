@@ -86,9 +86,11 @@
     <orderEntry type="library" exported="" name="ormlite-android-4.48" level="project" />
     <orderEntry type="library" exported="" name="ormlite-core-4.48" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.2" level="project" />
+    <orderEntry type="library" exported="" name="recyclerview-v7-21.0.2" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.2" level="project" />
     <orderEntry type="library" exported="" name="commons-collections4-4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-6.1.71" level="project" />
+    <orderEntry type="library" exported="" name="cardview-v7-21.0.2" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.2" level="project" />
   </component>
 </module>

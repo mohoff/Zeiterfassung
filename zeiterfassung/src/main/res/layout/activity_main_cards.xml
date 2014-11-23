@@ -1,0 +1,77 @@
+<android.support.v7.widget.CardView
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="4dp"
+    card_view:cardElevation="4dp"
+    card_view:cardUseCompatPadding="true"
+    card_view:contentPadding="10dp"
+    android:layout_margin="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical">
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_action_discard"/>
+            <TextView
+                android:id="@+id/activity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="ACTIVITY NAME"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dip"
+                android:layout_toRightOf="@id/icon"
+                android:layout_toEndOf="@id/icon"/>
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LOCATION"
+
+                android:gravity="center_vertical"
+                android:layout_below="@id/activity"
+                android:layout_alignLeft="@+id/activity"
+                android:layout_marginTop="5dp"/>
+        </RelativeLayout>
+        <TextView
+            android:id="@+id/startTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:46"
+            android:textColor="@color/material_blue_grey_800"
+            android:textSize="12sp"
+            android:layout_alignParentRight="true"/>
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1h 5min"
+            android:textSize="14sp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/startTime"/>
+        <TextView
+            android:id="@+id/endTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="13:51"
+            android:textColor="@color/material_blue_grey_800"
+            android:textSize="12sp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/duration"/>
+
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

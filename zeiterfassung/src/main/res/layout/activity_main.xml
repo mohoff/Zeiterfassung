@@ -45,6 +45,9 @@
             android:id="@+id/textView2"
             android:layout_below="@+id/activityName" android:layout_alignLeft="@+id/activityName"
             android:layout_alignStart="@+id/activityName"/>
-
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/cardList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>
