@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingRight="20dp"
+    android:paddingTop="5dp"
+    android:paddingLeft="20dp"
+    android:background="?android:attr/activatedBackgroundIndicator">
+
+    <!-- ImageView: layout_height: 30dp was default -->
+    <ImageView
+        android:id="@+id/navigationListLabelIcon"
+        android:src="@drawable/ic_action_edit_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:tint="@color/greenish_50"/>
+
+    <!-- TextView: layout_height: 50dp was default -->
+    <!-- TextView: textColor: #555555 was default -->
+    <TextView
+        android:id="@+id/navigationListLabelText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/navigationListLabelIcon"
+        android:layout_centerVertical="true"
+        android:textSize="18sp"
+        android:paddingLeft="10dp"
+        android:textColor="@color/greenish_75"/>
+
+
+</RelativeLayout>

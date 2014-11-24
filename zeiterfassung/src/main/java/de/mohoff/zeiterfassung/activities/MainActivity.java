@@ -1,6 +1,5 @@
 package de.mohoff.zeiterfassung.activities;
 
-import android.app.Fragment;
 import android.content.*;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -11,9 +10,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,8 +20,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
-import de.mohoff.zeiterfassung.CardAdapterMainActivity;
 import de.mohoff.zeiterfassung.LocationServiceNewAPI;
+import de.mohoff.zeiterfassung.NavigationListAdapter;
+import de.mohoff.zeiterfassung.NavigationListItem;
+import de.mohoff.zeiterfassung.NavigationListItemLabel;
+import de.mohoff.zeiterfassung.NavigationListItemSection;
 import de.mohoff.zeiterfassung.legacy.LocationUpdateHandler;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
@@ -39,9 +38,8 @@ public class MainActivity extends ActionBarActivity {
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerActionBarToggle;
-    private String[] titles = new String[5];
+    private NavigationListItem[] items = new NavigationListItem[9];
     private CharSequence title;
-    private CharSequence drawerTitle;
 
     private Button goToMap;
     private Button addNewTLA;
@@ -59,26 +57,33 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
-        setContentView(R.layout.navigation_drawer_main);
+        setContentView(R.layout.navigation_drawer);
         getDbHelper();
 
-        title = drawerTitle = getSupportActionBar().getTitle();
+        title = getSupportActionBar().getTitle();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        titles[0] = "Cheese";
-        titles[1] = "Pepperoni";
-        titles[2] = "Black Olives";
-        titles[3] = "Mushrooms";
-        titles[4] = "Onions";
+        this.items[0] = NavigationListItemSection.create(1, "ALL");
+        this.items[1] = NavigationListItemLabel.create(2, "Overview", "R.drawable.ic_overview", true, this);
+        this.items[2] = NavigationListItemLabel.create(3, "Manage TLAs", "R.drawable.ic_location", true, this);
+        this.items[3] = NavigationListItemSection.create(4, "DEBUG");
+        this.items[4] = NavigationListItemLabel.create(5, "Map", "R.drawable.ic_debug", true, this);
+        this.items[5] = NavigationListItemLabel.create(6, "Start LocationService", "R.drawable.ic_service_start", false, this);
+        this.items[6] = NavigationListItemLabel.create(7, "Stop LocationService", "R.drawable.ic_service_stop", false, this);
+        this.items[7] = NavigationListItemSection.create(8, "MISC");
+        this.items[8] = NavigationListItemLabel.create(9, "About", "drawable/ic_action_about", true, this);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
 
         // Set the adapter for the list view
-        drawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.navigation_drawer_main_item, titles));
+        /*drawerList.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.navigation_drawer_item, titles));*/
+
+        drawerList.setAdapter(new NavigationListAdapter(this, R.layout.navigation_drawer_list_label, items));
+
         // Set the list's click listener
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
@@ -96,15 +101,15 @@ public class MainActivity extends ActionBarActivity {
             }
 
             public void onDrawerOpened(View drawerView) {
-                getSupportActionBar().setTitle(drawerTitle);
+                //getSupportActionBar().setTitle(drawerTitle);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
         drawerLayout.setDrawerListener(drawerActionBarToggle);
 
-        /*if (savedInstanceState == null) {
-            selectItem(0);
-        }*/
+        if (savedInstanceState == null) {
+            selectItem(1);
+        }
 
         /*// START SERVICE
         Intent i = new Intent(this, LocationService.class);
@@ -172,6 +177,23 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void selectItem(int position) {
+        NavigationListItem selected = items[position];
+        drawerList.setItemChecked(position, true);
+        if(selected.getType() == 1){
+            //drawerList.getSelectedView().setBackgroundColor(0x11000000);
+            if (selected.updateActionBarTitle()) {
+                drawerLayout.closeDrawer(drawerList);
+                setTitle(selected.getLabel());
+            }
+
+        }
+
+        /*
+        if (drawerLayout.isDrawerOpen(drawerList)) {
+            drawerLayout.closeDrawer(drawerList);
+        }
+        */
+
         // update the main content by replacing fragments
         /*Fragment fragment = new PlanetFragment();
         Bundle args = new Bundle();
@@ -182,9 +204,8 @@ public class MainActivity extends ActionBarActivity {
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
         */
         // update selected item and title, then close the drawer
-        drawerList.setItemChecked(position, true);
-        setTitle("you chose position " + position);
-        drawerLayout.closeDrawer(drawerList);
+
+
     }
 
     @Override

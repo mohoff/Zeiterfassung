@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="background_white">#ffffffff</color>
-    <color name="almost_black">#ff111111</color>
+    <color name="background_white">#FFFFFFFF</color>
+    <color name="almost_black">#FF111111</color>
+    <color name="almost_white">#FFEEEEEE</color>
+    <color name="greenish_100">#FF025167</color>
+    <color name="greenish_75">#BF025167</color>
+    <color name="greenish_50">#80025167</color>
+    <color name="greenish_25">#40025167</color>
+    <color name="greenish_20">#33025167</color>
+    <color name="greenish_15">#26025167</color>
+    <color name="greenish_10">#1A025167</color>
+    <color name="greenish_5">#0D025167</color>
 
     <string name="app_name">ZeiterfassungWithGradle</string>
     <string name="hello_world">Hello world!</string>
