@@ -1,5 +1,6 @@
 package de.mohoff.zeiterfassung.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -7,8 +8,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import com.google.android.gms.maps.*;
@@ -22,7 +26,9 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import java.util.ArrayList;
 
 
-public class Map extends ActionBarActivity implements LocationChangeListener {
+public class Map extends MapFragment implements LocationChangeListener {
+    Activity parentActivity;
+
     LocationUpdater lu;
     LocationUpdateHandler luh;
 
@@ -40,16 +46,14 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
     EditText et;
     int radius;
 
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
 
-        lu = LocationUpdater.getInstance(this);
-        luh = LocationUpdateHandler.getInstance(this);
+        parentActivity = getActivity();
+        lu = LocationUpdater.getInstance(parentActivity);
+        luh = LocationUpdateHandler.getInstance(parentActivity);
 
         setUpMapIfNeeded();
         lu.addTheListener(this);
@@ -62,7 +66,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-                InputMethodManager imm = (InputMethodManager)getSystemService(
+                InputMethodManager imm = (InputMethodManager) parentActivity.getSystemService(
                         Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(et.getWindowToken(), 0);
 
@@ -135,6 +139,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
             //    mostRecentUserLocation = new LatLng(lat, lng);
             //}
         }
+        return inflater.inflate(R.layout.activity_map, container, false);
     }
 
     public void handleLocationUpdate(Location loc){
@@ -187,20 +192,20 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
         }
     }
     */
-    @Override
+    /*@Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.map, menu);
+        parentActivity.getMenuInflater().inflate(R.menu.map, menu);
         return true;
-    }
+    }*/
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -220,13 +225,8 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
                 return super.onOptionsItemSelected(item);
         }
 
-        /*int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);*/
     }
-
+*/
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (map == null) {
@@ -261,7 +261,7 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
         }*/
     }
 
-    @Override
+    /*@Override
     protected void onSaveInstanceState(Bundle outState) {
         //if(mostRecentUserLocation != null){
         //    double[] latLng = {mostRecentUserLocation.latitude, mostRecentUserLocation.longitude};
@@ -272,5 +272,5 @@ public class Map extends ActionBarActivity implements LocationChangeListener {
         }
 
         super.onSaveInstanceState(outState);
-    }
+    }*/
 }

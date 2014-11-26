@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="background_white">#FFFFFFFF</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="red_light">#FFFFBAB1</color>
+    <color name="green_light">#FFA8F2BB</color>
+    <color name="grey_10">#FFE6E6E6</color>
+    <color name="grey_10_alpha">#1A000000</color>
+    <color name="grey_25">#FFBFBFBF</color>
+    <color name="grey_25_alpha">#40000000</color>
+    <color name="grey_50">#FF808080</color>
+    <color name="grey_50_alpha">#80000000</color>
+    <color name="grey_60">#FF666666</color>
+    <color name="grey_60_alpha">#99000000</color>
+    <color name="grey_75">#FF404040</color>
+    <color name="grey_75_alpha">#BF000000</color>
+
     <color name="almost_black">#FF111111</color>
     <color name="almost_white">#FFEEEEEE</color>
     <color name="greenish_100">#FF025167</color>

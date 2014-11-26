@@ -2,46 +2,11 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\IBM_ADMIN\.gradle\caches\modules-2\files-2.1\com.j256.ormlite\ormlite-android\4.48\afa06f539a4026c10b247386312aa67404b80a16\ormlite-android-4.48.jar"
-        jumboMode="false"
-        revision="21.1.1"
-        sha1="afa06f539a4026c10b247386312aa67404b80a16">
-        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\ormlite-android-4.48-46fd07b757a15fd9318c371e5b19dff22ea56867.jar" />
-    </item>
-    <item
         jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\21.0.2\classes.jar"
         jumboMode="false"
         revision="21.1.1"
         sha1="4796f18d3750bf2bfa078407a94a7f9db35b440d">
         <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\classes-5f07ed2a433ff79327d13c5a7dd1a62b3062f5b9.jar" />
-    </item>
-    <item
-        jar="C:\Android\android-sdk\extras\android\m2repository\com\android\support\support-annotations\21.0.2\support-annotations-21.0.2.jar"
-        jumboMode="false"
-        revision="21.1.1"
-        sha1="99373741f99a0556ee293c41e8faa1ca3ae8a4e6">
-        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\support-annotations-21.0.2-989cd3adee40071cd4927e30b8b8a0290ce05f0a.jar" />
-    </item>
-    <item
-        jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.android.support\appcompat-v7\21.0.2\classes.jar"
-        jumboMode="false"
-        revision="21.1.1"
-        sha1="7ae2d38807a43b2f2185ff4089a92c790b579e54">
-        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\classes-1d290f7e44395e8994259ba228b3a06faccc1e22.jar" />
-    </item>
-    <item
-        jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.2\libs\internal_impl-21.0.2.jar"
-        jumboMode="false"
-        revision="21.1.1"
-        sha1="962e8b12569c56dbdcf8367eb4eac8bb129cd18f">
-        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\internal_impl-21.0.2-4652f6c29e8df469b288d0914569b97568ef6823.jar" />
-    </item>
-    <item
-        jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.android.support\cardview-v7\21.0.2\classes.jar"
-        jumboMode="false"
-        revision="21.1.1"
-        sha1="b017100da14f9c158c9f5f2f508333c224b24a7c">
-        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\classes-e874b57980a110811adb01a4a90e587728da9ce6.jar" />
     </item>
     <item
         jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.2\classes.jar"
@@ -70,6 +35,41 @@
         revision="21.1.1"
         sha1="e579bd2905d0399af5029aaaf9817d5fa0ca88a5">
         <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\ormlite-core-4.48-309afcf91a7735221184107d8d8e5a51cb1ef88a.jar" />
+    </item>
+    <item
+        jar="C:\Users\IBM_ADMIN\.gradle\caches\modules-2\files-2.1\com.j256.ormlite\ormlite-android\4.48\afa06f539a4026c10b247386312aa67404b80a16\ormlite-android-4.48.jar"
+        jumboMode="false"
+        revision="21.1.1"
+        sha1="afa06f539a4026c10b247386312aa67404b80a16">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\ormlite-android-4.48-46fd07b757a15fd9318c371e5b19dff22ea56867.jar" />
+    </item>
+    <item
+        jar="C:\Android\android-sdk\extras\android\m2repository\com\android\support\support-annotations\21.0.2\support-annotations-21.0.2.jar"
+        jumboMode="false"
+        revision="21.1.1"
+        sha1="99373741f99a0556ee293c41e8faa1ca3ae8a4e6">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\support-annotations-21.0.2-989cd3adee40071cd4927e30b8b8a0290ce05f0a.jar" />
+    </item>
+    <item
+        jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.android.support\appcompat-v7\21.0.2\classes.jar"
+        jumboMode="false"
+        revision="21.1.1"
+        sha1="7ae2d38807a43b2f2185ff4089a92c790b579e54">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\classes-1d290f7e44395e8994259ba228b3a06faccc1e22.jar" />
+    </item>
+    <item
+        jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.android.support\support-v4\21.0.2\libs\internal_impl-21.0.2.jar"
+        jumboMode="false"
+        revision="21.1.1"
+        sha1="962e8b12569c56dbdcf8367eb4eac8bb129cd18f">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\internal_impl-21.0.2-4652f6c29e8df469b288d0914569b97568ef6823.jar" />
+    </item>
+    <item
+        jar="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\exploded-aar\com.android.support\cardview-v7\21.0.2\classes.jar"
+        jumboMode="false"
+        revision="21.1.1"
+        sha1="b017100da14f9c158c9f5f2f508333c224b24a7c">
+        <dex dex="C:\Users\IBM_ADMIN\SOURCETREE\repo1\zeiterfassung\build\intermediates\pre-dexed\debug\classes-e874b57980a110811adb01a4a90e587728da9ce6.jar" />
     </item>
 
 </items>

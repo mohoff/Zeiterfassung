@@ -1,11 +1,12 @@
 package de.mohoff.zeiterfassung;
 
 import android.content.Context;
+import android.view.View;
 
 /**
  * Created by TPPOOL01 on 24.11.2014.
  */
-public class NavigationListItemLabel implements NavigationListItem{
+public class NavigationListItemLabel implements NavigationListItem, View.OnClickListener{
 
     public static final int ITEM_TYPE = 1;
 
@@ -67,5 +68,10 @@ public class NavigationListItemLabel implements NavigationListItem{
 
     public void setUpdateActionBarTitle(boolean updateActionBarTitle) {
         this.updateActionBarTitle = updateActionBarTitle;
+    }
+
+    @Override
+    public void onClick(View v) {
+
     }
 }

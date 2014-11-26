@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- better inherit "AppTheme", my <APILVL21 theme ? -->
+    <!-- better inherit "android:Theme.Material", my <APILVL21 theme ? -->
+    <style name="AppThemeLollipop" parent="android:Theme.Material">
+        <item name="android:colorButtonNormal">@color/greenish_75</item>
+
+        <!-- ActionBar Background Color -->
+        <item name="android:colorPrimary">@color/greenish_75</item>
+        <!-- StatusBar Background Color, usually darker variant of ActionBar Background Color -->
+        <item name="android:colorPrimaryDark">@color/greenish_100</item>
+        <!-- UI Controls Collors (TextView, EdditView, Slider, Checkboxes -->
+        <item name="android:colorAccent">@color/greenish_100</item>
+        <!-- StatusBar Title Text Color -->
+        <item name="android:textColorPrimary">@color/white</item>
+        <!-- MainContent Background Color -->
+        <item name="android:windowBackground">@color/white</item>
+        <!-- Softkey Background Color -->
+        <item name="android:navigationBarColor">@color/black</item>
+    </style>
+
+
+    <style name="ButtonStyle" parent="android:style/Widget.Material.Button">
+        <item name="android:background">@drawable/button_raised</item>
+    </style>
+</resources>
