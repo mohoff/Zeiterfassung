@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung;
+package de.mohoff.zeiterfassung.ui;
 
 
 import android.app.Activity;
@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+
+import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
 

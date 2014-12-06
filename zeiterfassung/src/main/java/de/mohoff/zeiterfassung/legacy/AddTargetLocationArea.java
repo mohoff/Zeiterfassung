@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung.activities;
+package de.mohoff.zeiterfassung.legacy;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -22,10 +22,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.*;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import de.mohoff.zeiterfassung.legacy.LocationUpdater;
+
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
+import de.mohoff.zeiterfassung.ui.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;

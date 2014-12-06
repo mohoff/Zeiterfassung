@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung;
+package de.mohoff.zeiterfassung.ui.navdrawer;
 
 /**
  * Created by TPPOOL01 on 24.11.2014.

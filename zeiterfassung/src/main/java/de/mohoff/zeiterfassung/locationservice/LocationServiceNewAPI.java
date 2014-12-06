@@ -1,7 +1,6 @@
-package de.mohoff.zeiterfassung;
+package de.mohoff.zeiterfassung.locationservice;
 
 
-import android.app.Dialog;
 import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
@@ -26,6 +25,7 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
@@ -43,9 +43,10 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     private LocationRequest locReq;
 
 
-    public static int timeBetweenMeasures = 1000 * 60; // in ms // 1000 * 60;
+    //public static int timeBetweenMeasures = 1000 * 60; // in ms // 1000 * 60;
     private static float boundaryTreshold = 0.8f;
     private static int amountOfTemporarySavedLocations = 5;
+    private static int timeBetweenMeasures = 60 * 1000; // ms
     private static String locationProviderType = LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
 
     private static LocationUpdater lm = null;
@@ -115,7 +116,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
 
     public void onCreate() {
         super.onCreate();
-        locCache = new LocationCache(amountOfTemporarySavedLocations);
+        locCache = new LocationCache(amountOfTemporarySavedLocations, timeBetweenMeasures);
         locationmanager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         Notification notification = new Notification.Builder(this)
@@ -134,8 +135,8 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
 
         locReq = new LocationRequest();
         locReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); // make static
-        locReq.setInterval(60 * 1000); // make static
-        locReq.setFastestInterval(30 * 1000); // make static
+        locReq.setInterval(timeBetweenMeasures); // make static
+        locReq.setFastestInterval(timeBetweenMeasures/2); // make static // or better same as setInterval() to have consistent locAlgorithm?
 
 
         startForeground(1337, notification);
@@ -237,6 +238,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
         locCache.addLocationUpdate(currentLoc);
         boolean cacheIsFull = locCache.isFull();
         numberOfUpdates++;
+        sendLocationUpdateViaBroadcast(loc.getLatitude(), loc.getLongitude(), loc.getAccuracy());
 
         if ((numberOfUpdates % 2 == 0) && cacheIsFull) {
             updateTLAsAndTimeslots();
@@ -255,16 +257,43 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
         return new LatLng(locCache.getInterpolatedPosition().getLatitude(), locCache.getInterpolatedPosition().getLongitude());
     }
 
+    // broadcast for timeslot events
+    private void sendTimeslotEventViaBroadcast(String message, long timestamp, String activityName, String locationName) {
+        Intent intent = new Intent("locationServiceTimeslotEvents");
+        intent.putExtra("message", message);
+        intent.putExtra("timestamp", String.valueOf(timestamp));
+        intent.putExtra("activityName", activityName);
+        intent.putExtra("locationName", locationName);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    // broadcast for locationUpdate events
+    private void sendLocationUpdateViaBroadcast(double lat, double lng, double accuracy){
+        Intent intent = new Intent("locationServiceLocUpdateEvents");
+        // message = "newTimeslotStarted"
+        intent.putExtra("lat", String.valueOf(lat));
+        intent.putExtra("lng", String.valueOf(lng));
+        intent.putExtra("accuracy", String.valueOf(accuracy));
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    public static long getPastTimestampForBoundaryEvents(Loc loc){
+        //return loc.getTimestampInMillis() - (int)((amountOfTemporarySavedLocations-amountOfTemporarySavedLocations*boundaryTreshold) * LocationUpdater.timeBetweenMeasures);
+        return loc.getTimestampInMillis() - amountOfTemporarySavedLocations * LocationUpdater.timeBetweenMeasures;
+    }
+
     public static Loc convertLocationToLoc(Location loc) {
         Loc result = null;
-        if ((loc.getLatitude() != 0) && (loc.getLongitude() != 0)) {
-            result = new Loc(loc.getLatitude(), loc.getLongitude(), (loc.getTime()));
-        }
+        //if ((loc.getLatitude() != 0) && (loc.getLongitude() != 0)) {
+            //result = new Loc(loc.getLatitude(), loc.getLongitude(), (loc.getTime()));
+        long timeToPersist = System.currentTimeMillis();
+        result = new Loc(loc.getLatitude(), loc.getLongitude(), timeToPersist);
+        //}
         if (loc.getAccuracy() > 0.0) {
-            result.setAccuracyPenalty(LocationCache.getPenaltyFromAccuracy(loc.getAccuracy()));
+            result.setAccuracyMultiplier(LocationCache._getAccuracyMultiplier(loc.getAccuracy()));
         }
         if (loc.hasAltitude()) {
-            result.setAccuracyPenalty(loc.getAltitude());
+            result.setAltitude((int) loc.getAltitude());
         }
         if (loc.hasSpeed()) {
             result.setSpeed((int) loc.getSpeed());

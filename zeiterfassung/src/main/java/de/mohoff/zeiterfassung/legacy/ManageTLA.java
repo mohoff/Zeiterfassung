@@ -1,18 +1,14 @@
-package de.mohoff.zeiterfassung.activities;
+package de.mohoff.zeiterfassung.legacy;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import de.mohoff.zeiterfassung.ListAdapterTLA;
+import de.mohoff.zeiterfassung.ui.ListAdapterTLA;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-import de.mohoff.zeiterfassung.LocationChangeListener;
+import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
@@ -46,7 +46,7 @@ public class LocationUpdateHandler extends OpenHelperManager implements Location
         lu = LocationUpdater.getInstance(ctx);
         lu.addTheListener(this); // so the listener-method "handleLocationUpdate" gets invoked frequently
 
-        locCache = new LocationCache(amountOfTemporarySavedLocations);
+        locCache = new LocationCache(amountOfTemporarySavedLocations, 60*1000); /* 2nd paramter: time between measures */
     }
 
     // Listener
@@ -84,10 +84,10 @@ public class LocationUpdateHandler extends OpenHelperManager implements Location
             result = new Loc(loc.getLatitude(), loc.getLongitude(), (int)(loc.getTime()));
         }
         if(loc.getAccuracy() > 0.0){
-            result.setAccuracyPenalty(LocationCache.getPenaltyFromAccuracy(loc.getAccuracy()));
+            result.setAccuracyMultiplier(LocationCache._getAccuracyMultiplier(loc.getAccuracy()));
         }
         if(loc.hasAltitude()){
-            result.setAccuracyPenalty(loc.getAltitude());
+            result.setAccuracyMultiplier(loc.getAltitude());
         }
         if(loc.hasSpeed()){
             result.setSpeed((int)loc.getSpeed());

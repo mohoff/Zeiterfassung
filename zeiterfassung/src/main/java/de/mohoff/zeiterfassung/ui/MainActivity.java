@@ -1,10 +1,14 @@
-package de.mohoff.zeiterfassung.activities;
+package de.mohoff.zeiterfassung.ui;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.*;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
@@ -20,23 +24,31 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
-import de.mohoff.zeiterfassung.GeneralHelper;
-import de.mohoff.zeiterfassung.LocationServiceNewAPI;
-import de.mohoff.zeiterfassung.NavigationDrawerListener;
-import de.mohoff.zeiterfassung.NavigationListAdapter;
-import de.mohoff.zeiterfassung.NavigationListItem;
-import de.mohoff.zeiterfassung.NavigationListItemLabel;
-import de.mohoff.zeiterfassung.NavigationListItemLabelService;
-import de.mohoff.zeiterfassung.NavigationListItemSection;
+import de.mohoff.zeiterfassung.datamodel.Loc;
+import de.mohoff.zeiterfassung.locationservice.LocationServiceNewAPI;
+import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
+import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListAdapter;
+import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItem;
+import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItemLabel;
+import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItemLabelService;
+import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItemSection;
+import de.mohoff.zeiterfassung.ui.fragments.*;
+import de.mohoff.zeiterfassung.ui.fragments.Map;
 import de.mohoff.zeiterfassung.legacy.LocationUpdateHandler;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity implements NavigationDrawerListener {
     SimpleDateFormat sdf;
+    public static FragmentManager fragM;
+    FragmentTransaction fragT;
+
+    public ArrayList<Loc> locs = new ArrayList<Loc>();
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
@@ -60,8 +72,11 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
-        setContentView(R.layout.navigation_drawer);
+        setContentView(R.layout.navigation_drawer_main);
         getDbHelper();
+        fragM = getFragmentManager();
+        fragT = fragM.beginTransaction();
+
 
         title = getSupportActionBar().getTitle();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
@@ -160,17 +175,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
             }
         });
 
-        RecyclerView recList = (RecyclerView) findViewById(R.id.cardList);
-
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-
-        //recList.setHasFixedSize(true); // allows for optimizations
-        recList.setAdapter(new CardAdapterMainActivity());
-        recList.setLayoutManager(new LinearLayoutManager(this));
-        recList.setItemAnimator(new DefaultItemAnimator());
-
-        recList.setLayoutManager(llm);*/
+        */
 
         //startAndConnectToLocationService();
     }
@@ -198,9 +203,49 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         label.setTypeface(Typeface.DEFAULT_BOLD);
     }
 
+    /*/public void onNavigationDrawerItemSelected(int position) {
+        // update the main content by replacing fragments
+        Fragment fragment = new MyFragment1();
+        FragmentManager fragmentManager = getFragmentManager();
+        switch(position) {
+            case 0:
+                fragment = new MyFragment1();
+                break;
+            case 1:
+                fragment = new MyFragment2();
+                break;
+        }
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, fragment)
+                .commit();
+    }*/
+
+
+
     private void selectItem(int position) {
         NavigationListItem selected = items[position];
         drawerList.setItemChecked(position, true);
+
+
+        // update the main content by replacing fragments
+        Fragment fragment = new Fragment();
+
+        switch(position) {
+            case 1:
+                fragment = new Overview();
+                break;
+            case 2:
+                fragment = new ManageTLAs();
+                break;
+            case 4:
+                fragment = new Map(locs);
+                break;
+            case 7:
+                fragment = new About();
+                break;
+        }
+
+
         if(selected.getType() == 1){
             //drawerList.getSelectedView().setBackgroundColor(0x11000000);
             if (selected.updateActionBarTitle()) {
@@ -210,23 +255,16 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
 
         }
 
+        fragM.beginTransaction().replace(R.id.content_frame, fragment).commit();
+
+
+
+
         /*
         if (drawerLayout.isDrawerOpen(drawerList)) {
             drawerLayout.closeDrawer(drawerList);
         }
         */
-
-        // update the main content by replacing fragments
-        /*Fragment fragment = new PlanetFragment();
-        Bundle args = new Bundle();
-        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
-        fragment.setArguments(args);
-
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-        */
-        // update selected item and title, then close the drawer
-
 
     }
 
@@ -269,7 +307,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
 
 
     // BroadcastReceiver, which receives Events from LocationService, such as "newTimeslotStarted" as message
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver timeslotReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
@@ -281,17 +319,37 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
             }
         }
     };
+    private BroadcastReceiver locUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Extract data included in the Intent
+            double lat = Double.valueOf(intent.getStringExtra("lat"));
+            double lng = Double.valueOf(intent.getStringExtra("lng"));
+            double accuracy = Double.valueOf(intent.getStringExtra("accuracy"));
+            locs.add(new Loc(lat, lng, accuracy));
+            // GEHT NOCH NICHT, mapFragment ist jedes mal NULL
+            //getFragmentManager().executePendingTransactions();
+            //Map mapFragment = (Map)getFragmentManager().findFragmentByTag("MAP");
+            //if (mapFragment.isVisible()) {
+            //    mapFragment.drawLocationUpdate(new Loc(lat, lng, accuracy));
+            //}
+
+
+        }
+    };
     @Override
     protected void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-                new IntentFilter("locationServiceEvents"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(timeslotReceiver,
+                new IntentFilter("locationServiceTimeslotEvents"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(locUpdateReceiver,
+                new IntentFilter("locationServiceLocUpdateEvents"));
     }
     @Override
     protected void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
-        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(timeslotReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(locUpdateReceiver);
     }
 
     public void timeslotStartedEvent(long millis, String activityName, String locationName) {

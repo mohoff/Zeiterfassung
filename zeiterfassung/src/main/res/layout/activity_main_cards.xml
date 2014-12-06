@@ -7,21 +7,25 @@
     card_view:cardCornerRadius="4dp"
     card_view:cardElevation="2dp"
     card_view:cardUseCompatPadding="true"
-    card_view:contentPadding="10dp"
+
     card_view:cardBackgroundColor="#fff"
     android:layout_marginTop="5dp"
     android:layout_marginLeft="5dp"
-    android:layout_marginRight="5dp">
+    android:layout_marginRight="5dp"
+    android:padding="0dp">
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+        android:layout_height="match_parent"
+        android:weightSum="1.0">
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:gravity="center_vertical">
+            android:layout_margin="10dp"
+            android:gravity="center_vertical"
+            android:id="@+id/leftPart"
+            android:layout_weight="0.7">
             <ImageView
                 android:id="@+id/icon"
                 android:layout_width="wrap_content"
@@ -50,32 +54,61 @@
                 android:layout_alignLeft="@+id/activity"
                 android:layout_marginTop="0dp"/>
         </RelativeLayout>
-        <TextView
-            android:id="@+id/startTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="12:46"
-            android:textColor="@color/material_blue_grey_800"
-            android:textSize="12sp"
-            android:layout_alignParentRight="true"/>
-        <TextView
-            android:id="@+id/duration"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1h 5min"
-            android:textSize="14sp"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/startTime"/>
-        <TextView
-            android:id="@+id/endTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="13:51"
-            android:textColor="@color/material_blue_grey_800"
-            android:textSize="12sp"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/duration"/>
-
-
-    </RelativeLayout>
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_weight="0.3">
+            <TextView
+                android:id="@+id/startTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:gravity="center_horizontal"
+                android:layout_centerHorizontal="true"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:text="12:46"
+                android:textColor="@color/white"
+                android:background="@color/greenish_100"
+                android:textSize="12sp"/>
+            <TextView
+                android:id="@+id/duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center_horizontal"
+                android:text="1h 5min"
+                android:textSize="12sp"/>
+            <TextView
+                android:id="@+id/endTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center_horizontal"
+                android:layout_centerHorizontal="true"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:text="13:51"
+                android:textColor="@color/white"
+                android:background="@color/grey_25"
+                android:textSize="12sp"/>
+            <View
+                android:layout_height="fill_parent"
+                android:layout_width="2dp"
+                android:layout_below="@id/startTime"
+                android:layout_above="@id/duration"
+                android:layout_centerHorizontal="true"
+                android:background="@color/greenish_100"/>
+            <View
+                android:layout_height="fill_parent"
+                android:layout_width="2dp"
+                android:layout_below="@id/duration"
+                android:layout_above="@id/endTime"
+                android:layout_centerHorizontal="true"
+                android:background="@color/grey_25"/>
+        </RelativeLayout>
+    </LinearLayout>
 </android.support.v7.widget.CardView>

@@ -1,7 +1,8 @@
-package de.mohoff.zeiterfassung;
+package de.mohoff.zeiterfassung.ui.navdrawer;
 
 import android.content.Context;
-import android.graphics.Color;
+
+import de.mohoff.zeiterfassung.R;
 
 /**
  * Created by TPPOOL01 on 24.11.2014.

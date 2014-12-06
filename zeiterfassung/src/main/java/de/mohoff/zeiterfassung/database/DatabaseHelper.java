@@ -125,16 +125,19 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public int sealCurrentTimeslot(long millis){ // seals newest TS
         getTimeslotREDAO();
 
+        /*
         // approach 1
         Timeslot toUpdate = timeslotREDAO.queryForId(getAmountOfTimeslots());     // does this work? does it count from 0 or 1 or not even autoincrement?
         toUpdate.setEndtime(millis);
         timeslotREDAO.update(toUpdate);
+        */
 
         // approach 2
         UpdateBuilder<Timeslot, Integer> updateBuilder = timeslotREDAO.updateBuilder();
         try {
             updateBuilder.updateColumnValue("endtime", millis);
-            updateBuilder.where().isNull("endtime");        // only update the rows where password is null
+            updateBuilder.where().eq("endtime", 0);
+            //updateBuilder.where().isNull("endtime");
             updateBuilder.update();
             return 1;
         } catch (SQLException e) {
@@ -175,17 +178,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
             throw new RuntimeException(e);
         }
-
-
-
-        // allmandring 26d:     48.743715 , 9.095967
-        // hdm:                 48.742120 , 9.101002
-        // sbahn station uni:   48.745847 , 9.105381
-        // ibm bb:              48.665458 , 9.037194
-
-
-
-
     }
     /**
      * This is called when your application is upgraded and it has a higher version number. This allows you to adjust

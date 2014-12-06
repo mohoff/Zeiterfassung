@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung;
+package de.mohoff.zeiterfassung.locationservice;
 
 import android.location.Location;
 

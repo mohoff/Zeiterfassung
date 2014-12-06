@@ -6,8 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import de.mohoff.zeiterfassung.activities.MainActivity;
-import de.mohoff.zeiterfassung.LocationServiceNewAPI;
+import de.mohoff.zeiterfassung.locationservice.LocationServiceNewAPI;
 
 /**
  * Created by TPPOOL01 on 26.11.2014.

@@ -5,7 +5,8 @@ public class Loc {
     private double latitude;            // mandatory
     private double longitude;           // mandatory
     private long timestampInMillis;     // mandatory
-    private double accuracyPenalty;
+    private double accuracy;
+    private double accuracyMultiplier;
     private int altitude;
     private int speed;
 
@@ -14,24 +15,30 @@ public class Loc {
         this.longitude = longitude;
     }
 
+    public Loc(double latitude, double longitude, double accuracy) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.accuracy = accuracy;
+    }
+
     public Loc(double latitude, double longitude, long timestampInMillis) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.timestampInMillis = timestampInMillis;
     }
 
-    public Loc(double latitude, double longitude, long timestampInMillis, double accuracyPenalty) {
+    public Loc(double latitude, double longitude, long timestampInMillis, double accuracyMultiplier) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.timestampInMillis = timestampInMillis;
-        this.accuracyPenalty = accuracyPenalty;
+        this.accuracyMultiplier = accuracyMultiplier;
     }
 
-    public Loc(double latitude, double longitude, long timestampInMillis, double accuracyPenalty, int altitude, int speed) {
+    public Loc(double latitude, double longitude, long timestampInMillis, double accuracyMultiplier, int altitude, int speed) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.timestampInMillis = timestampInMillis;
-        this.accuracyPenalty = accuracyPenalty;
+        this.accuracyMultiplier = accuracyMultiplier;
         this.altitude = altitude;
         this.speed = speed;
     }
@@ -86,12 +93,20 @@ public class Loc {
         this.longitude = longitude;
     }
 
-    public double getAccuracyPenalty() {
-        return accuracyPenalty;
+    public double getAccuracy() {
+        return accuracy;
     }
 
-    public void setAccuracyPenalty(double accuracyPenalty) {
-        this.accuracyPenalty = accuracyPenalty;
+    public void setAccuracy(double accuracy) {
+        this.accuracy = accuracy;
+    }
+
+    public double getAccuracyMultiplier() {
+        return accuracyMultiplier;
+    }
+
+    public void setAccuracyMultiplier(double accuracyMultiplier) {
+        this.accuracyMultiplier = accuracyMultiplier;
     }
 
     public int getSpeed() {

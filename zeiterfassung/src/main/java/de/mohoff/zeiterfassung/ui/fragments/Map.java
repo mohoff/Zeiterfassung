@@ -1,41 +1,53 @@
-package de.mohoff.zeiterfassung.activities;
+package de.mohoff.zeiterfassung.ui.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.app.Fragment;
+import android.view.InflateException;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import com.google.android.gms.maps.*;
-import com.google.android.gms.maps.model.*;
-import de.mohoff.zeiterfassung.LocationChangeListener;
-import de.mohoff.zeiterfassung.legacy.LocationUpdateHandler;
-import de.mohoff.zeiterfassung.legacy.LocationUpdater;
-import de.mohoff.zeiterfassung.R;
+import android.widget.FrameLayout;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import de.mohoff.zeiterfassung.datamodel.Loc;
+import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
+import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.ui.MainActivity;
+import de.mohoff.zeiterfassung.legacy.LocationUpdateHandler;
+import de.mohoff.zeiterfassung.legacy.LocationUpdater;
 
-public class Map extends MapFragment implements LocationChangeListener {
+public class Map extends Fragment {
     Activity parentActivity;
+    private static View view;
 
-    LocationUpdater lu;
-    LocationUpdateHandler luh;
+    //LocationUpdater lu;
+    //LocationUpdateHandler luh;
 
     GoogleMap map;
     LatLng mostRecentUserLocation = null;
-    ArrayList<Location> userLocations = new ArrayList<Location>();
-    ArrayList<Marker> markers = new ArrayList<Marker>();
+    List<Loc> userLocations = new ArrayList<>();
+    List<Marker> markers = new ArrayList<Marker>();
     Marker markerUserLocation;
     Marker markerCandidate = null;
     Circle circle = null;
@@ -46,17 +58,39 @@ public class Map extends MapFragment implements LocationChangeListener {
     EditText et;
     int radius;
 
+
+    public Map(ArrayList<Loc> locs) {
+        // Required empty public constructor
+        this.userLocations = locs;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null)
+                parent.removeView(view);
+        }
+        try {
+            view = (FrameLayout) inflater.inflate(R.layout.fragment_map, container, false);
+        } catch (InflateException e) {
+            /* map is already there, just return view as it is */
+        }
 
-
+        //view = (FrameLayout) inflater.inflate(R.layout.fragment_map, container, false);
         parentActivity = getActivity();
-        lu = LocationUpdater.getInstance(parentActivity);
-        luh = LocationUpdateHandler.getInstance(parentActivity);
+        //lu = LocationUpdater.getInstance(parentActivity);
+        //luh = LocationUpdateHandler.getInstance(parentActivity);
 
         setUpMapIfNeeded();
-        lu.addTheListener(this);
+        //lu.addTheListener(this);
+
+
 
         /*
         et = (EditText) findViewById(R.id.editText);
@@ -76,9 +110,9 @@ public class Map extends MapFragment implements LocationChangeListener {
                     circle.setRadius(radius);
                 } else {
                     markerCandidate = map.addMarker(new MarkerOptions()
-                            .position(point)
-                            .draggable(true)
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                                    .position(point)
+                                    .draggable(true)
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     );
                     CircleOptions circleOptions = new CircleOptions()
                             .center(point)
@@ -87,7 +121,7 @@ public class Map extends MapFragment implements LocationChangeListener {
                             .strokeWidth(0)
                             .strokeColor(Color.TRANSPARENT)
 
-                    ;
+                            ;
                     circle = map.addCircle(circleOptions);
                 }
             }
@@ -126,7 +160,7 @@ public class Map extends MapFragment implements LocationChangeListener {
         });
 
         // store userLocations temporarly in bundle, to repopulate map after screen rotation
-        if(savedInstanceState != null){
+        /*if(savedInstanceState != null){
             if(savedInstanceState.containsKey("userLocations")){
                 userLocations = savedInstanceState.getParcelableArrayList("userLocations");
                 for(int i=0; i<userLocations.size(); i++){
@@ -138,11 +172,40 @@ public class Map extends MapFragment implements LocationChangeListener {
             //    double lng = savedInstanceState.getDoubleArray("mostRecentUserLocation")[1];
             //    mostRecentUserLocation = new LatLng(lat, lng);
             //}
-        }
-        return inflater.inflate(R.layout.activity_map, container, false);
+        }*/
+        return view;
     }
 
-    public void handleLocationUpdate(Location loc){
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        if (map != null)
+            setUpMap();
+
+        if (map == null) {
+            // Try to obtain the map from the SupportMapFragment.
+            map = ((MapFragment) MainActivity.fragM.findFragmentById(R.id.map)).getMap();
+            // Check if we were successful in obtaining the map.
+            if (map != null)
+                setUpMap();
+        }
+
+
+        for(Loc loc : this.userLocations){
+            drawMarkerForLocation(loc);
+        }
+    }
+
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (map != null) {
+            MainActivity.fragM.beginTransaction()
+                    .remove(MainActivity.fragM.findFragmentById(R.id.map)).commit();
+            map = null;
+        }
+    }
+
+    public void drawLocationUpdate(Loc loc){
+        // transform to my "Loc" datatype
         locationCache.add(loc);
         drawMarkerForLocation(loc);
         if(!markers.isEmpty()){
@@ -150,7 +213,7 @@ public class Map extends MapFragment implements LocationChangeListener {
         }
         try {
             // may cause racecondition with second listener implemenatation (following line might get old interpolated position)
-            drawMarkerForLatLng(luh.getInterpolatedPositionInLatLng());
+            //drawMarkerForLatLng(luh.getInterpolatedPositionInLatLng());
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -160,16 +223,16 @@ public class Map extends MapFragment implements LocationChangeListener {
 
 
 
-    public void drawMarkerForLocation(Location loc){
+    public void drawMarkerForLocation(Loc loc){
         LatLng latLng = new LatLng(loc.getLatitude(), loc.getLongitude());
         markerUserLocation = map.addMarker(new MarkerOptions()
                         .position(latLng)
                         .draggable(false)
                         .title("acc " + String.valueOf(loc.getAccuracy()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
-                        .snippet(loc.getExtras().toString())
+                                //.snippet(loc.getExtras().toString())
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
         );
-        userLocations.add(loc);
+        //userLocations.add(loc);
         markers.add(markerUserLocation);
     }
 
@@ -177,8 +240,8 @@ public class Map extends MapFragment implements LocationChangeListener {
         map.addMarker(new MarkerOptions()
                         .position(latLng)
                         .draggable(false)
-                        //.title("acc " + String.valueOf(loc.getAccuracyPenalty()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
-                        //.snippet(loc.getExtras().toString())
+                                //.title("acc " + String.valueOf(loc.getAccuracyMultiplier()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
+                                //.snippet(loc.getExtras().toString())
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
         );
     }
@@ -230,25 +293,33 @@ public class Map extends MapFragment implements LocationChangeListener {
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (map == null) {
-            map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+            //map = ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.map)).getMap();
+            map = ((MapFragment) MainActivity.fragM.findFragmentById(R.id.map)).getMap();
+
+            //map = ((MapFragment) MainActivity.fragM
+            //        .findFragmentById(R.id.map)).getMap();
+
             // Check if we were successful in obtaining the map.
             if (map != null) {
                 // The Map is verified. It is now safe to manipulate the map.
-                try {
-                    mostRecentUserLocation = new LatLng(LocationUpdater.mostRecentLocation.getLatitude(), LocationUpdater.mostRecentLocation.getLongitude());
-                    markers.add(map.addMarker(new MarkerOptions()
-                                    .position(mostRecentUserLocation)
-                                    .draggable(false)
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
-                    ));
-                    CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(mostRecentUserLocation, 15);
-                    map.animateCamera(cu);
-
-                } catch(Exception e){
-                    System.out.println("fehler beim abrufen der mostRecentLocation");
-                }
+                setUpMap();
             }
+        }
+    }
+
+    public void setUpMap(){
+        try {
+            mostRecentUserLocation = new LatLng(LocationUpdater.mostRecentLocation.getLatitude(), LocationUpdater.mostRecentLocation.getLongitude());
+            markers.add(map.addMarker(new MarkerOptions()
+                            .position(mostRecentUserLocation)
+                            .draggable(false)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+            ));
+            CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(mostRecentUserLocation, 15);
+            map.animateCamera(cu);
+
+        } catch(Exception e){
+            System.out.println("fehler beim abrufen der mostRecentLocation");
         }
     }
 
@@ -273,4 +344,14 @@ public class Map extends MapFragment implements LocationChangeListener {
 
         super.onSaveInstanceState(outState);
     }*/
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
 }

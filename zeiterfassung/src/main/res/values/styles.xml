@@ -2,8 +2,13 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-
         <item name="android:activatedBackgroundIndicator">@drawable/navigation_drawer_list_selector</item>
+
+        <!--<item name="actionBarStyle">@style/MyActionBarStyle</item>-->
+
+        <item name="colorPrimary">@color/greenish_75</item>
+        <item name="colorPrimaryDark">@color/greenish_100</item>
+        <item name="colorAccent">@color/green_light</item>
 
     </style>
 

@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung;
+package de.mohoff.zeiterfassung.locationservice;
 
 
 
@@ -16,9 +16,10 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+
+import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
@@ -74,7 +75,7 @@ public class LocationService extends Service {
 
     public void onCreate() {
         super.onCreate();
-        locCache = new LocationCache(amountOfTemporarySavedLocations);
+        locCache = new LocationCache(amountOfTemporarySavedLocations, 60 * 1000); /* 2nd paramter: timeBetweenMeasures */
 
         Notification notification = new Notification.Builder(this)
                 .setContentTitle("Location Tracking")
@@ -288,14 +289,23 @@ public class LocationService extends Service {
         */
     }
 
-    // broadcast custom events
-    private void sendMessageViaBroadcast(String message, long timestamp, String activityName, String locationName) {
-        Intent intent = new Intent("locationServiceEvents");
-        // message = "newTimeslotStarted"
+    // broadcast for timeslot events
+    private void sendTimeslotEventViaBroadcast(String message, long timestamp, String activityName, String locationName) {
+        Intent intent = new Intent("locationServiceTimeslotEvents");
         intent.putExtra("message", message);
         intent.putExtra("timestamp", String.valueOf(timestamp));
         intent.putExtra("activityName", activityName);
         intent.putExtra("locationName", locationName);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    // broadcast for locationUpdate events
+    private void sendLocationUpdateViaBroadcast(double lat, double lng, double accuracy){
+        Intent intent = new Intent("locationServiceLocUpdateEvents");
+        // message = "newTimeslotStarted"
+        intent.putExtra("lat", lat);
+        intent.putExtra("lng", lng);
+        intent.putExtra("accuracy", accuracy);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -323,10 +333,10 @@ public class LocationService extends Service {
             result = new Loc(loc.getLatitude(), loc.getLongitude(), (loc.getTime()));
         }
         if(loc.getAccuracy() > 0.0){
-            result.setAccuracyPenalty(LocationCache.getPenaltyFromAccuracy(loc.getAccuracy()));
+            result.setAccuracyMultiplier(LocationCache._getAccuracyMultiplier(loc.getAccuracy()));
         }
         if(loc.hasAltitude()){
-            result.setAccuracyPenalty(loc.getAltitude());
+            result.setAccuracyMultiplier(loc.getAltitude());
         }
         if(loc.hasSpeed()){
             result.setSpeed((int)loc.getSpeed());

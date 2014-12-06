@@ -6,7 +6,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.Toast;
-import de.mohoff.zeiterfassung.LocationChangeListener;
+import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 
 
 import java.util.ArrayList;
