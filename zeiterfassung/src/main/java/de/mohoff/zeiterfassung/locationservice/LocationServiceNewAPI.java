@@ -176,7 +176,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
 
     public void updateTLAs() {
         getHelper();
-        this.TLAs = databaseHelper.getTLAs();
+        this.TLAs = databaseHelper.getAllTLAs();
     }
 
     public void updateInBoundTLAs() {

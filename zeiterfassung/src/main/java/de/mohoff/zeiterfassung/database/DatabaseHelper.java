@@ -273,7 +273,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return unsealed;
     }
 
-    public List<TargetLocationArea> getTLAs(){
+    public List<TargetLocationArea> getAllTLAs(){
         getTargetLocationAreaREDAO();
         List<TargetLocationArea> tla = new ArrayList<TargetLocationArea>();
 
@@ -284,6 +284,19 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             tla = null;
         }
         return tla;
+    }
+
+    public List<Timeslot> getAllTimeslots(){
+        getTimeslotREDAO();
+        List<Timeslot> timeslots = new ArrayList<Timeslot>();
+
+        try {
+            timeslots = timeslotREDAO.queryForAll();
+        } catch (Exception e){
+            e.printStackTrace();
+            timeslots = null;
+        }
+        return timeslots;
     }
 
     public Cursor getCursorForTLAs(){

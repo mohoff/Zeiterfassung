@@ -32,6 +32,8 @@ public class Overview extends Fragment {
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setReverseLayout(true);
+        llm.setStackFromEnd(true);
 
         //recList.setHasFixedSize(true); // allows for optimizations
         recList.setAdapter(new CardAdapterOverview(getActivity()));

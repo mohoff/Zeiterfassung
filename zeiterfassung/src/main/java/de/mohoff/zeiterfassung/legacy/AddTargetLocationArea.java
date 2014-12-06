@@ -140,7 +140,7 @@ public class AddTargetLocationArea extends ActionBarActivity{
     public void drawExistingTargetLocationAreas(){
         getDbHelper();
 
-        for(TargetLocationArea tla : dbHelper.getTLAs()){
+        for(TargetLocationArea tla : dbHelper.getAllTLAs()){
             LatLng latLng = new LatLng(tla.getLatitude(), tla.getLongitude());
             markers.add(map.addMarker(new MarkerOptions()
                             .position(latLng)

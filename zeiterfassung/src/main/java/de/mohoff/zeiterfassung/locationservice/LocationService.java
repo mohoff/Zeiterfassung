@@ -171,7 +171,7 @@ public class LocationService extends Service {
 
     public void updateTLAs(){
         getHelper();
-        this.TLAs = databaseHelper.getTLAs();
+        this.TLAs = databaseHelper.getAllTLAs();
     }
 
     public void updateInBoundTLAs(){
@@ -190,7 +190,7 @@ public class LocationService extends Service {
         Loc loc = currentLoc; //convertLatLngToLoc(currentLoc);
         int minDistance = 10000;        // 10km distance to remember iterated TLA as closes TLA
 
-        List<TargetLocationArea> tlas = databaseHelper.getTLAs();
+        List<TargetLocationArea> tlas = databaseHelper.getAllTLAs();
         for(TargetLocationArea tla : tlas){
             Loc targetLoc = new Loc(tla.getLatitude(), tla.getLongitude());
             int distance = loc.distanceTo(targetLoc); // - tla.getRadius(); ???

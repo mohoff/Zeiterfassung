@@ -51,7 +51,7 @@ public class ManageTLA extends ActionBarActivity {
     }
 
     public List<TargetLocationArea> getAllTLAs(){
-        return dbHelper.getTLAs();
+        return dbHelper.getAllTLAs();
     }
 
 

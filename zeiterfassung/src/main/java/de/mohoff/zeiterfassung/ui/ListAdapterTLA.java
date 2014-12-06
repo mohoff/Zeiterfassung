@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +34,7 @@ public class ListAdapterTLA extends ArrayAdapter{
     public ListAdapterTLA(Context context) {
         super(context, R.layout.activity_manage_tla_views);
         getDbHelper();
-        this.tlas = dbHelper.getTLAs();
+        this.tlas = dbHelper.getAllTLAs();
         this.activityNames = dbHelper.getDistinctActivityNames();
         this.context = context;
 
