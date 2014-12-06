@@ -82,14 +82,14 @@ public class CardAdapterOverview extends RecyclerView.Adapter<CardAdapterOvervie
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
+        Timeslot timeslot = dummyData.get(position);
+
         holder.icon.setImageResource(R.drawable.ic_action_edit_location);
-        holder.activity.setText(dummyData.get(position).getActivity());
-        holder.location.setText(dummyData.get(position).getLocation());
-        holder.startTime.setText(Timeslot.getTimeReadableTime(dummyData.get(position).getStarttime()));
-        holder.endTime.setText(Timeslot.getTimeReadableTime(dummyData.get(position).getEndtime()));
-        holder.duration.setText(Timeslot.getDurationReadable(dummyData.get(position).getStarttime(), dummyData.get(position).getEndtime())); // e.g. "1d 2h 14min"
+        holder.activity.setText(timeslot.getActivity());
+        holder.location.setText(timeslot.getLocation());
+        holder.startTime.setText(timeslot.getReadableStarttime());
+        holder.endTime.setText(timeslot.getReadableEndtime());
+        holder.duration.setText(timeslot.getReadableDuration()); // e.g. "1d 2h 14min"
 
         setAnimation(holder.container, position);
     }
@@ -98,7 +98,8 @@ public class CardAdapterOverview extends RecyclerView.Adapter<CardAdapterOvervie
         // If the bound view wasn't previously displayed on screen, it's animated
         if (position > lastPosition){
             Animation animation = AnimationUtils.loadAnimation(this.context, R.anim.animation_bottom_top);
-            animation.setStartOffset(position * 100);
+            // --> PROBLEM with following line: at position=100 it results into 10s offset. How to refresh offset after initial load?
+            //animation.setStartOffset(position * 100);
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
         }
