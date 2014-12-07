@@ -100,8 +100,8 @@ public class CardAdapterOverview extends RecyclerView.Adapter<CardAdapterOvervie
         holder.icon.setImageResource(R.drawable.ic_action_edit_location);
         holder.activity.setText(timeslot.getActivity());
         holder.location.setText(timeslot.getLocation());
-        holder.startTime.setText(timeslot.getReadableStarttime());
-        holder.endTime.setText(timeslot.getReadableEndtime());
+        holder.startTime.setText(timeslot.getReadableStartTime());
+        holder.endTime.setText(timeslot.getReadableEndTime());
         holder.duration.setText(timeslot.getReadableDuration()); // e.g. "1d 2h 14min"
 
         setAnimation(holder.container, position);

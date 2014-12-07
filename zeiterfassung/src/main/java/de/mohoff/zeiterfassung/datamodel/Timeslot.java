@@ -84,27 +84,43 @@ public class Timeslot {
         this.location = location;
     }
 
-    private String getReadableTime(long time){
+    private String getReadableDate(long time){
         boolean wasToday = this.isSameDay(System.currentTimeMillis(), time);
         boolean wasYesterday = false;
         if(!wasToday){
             wasYesterday = this.isSameDay(System.currentTimeMillis(), time);
             if(wasYesterday){
-                return "Yesterday, " + new SimpleDateFormat("HH:mm").format(new Date(time));
+                return "Yesterday";
             } else {
                 // older than "yesterday"
-                return new SimpleDateFormat("dd.MM.yy, HH:mm").format(new Date(time));
+                return new SimpleDateFormat("dd.MM.yy").format(new Date(time));
             }
         } else {
-            return "Today, " + new SimpleDateFormat("HH:mm").format(new Date(time));
+            return "Today";
         }
     }
 
-    public String getReadableStarttime(){
+    private String getReadableTime(long time){
+        return new SimpleDateFormat("HH:mm").format(new Date(time));
+    }
+
+    public String getReadableStartDate(){
+        return getReadableDate(this.starttime);
+    }
+
+    public String getReadableStartTime(){
         return getReadableTime(this.starttime);
     }
 
-    public String getReadableEndtime(){
+    public String getReadableEndDate(){
+        if(endtime != 0){
+            return getReadableDate(this.endtime);
+        } else {
+            return "";
+        }
+    }
+
+    public String getReadableEndTime(){
         if(endtime != 0){
             return getReadableTime(this.endtime);
         } else {
