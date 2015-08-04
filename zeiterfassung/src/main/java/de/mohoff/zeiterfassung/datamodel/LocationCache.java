@@ -8,25 +8,22 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
  * Created by Moritz on 03.10.2014.
  */
 public class LocationCache {
-    public int amountOfTemporarySavedLocations;
-    public int timeBetweenMeasures;
+    public int queueSize;
+    public int updateInterval;
     private static float interpolationVariance = 1;
 
     private CircularFifoQueue locationCache; // fifo based queue
     private CircularFifoQueue interpolatedCache; // fifo based queue
     private Loc interpolatedPosition;
-    // interpolated position cache anlegen
 
-
-    public LocationCache(int amountOfTemporarySavedLocations, int timeBetweenMeasures){
-        this.amountOfTemporarySavedLocations = amountOfTemporarySavedLocations;
-        this.timeBetweenMeasures = timeBetweenMeasures;
-        locationCache = new CircularFifoQueue<Loc>(amountOfTemporarySavedLocations);
-        interpolatedCache = new CircularFifoQueue<Loc>(amountOfTemporarySavedLocations);
+    public LocationCache(int queueSize, int updateInterval){
+        this.queueSize = queueSize;
+        this.updateInterval = updateInterval;
+        locationCache = new CircularFifoQueue<Loc>(queueSize);
+        interpolatedCache = new CircularFifoQueue<Loc>(queueSize);
     }
 
     public float validateInBoundsForTLA(TargetLocationArea tla){
-        float result = 0;
         float positives = 0;
 
         for(int i=0; i<interpolatedCache.size(); i++){
@@ -36,7 +33,6 @@ public class LocationCache {
                 positives++;
             }
         }
-
         return positives/(float)interpolatedCache.size();
     }
 
@@ -45,10 +41,10 @@ public class LocationCache {
         float all = locationCache.maxSize();
 
         for(int i=0; i<interpolatedCache.size(); i++){
-            Loc loc = (Loc)interpolatedCache.get(i);
+            Loc loc = (Loc) interpolatedCache.get(i);
             //int distanceDebug = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude()));
             int distanceTLABorderToUser = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude())) - tla.getRadius();
-            if(distanceTLABorderToUser < 0){
+            if(distanceTLABorderToUser <= 0){
                 positives++;
             }
         }
@@ -107,11 +103,11 @@ public class LocationCache {
 
     public double _getAgeMultiplier(Loc loc, long currentTime){
         long millisInPast = currentTime - loc.getTimestampInMillis();
-        int optimalTimeInCache = amountOfTemporarySavedLocations * timeBetweenMeasures; // ms
+        int optimalTimeInCache = queueSize * updateInterval; // ms
         double ageMultiplier = 0; // default. If more than 15min in past, don't weight this location/timestamp anymore
 
-        long tresholdTimeToScoreOfZero = amountOfTemporarySavedLocations * timeBetweenMeasures * 3; // 3 for 3*5=15min in past is treshold
-        double slopeOfRegression = 1.5 / (double)tresholdTimeToScoreOfZero;
+        long tresholdTimeToScoreOfZero = queueSize * updateInterval * 3; // 3 for 3*5=15min in past is treshold
+        double slopeOfRegression = 1.5 / (double) tresholdTimeToScoreOfZero;
         if(millisInPast <= tresholdTimeToScoreOfZero){
             // [0 - 1,5]
             ageMultiplier = (tresholdTimeToScoreOfZero-millisInPast)*slopeOfRegression; // x * slope = y = score
@@ -119,12 +115,11 @@ public class LocationCache {
         return ageMultiplier;
     }
 
-
     private void _calcInterpolatedPosition(){
         int cacheSize = locationCache.size();
         float[] score = new float[cacheSize];
         float scoreSum = 0;
-        double latSumZaehler = 0, lngSumZaehler = 0;
+        double latSumCounter = 0, lngSumCounter = 0;
         long currentTime = System.currentTimeMillis();
 
         for(int i=0; i<cacheSize; i++){
@@ -136,12 +131,14 @@ public class LocationCache {
             score[i] = (float)(1 * ageMultiplier * accuracyMultiplier);
             // weighted arithmethic mean, http://en.wikipedia.org/wiki/Weighted_arithmetic_mean > Mathematical definition
             scoreSum += score[i];
-            latSumZaehler += loc.getLatitude() * score[i];
-            lngSumZaehler += loc.getLongitude() * score[i];
+            latSumCounter += loc.getLatitude() * score[i];
+            lngSumCounter += loc.getLongitude() * score[i];
         }
 
-        interpolatedPosition = new Loc(latSumZaehler/scoreSum, lngSumZaehler/scoreSum);
+        interpolatedPosition = new Loc(latSumCounter/scoreSum, lngSumCounter/scoreSum);
         interpolatedCache.add(interpolatedPosition);
+
+        // LEGACY
         /*
         for(int i=0; i<cacheSize; i++){
             Location currentLoc = (Location) locationCache.get(i);
@@ -162,14 +159,14 @@ public class LocationCache {
         }
 
         // weighted arithmethic mean, http://en.wikipedia.org/wiki/Weighted_arithmetic_mean > Mathematical definition
-        double latSumZaehler = 0, lngSumZaehler = 0;
+        double latSumZaehler = 0, lngSumCounter = 0;
 
         for(int i=0; i<locationCache.size(); i++){
             Location currentLoc = (Location)locationCache.get(i);
             latSumZaehler += currentLoc.getLatitude() * score[i];
-            lngSumZaehler += currentLoc.getLongitude() * score[i];
+            lngSumCounter += currentLoc.getLongitude() * score[i];
         }
-        LatLng result = new LatLng(latSumZaehler/scoreSum, lngSumZaehler/scoreSum);
+        LatLng result = new LatLng(latSumZaehler/scoreSum, lngSumCounter/scoreSum);
         return result;
         */
     }

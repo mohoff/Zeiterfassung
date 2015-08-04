@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.widget.Toast;
 
 import de.mohoff.zeiterfassung.locationservice.LocationServiceNewAPI;
 
@@ -53,7 +54,7 @@ public class GeneralHelper {
         boolean result = context.bindService(
                 new Intent(context, LocationServiceNewAPI.class),
                 lsc,
-                context.BIND_AUTO_CREATE
+                Context.BIND_AUTO_CREATE
         );
 
         if(!result){
@@ -84,6 +85,11 @@ public class GeneralHelper {
             service.stopService(new Intent(context, LocationServiceNewAPI.class));
             serviceIsRunning = false;
         }
+    }
+
+    public static void showToast(Context ctx, String msg) {
+        Toast toast = Toast.makeText(ctx, msg, Toast.LENGTH_LONG);
+        toast.show();
     }
 
 

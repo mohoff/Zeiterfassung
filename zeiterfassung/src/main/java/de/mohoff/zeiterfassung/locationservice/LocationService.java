@@ -45,7 +45,7 @@ public class LocationService extends Service {
     /////
     private LocationCache locCache;
     private DatabaseHelper databaseHelper = null;
-    private boolean inBound = false;
+    //private boolean inBound = false;
     private int numberOfUpdates = 0;
     private TargetLocationArea nearestTLA = null;
     private List<TargetLocationArea> TLAs = new ArrayList<TargetLocationArea>();
@@ -98,7 +98,7 @@ public class LocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         locationmanager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        this.mostRecentLocation = locationmanager.getLastKnownLocation(locationProviderType);
+        LocationService.mostRecentLocation = locationmanager.getLastKnownLocation(locationProviderType);
         updateTLAs();
 
         /*LocationRequest locReq = LocationRequest.create();

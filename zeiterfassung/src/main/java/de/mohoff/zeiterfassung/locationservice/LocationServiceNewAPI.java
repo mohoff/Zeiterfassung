@@ -25,6 +25,7 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
@@ -46,7 +47,8 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     //public static int timeBetweenMeasures = 1000 * 60; // in ms // 1000 * 60;
     private static float boundaryTreshold = 0.8f;
     private static int amountOfTemporarySavedLocations = 5;
-    private static int timeBetweenMeasures = 60 * 1000; // ms
+    private static int REGULAR_UPDATE_INTERVAL = 60 * 1000; // ms, update interval
+    private static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
     private static String locationProviderType = LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
 
     private static LocationUpdater lm = null;
@@ -85,10 +87,6 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
 
     @Override
     public void onLocationChanged(Location location) {
-        //System.out.println("onLocationChanged");
-        //Toast toast = Toast.makeText(LocationServiceNewAPI.this, "onLocationChanged() called", Toast.LENGTH_LONG);
-        //toast.show();
-
         handleLocationUpdate(location);
     }
 
@@ -116,7 +114,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
 
     public void onCreate() {
         super.onCreate();
-        locCache = new LocationCache(amountOfTemporarySavedLocations, timeBetweenMeasures);
+        locCache = new LocationCache(amountOfTemporarySavedLocations, LocationServiceNewAPI.REGULAR_UPDATE_INTERVAL);
         locationmanager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         Notification notification = new Notification.Builder(this)
@@ -135,9 +133,8 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
 
         locReq = new LocationRequest();
         locReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); // make static
-        locReq.setInterval(timeBetweenMeasures); // make static
-        locReq.setFastestInterval(timeBetweenMeasures/2); // make static // or better same as setInterval() to have consistent locAlgorithm?
-
+        locReq.setInterval(LocationServiceNewAPI.REGULAR_UPDATE_INTERVAL); // make static
+        locReq.setFastestInterval(LocationServiceNewAPI.FASTEST_UPDATE_INTERVAL); // make static // or better same as setInterval() to have consistent locAlgorithm?
 
         startForeground(1337, notification);
 
@@ -146,7 +143,9 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     @Override
     public void onDestroy() {
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-        googleApiClient.disconnect();
+        if(googleApiClient.isConnected()){
+            googleApiClient.disconnect();
+        }
 
         stopForeground(true);
         super.onDestroy();
@@ -160,7 +159,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
         }
 
 
-        this.mostRecentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        LocationServiceNewAPI.mostRecentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         updateTLAs();
 
         return Service.START_STICKY;
@@ -190,10 +189,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
         }
     }
 
-    public void showToastWithMsg(String msg) {
-        Toast toast = Toast.makeText(LocationServiceNewAPI.this, msg, Toast.LENGTH_LONG);
-        toast.show();
-    }
+
 
     public void updateTLAsAndTimeslots() {
         updateInBoundTLAs();
@@ -213,9 +209,9 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
             }
             int status = databaseHelper.startNewTimeslot(getNormalizedTimestamp(), tla.getActivityName(), tla.getLocationName());
             if (status == 1) {
-                showToastWithMsg("new timeslot in DB started");
+                GeneralHelper.showToast(this, "new timeslot in DB started");
             } else {
-                showToastWithMsg("timeslot already exists");
+                GeneralHelper.showToast(this, "timeslot already exists");
             }
         }
 
@@ -225,9 +221,9 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
             int id = shouldSeal.get_id();
             int status = databaseHelper.sealThisTimeslot(id, getNormalizedTimestamp());
             if (status == 1) {
-                showToastWithMsg("timeslot successfully sealed in DB");
+                GeneralHelper.showToast(this, "timeslot successfully sealed in DB");
             } else {
-                showToastWithMsg("error sealing timelsot in DB");
+                GeneralHelper.showToast(this, "error sealing timeslot in DB");
             }
         }
     }
@@ -236,11 +232,10 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     public void handleLocationUpdate(Location loc) {
         Loc currentLoc = convertLocationToLoc(loc);
         locCache.addLocationUpdate(currentLoc);
-        boolean cacheIsFull = locCache.isFull();
         numberOfUpdates++;
         sendLocationUpdateViaBroadcast(loc.getLatitude(), loc.getLongitude(), loc.getAccuracy());
 
-        if ((numberOfUpdates % 2 == 0) && cacheIsFull) {
+        if ((numberOfUpdates % 2 == 0) && locCache.isFull()) {
             updateTLAsAndTimeslots();
         }
     }
@@ -283,12 +278,9 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     }
 
     public static Loc convertLocationToLoc(Location loc) {
-        Loc result = null;
-        //if ((loc.getLatitude() != 0) && (loc.getLongitude() != 0)) {
-            //result = new Loc(loc.getLatitude(), loc.getLongitude(), (loc.getTime()));
+        Loc result;
         long timeToPersist = System.currentTimeMillis();
         result = new Loc(loc.getLatitude(), loc.getLongitude(), timeToPersist);
-        //}
         if (loc.getAccuracy() > 0.0) {
             result.setAccuracyMultiplier(LocationCache._getAccuracyMultiplier(loc.getAccuracy()));
         }
@@ -298,7 +290,6 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
         if (loc.hasSpeed()) {
             result.setSpeed((int) loc.getSpeed());
         }
-
         return result;
     }
 
@@ -322,13 +313,12 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     private boolean googlePlayServiceConnected() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
-        if (ConnectionResult.SUCCESS == resultCode) {
+        if (resultCode == ConnectionResult.SUCCESS) {
             return true;
         } else {
             Toast toast = Toast.makeText(LocationServiceNewAPI.this, resultCode, Toast.LENGTH_LONG);
             toast.show();
             return false;
-
 
             // Get the error dialog from Google Play services
             /*Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(
