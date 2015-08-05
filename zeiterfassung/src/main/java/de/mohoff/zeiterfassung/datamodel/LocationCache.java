@@ -63,7 +63,6 @@ public class LocationCache {
         } else {
             accuracyMultiplier = 2;
         }
-
         return accuracyMultiplier;
 
         //////// LEGACY

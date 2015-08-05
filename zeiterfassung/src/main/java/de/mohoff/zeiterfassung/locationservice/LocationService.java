@@ -335,9 +335,9 @@ public class LocationService extends Service {
         if(loc.getAccuracy() > 0.0){
             result.setAccuracyMultiplier(LocationCache._getAccuracyMultiplier(loc.getAccuracy()));
         }
-        if(loc.hasAltitude()){
+        /*if(loc.hasAltitude()){
             result.setAccuracyMultiplier(loc.getAltitude());
-        }
+        }*/
         if(loc.hasSpeed()){
             result.setSpeed((int)loc.getSpeed());
         }

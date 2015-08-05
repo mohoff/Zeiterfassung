@@ -20,6 +20,7 @@
     <color name="grey_75_alpha">#BF000000</color>
     <color name="almost_black">#FF111111</color>
     <color name="almost_white">#FFEEEEEE</color>
+    <color name="greenish">#025167</color>
     <color name="greenish_100">#FF025167</color>
     <color name="greenish_75">#BF025167</color>
     <color name="greenish_50">#80025167</color>

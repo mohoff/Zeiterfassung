@@ -6,8 +6,8 @@
 
         <!--<item name="actionBarStyle">@style/MyActionBarStyle</item>-->
 
-        <item name="colorPrimary">@color/greenish_75</item>
-        <item name="colorPrimaryDark">@color/greenish_100</item>
+        <item name="colorPrimary">@color/greenish</item>
+        <item name="colorPrimaryDark">@color/greenish</item>
         <item name="colorAccent">@color/green_light</item>
 
     </style>

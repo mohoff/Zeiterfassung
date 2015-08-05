@@ -90,6 +90,7 @@ public class CardAdapterOverview extends RecyclerView.Adapter<CardAdapterOvervie
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Timeslot timeslot = data.get(position);
+        // data.get(position-1) and data.get(position+1) for previous and next ViewHolders...
         if(position < 10){
             // set a background color for dummy data
             holder.container.setCardBackgroundColor(context.getResources().getColor(R.color.greenish_5));
