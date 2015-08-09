@@ -5,12 +5,14 @@ import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -34,9 +36,8 @@ import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
 import de.mohoff.zeiterfassung.legacy.LocationUpdater;
 
-public class LocationServiceNewAPI extends Service implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+public class LocationServiceNewAPI extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+    private static final String TAG = LocationServiceNewAPI.class.getSimpleName();
     private final LocalBinder binder = new LocalBinder();
 
     private GoogleApiClient googleApiClient;
@@ -72,16 +73,14 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
 
     @Override
     public void onConnected(Bundle bundle) {
-        // Display the connection status
-        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
-        if (googlePlayServiceConnected()) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locReq, this);
-        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locReq, this);
+
+        Toast.makeText(this, "Connected to GoogleApiClient.", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        Toast.makeText(this, "Disconnected. Please reconnect.",
+        Toast.makeText(this, "Connection suspended.",
                 Toast.LENGTH_LONG).show();
     }
 
@@ -106,6 +105,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     public IBinder onBind(Intent intent) {
         getHelper();
         databaseHelper._createSampleTLAs();
+        googleApiClient.connect();
 
         return binder;
         //throw new UnsupportedOperationException("Not yet implemented");
@@ -138,26 +138,26 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
 
         startForeground(1337, notification);
 
+        Toast.makeText(this, "Service terminated",
+                Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onDestroy() {
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-        if(googleApiClient.isConnected()){
-            googleApiClient.disconnect();
-        }
-
+        googleApiClient.disconnect(); // does nothing if googleApiClient is already disconnected. So no need to check here again.
         stopForeground(true);
+
+        Toast.makeText(this, "Service terminated",
+                Toast.LENGTH_LONG).show();
+
         super.onDestroy();
     }
 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(isNetworkEnabled()){
-            googleApiClient.connect();
-        }
-
+        googleApiClient.connect();
 
         LocationServiceNewAPI.mostRecentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         updateTLAs();
@@ -165,6 +165,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
         return Service.START_STICKY;
     }
 
+    // not used anymore
     public boolean isNetworkEnabled() {
         return this.locationmanager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
