@@ -42,36 +42,21 @@
                 android:textColor="@color/greenish_75"/>
         </RelativeLayout>
 
-
         <Button
             android:id="@+id/navigationListLabelButtonStart"
+            style="@style/Button.ServiceControl.Start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:paddingTop="3dp"
-            android:paddingBottom="3dp"
-            android:text="Start"
-            android:textSize="16sp"
-            android:textColor="@color/greenish_100"
+            android:text="@string/servicecontrol_start"
             android:layout_below="@+id/upper"
             android:layout_alignLeft="@+id/upper"/>
         <Button
             android:id="@+id/navigationListLabelButtonStop"
+            style="@style/Button.ServiceControl.Stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:paddingTop="3dp"
-            android:paddingBottom="3dp"
-            android:text="Stop"
-            android:textSize="16sp"
-            android:textColor="@color/greenish_100"
-            android:layout_marginLeft="10dp"
+            android:text="@string/servicecontrol_stop"
+            android:layout_marginLeft="5dp"
             android:layout_below="@+id/upper"
             android:layout_toRightOf="@+id/navigationListLabelButtonStart"/>
 

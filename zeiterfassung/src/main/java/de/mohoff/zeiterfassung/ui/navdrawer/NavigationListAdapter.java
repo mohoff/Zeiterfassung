@@ -1,6 +1,7 @@
 package de.mohoff.zeiterfassung.ui.navdrawer;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,7 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
     public View getView(int position, View convertView, ViewGroup parent){
         View view = null;
         NavigationListItem menuItem = this.getItem(position);
+
         if (menuItem.getType() == NavigationListItemLabel.ITEM_TYPE){
             view = getLabelView(convertView, parent, menuItem);
         }
@@ -49,14 +51,13 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
         } else {
             view = getLabelServiceView(convertView, parent, menuItem);
         }
+
         return view;
     }
 
     public View getLabelView(View convertView, ViewGroup parentView, NavigationListItem navDrawerItem){
-
         NavigationListItemLabel menuItem = (NavigationListItemLabel) navDrawerItem;
         NavigationListItemLabelHolder navigationListItemLabelHolder = null;
-
 
         if(convertView == null){
             convertView = inflater.inflate( R.layout.navigation_drawer_list_label, parentView, false);
@@ -81,9 +82,6 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
     }
 
     public View getLabelServiceView(View convertView, ViewGroup parentView, NavigationListItem navDrawerItem){
-
-        //final View finalConvertView = convertView;
-        //final ViewGroup finalParentView = parentView;
         final NavigationListItemLabelService menuItem = (NavigationListItemLabelService) navDrawerItem ;
         NavigationListItemLabelServiceHolder navHolder = null;
 
@@ -102,22 +100,22 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
 
             convertView.setTag(navHolder);
         }
-
         if(navHolder == null) {
             navHolder = (NavigationListItemLabelServiceHolder) convertView.getTag();
         }
 
         navHolder.labelView.setText(menuItem.getLabel());
         navHolder.iconView.setImageResource(menuItem.getIcon());
-        navHolder.buttonStart.setText(menuItem.getButtonLabelStart());
-        navHolder.buttonStop.setText(menuItem.getButtonLabelStop());
 
         if(menuItem.isServiceRunning()){
-            navHolder.buttonStop.setBackgroundColor(menuItem.getColorServiceIsStopped());
-            navHolder.buttonStop.setTextColor(menuItem.getTextColorEnabled());
-            navHolder.buttonStart.setBackgroundColor(menuItem.getColorServiceActionDisabled());
-            navHolder.buttonStart.setTextColor(menuItem.getTextColorDisabled());
+            // start button
+            navHolder.buttonStart.getBackground().setColorFilter(context.getResources().getColor(R.color.grey_25), PorterDuff.Mode.MULTIPLY);
+            navHolder.buttonStart.setEnabled(false);
+            navHolder.buttonStart.setTextColor(context.getResources().getColor(R.color.white)); // need to set text color explicitly after setEnabled(false). Else text color gets grey somehow
             navHolder.buttonStart.setOnClickListener(null);
+            // stop button
+            navHolder.buttonStop.getBackground().setColorFilter(context.getResources().getColor(R.color.greenish), PorterDuff.Mode.MULTIPLY);
+            navHolder.buttonStop.setEnabled(true);
             navHolder.buttonStop.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -131,11 +129,9 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
                 }
             });
         } else {
-            navHolder.buttonStart.setBackgroundColor(menuItem.getColorServiceIsRunning());
-            navHolder.buttonStart.setTextColor(menuItem.getTextColorEnabled());
-            navHolder.buttonStop.setBackgroundColor(menuItem.getColorServiceActionDisabled());
-            navHolder.buttonStop.setTextColor(menuItem.getTextColorDisabled());
-            navHolder.buttonStop.setOnClickListener(null);
+            // start button
+            navHolder.buttonStart.getBackground().setColorFilter(context.getResources().getColor(R.color.greenish), PorterDuff.Mode.MULTIPLY);
+            navHolder.buttonStart.setEnabled(true);
             navHolder.buttonStart.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -148,6 +144,11 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
                     //getLabelServiceView(finalConvertView, finalParentView, menuItem); // redraw View
                 }
             });
+            // stop button
+            navHolder.buttonStop.getBackground().setColorFilter(context.getResources().getColor(R.color.grey_25), PorterDuff.Mode.MULTIPLY);
+            navHolder.buttonStop.setEnabled(false);
+            navHolder.buttonStop.setTextColor(context.getResources().getColor(R.color.white)); // need to set text color explicitly after setEnabled(false). Else text color gets grey somehow
+            navHolder.buttonStop.setOnClickListener(null);
         }
 
         return convertView;
@@ -165,11 +166,9 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
             navMenuItemHolder.labelView = labelView;
             convertView.setTag(navMenuItemHolder);
         }
-
         if(navMenuItemHolder == null){
             navMenuItemHolder = (NavigationListItemSectionHolder) convertView.getTag();
         }
-
         navMenuItemHolder.labelView.setText(menuSection.getLabel());
 
         return convertView;
@@ -198,7 +197,6 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
     private static class NavigationListItemLabelServiceHolder{
         private TextView labelView;
         private ImageView iconView;
-
         private Button buttonStart;
         private Button buttonStop;
     }

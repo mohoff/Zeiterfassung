@@ -88,7 +88,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         this.items[2] = NavigationListItemLabel.create(3, "Manage TLAs", "R.drawable.ic_location", true, this);
         this.items[3] = NavigationListItemSection.create(4, "DEBUG");
         this.items[4] = NavigationListItemLabel.create(5, "Map", "R.drawable.ic_debug", true, this);
-        this.items[5] = NavigationListItemLabelService.create(6, "Location Service", "Start", "Stop", "drawable/ic_action_edit_location", this, false);
+        this.items[5] = NavigationListItemLabelService.create(6, "Location Service", "drawable/ic_action_edit_location", this, false);
         //this.items[5] = NavigationListItemLabel.create(6, "Start LocationService", "R.drawable.ic_service_start", false, this);
         //this.items[6] = NavigationListItemLabel.create(7, "Stop LocationService", "R.drawable.ic_service_stop", false, this);
         this.items[6] = NavigationListItemSection.create(7, "MISC");
@@ -333,10 +333,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
             //if (mapFragment.isVisible()) {
             //    mapFragment.drawLocationUpdate(new Loc(lat, lng, accuracy));
             //}
-
-
         }
     };
+
     @Override
     protected void onResume() {
         super.onResume();

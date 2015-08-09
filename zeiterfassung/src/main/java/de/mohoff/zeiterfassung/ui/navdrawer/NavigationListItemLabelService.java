@@ -22,27 +22,18 @@ public class NavigationListItemLabelService implements NavigationListItem{
     private int colorServiceActionDisabled;
     private int textColorDisabled;
 
-
     private int textColorEnabled;
-    //private boolean updateActionBarTitle;
 
     private NavigationListItemLabelService() {
     }
 
-    public static NavigationListItemLabelService create(int id, String label, String labelStart, String labelStop, String icon, Context context, boolean isServiceRunning){
+    public static NavigationListItemLabelService create(int id, String label, String icon, Context context, boolean isServiceRunning){
         NavigationListItemLabelService item = new NavigationListItemLabelService();
         item.setId(id);
         item.setServiceRunning(isServiceRunning);
         item.setIcon(context.getResources().getIdentifier(icon, "drawable", context.getPackageName()));
         item.setLabel(label);
-        item.setButtonLabelStart(labelStart);
-        item.setButtonLabelStop(labelStop);
-        item.setColorServiceIsRunning(context.getResources().getColor(R.color.green_light));
-        item.setColorServiceIsStopped(context.getResources().getColor(R.color.red_light));
-        item.setColorServiceActionDisabled(context.getResources().getColor(R.color.grey_10));
-        item.setTextColorDisabled(context.getResources().getColor(R.color.grey_25));
-        item.setTextColorEnabled(context.getResources().getColor(R.color.grey_60));
-        //item.setUpdateActionBarTitle(updateActionBarTitle);
+
         return item;
     }
 

@@ -38,7 +38,7 @@ public class LocationCache {
 
     public float getCurrentInBoundProxFor(TargetLocationArea tla){
         float positives = 0;
-        float all = locationCache.maxSize();
+        float all = locationCache.size();
 
         for(int i=0; i<interpolatedCache.size(); i++){
             Loc loc = (Loc) interpolatedCache.get(i);

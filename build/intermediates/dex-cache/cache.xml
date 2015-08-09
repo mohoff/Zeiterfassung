@@ -2,116 +2,11 @@
 <items version="2" >
 
     <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-fitness/7.5.0/jars/classes.jar"
+        jar="/home/moo/.gradle/caches/modules-2/files-2.1/com.j256.ormlite/ormlite-android/4.48/afa06f539a4026c10b247386312aa67404b80a16/ormlite-android-4.48.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="a172852a35ff919e85b9b7f14bbc15c5bee25520">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-55b0739a573dddbd1de5cef97bdac17133fa1b87.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/22.2.1/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="3abb4b88f5a8a0584a9b01d3170d7165f12f8588">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-4fdc7c069885e7009301085d6ea735ce1c113f34.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-nearby/7.5.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="6440e5e5cfe368f9bff3c537fb8988048069cb33">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-6748ca1e68716f90e3d4e1b38ecd287413870534.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-analytics/7.5.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="e7b35244f50663b3f8d150714bca9ecd7a290da1">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-8dd02404c0ac49cbd6d65e9ac994ed602906b669.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-ads/7.5.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="29ebc7e04d877062317c8cc0e68b20f0c1fcda66">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-444676f2407417bd5bd002bdee73a5bd2dd6d61b.jar" />
-    </item>
-    <item
-        jar="/home/moo/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-collections4/4.0/da217367fd25e88df52ba79e47658d4cf928b0d1/commons-collections4-4.0.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="da217367fd25e88df52ba79e47658d4cf928b0d1">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/commons-collections4-4.0-284eeaf3325a267a9f88e56ddc82a14ba59c4152.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-gcm/7.5.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="8d736fefa22d896e84a268354b3ed48a42663150">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-dcc3a2c21ecea39efc2084aefda587b0e8c5b8fa.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-safetynet/7.5.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="1a6411087ab88ce5542f593e63a2752b6b0d6f1a">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-4ba7571429a6eafb79a525f3daa8f5d452d129cb.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.1/jars/libs/internal_impl-22.2.1.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="c471eaaba13ff64f6e0383d1c30a9cdc9a97efeb">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/internal_impl-22.2.1-ce9beff228fc816851cd7b44eb49a2d6ead207b0.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-appindexing/7.5.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="f02127a85abd52a2cd526d4c2409f21969f80ee8">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-e8a96b635131a1327facbb2ae36e88437be62722.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-wallet/7.5.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="6836d188602ec5382d1967c58b00960eb8ff8773">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-af6b0a8cb862303110c7a30adc9f12118ff6f772.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-panorama/7.5.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="ba207be21987c11b37d9f8faa08ed6e722569f30">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-e20be667110b110c2822e71c77641b56bd063177.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.1/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="f8efd0096475e0daf054267b61544e10dc776503">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-2e88a90746e159ff562b463a3b3df76cd768c2fc.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/mediarouter-v7/22.0.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="a1372c17fccacca753d3951d3ad820571cbce075">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-09fe9a52aa6bdde6a2de990b8d4cf39d5bb8f8cc.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/cardview-v7/22.2.1/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="e1fa5e1123997a55e3ed65b44892993ff4b58cfe">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-ff214e0bd161bccb12229104eaf73936624653e5.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.1/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="4486e953d1f35f8ccab098b1dd67146366d5f731">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-7a3fe05feb4abf519e74f7138143685497b5f19e.jar" />
+        sha1="afa06f539a4026c10b247386312aa67404b80a16">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/ormlite-android-4.48-f13945936a9f23a4b93b500b0f55a0e9cdaf67f1.jar" />
     </item>
     <item
         jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/mediarouter-v7/22.0.0/jars/libs/internal_impl-22.0.0.jar"
@@ -128,32 +23,11 @@
         <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-baa1969fc38d77561eaec91e41ea75caeab318d5.jar" />
     </item>
     <item
-        jar="/home/moo/.gradle/caches/modules-2/files-2.1/com.j256.ormlite/ormlite-android/4.48/afa06f539a4026c10b247386312aa67404b80a16/ormlite-android-4.48.jar"
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-plus/7.5.0/jars/classes.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="afa06f539a4026c10b247386312aa67404b80a16">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/ormlite-android-4.48-f13945936a9f23a4b93b500b0f55a0e9cdaf67f1.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-maps/7.5.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="06a42becc33232ec0ee125161da68c1829c9f8fd">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-757f23906fc19a7662d95124f71f8116953cf3a9.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-wearable/7.5.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="69dd177337ead693c408c8dddc9546bb6f1244fa">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-55717841727ea5a8d7e8a6d02b37652f7ed66521.jar" />
-    </item>
-    <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/7.5.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="1e98ef3f124bb7a11f8575f9ff5dfea330b61b6f">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-e865efb73b500033e6a84af204bbf977f958c14c.jar" />
+        sha1="272bc5d7063f24bc3a33ea1d318cde8f31f5ec4c">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-409dd0e7c81036bbebea0d4c1307321939004354.jar" />
     </item>
     <item
         jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-appinvite/7.5.0/jars/classes.jar"
@@ -163,6 +37,13 @@
         <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-4204416d9abadf8bb81218b3615dcf0cb3bf4db6.jar" />
     </item>
     <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/mediarouter-v7/22.0.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="a1372c17fccacca753d3951d3ad820571cbce075">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-09fe9a52aa6bdde6a2de990b8d4cf39d5bb8f8cc.jar" />
+    </item>
+    <item
         jar="/home/moo/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/22.2.1/support-annotations-22.2.1.jar"
         jumboMode="false"
         revision="22.0.1"
@@ -170,18 +51,109 @@
         <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/support-annotations-22.2.1-d60f0b07c84caa039bdc13ec1b2f296655bbd891.jar" />
     </item>
     <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-appstate/7.5.0/jars/classes.jar"
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.1/jars/classes.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="68c140702c7242d914655bcb3164d9e8c45b84cb">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-a2e710c3b1c2c0cb8d9b0d353047e22851508a7d.jar" />
+        sha1="f8efd0096475e0daf054267b61544e10dc776503">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-2e88a90746e159ff562b463a3b3df76cd768c2fc.jar" />
     </item>
     <item
-        jar="/home/moo/.gradle/caches/modules-2/files-2.1/com.j256.ormlite/ormlite-core/4.48/e579bd2905d0399af5029aaaf9817d5fa0ca88a5/ormlite-core-4.48.jar"
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-appindexing/7.5.0/jars/classes.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="e579bd2905d0399af5029aaaf9817d5fa0ca88a5">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/ormlite-core-4.48-a4547055c40098631ffa56183942a1ad630945f9.jar" />
+        sha1="f02127a85abd52a2cd526d4c2409f21969f80ee8">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-e8a96b635131a1327facbb2ae36e88437be62722.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-maps/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="06a42becc33232ec0ee125161da68c1829c9f8fd">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-757f23906fc19a7662d95124f71f8116953cf3a9.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="1e98ef3f124bb7a11f8575f9ff5dfea330b61b6f">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-e865efb73b500033e6a84af204bbf977f958c14c.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-analytics/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="e7b35244f50663b3f8d150714bca9ecd7a290da1">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-8dd02404c0ac49cbd6d65e9ac994ed602906b669.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-wearable/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="69dd177337ead693c408c8dddc9546bb6f1244fa">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-55717841727ea5a8d7e8a6d02b37652f7ed66521.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-panorama/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="ba207be21987c11b37d9f8faa08ed6e722569f30">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-e20be667110b110c2822e71c77641b56bd063177.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/22.2.1/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="3abb4b88f5a8a0584a9b01d3170d7165f12f8588">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-4fdc7c069885e7009301085d6ea735ce1c113f34.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/cardview-v7/22.2.1/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="e1fa5e1123997a55e3ed65b44892993ff4b58cfe">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-ff214e0bd161bccb12229104eaf73936624653e5.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-wallet/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="6836d188602ec5382d1967c58b00960eb8ff8773">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-af6b0a8cb862303110c7a30adc9f12118ff6f772.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-nearby/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="6440e5e5cfe368f9bff3c537fb8988048069cb33">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-6748ca1e68716f90e3d4e1b38ecd287413870534.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-fitness/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="a172852a35ff919e85b9b7f14bbc15c5bee25520">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-55b0739a573dddbd1de5cef97bdac17133fa1b87.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-ads/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="29ebc7e04d877062317c8cc0e68b20f0c1fcda66">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-444676f2407417bd5bd002bdee73a5bd2dd6d61b.jar" />
+    </item>
+    <item
+        jar="/home/moo/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-collections4/4.0/da217367fd25e88df52ba79e47658d4cf928b0d1/commons-collections4-4.0.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="da217367fd25e88df52ba79e47658d4cf928b0d1">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/commons-collections4-4.0-284eeaf3325a267a9f88e56ddc82a14ba59c4152.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.1/jars/libs/internal_impl-22.2.1.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="c471eaaba13ff64f6e0383d1c30a9cdc9a97efeb">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/internal_impl-22.2.1-ce9beff228fc816851cd7b44eb49a2d6ead207b0.jar" />
     </item>
     <item
         jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-games/7.5.0/jars/classes.jar"
@@ -191,11 +163,11 @@
         <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-fcbbd6f0ceb85c382a422357b7634a80771f2fac.jar" />
     </item>
     <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-cast/7.5.0/jars/classes.jar"
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-safetynet/7.5.0/jars/classes.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="8e3a972f28b8bae817e382257ba177a31bcadbbc">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-5f46e7e4588b7bf60ca989241ac6bbbc5df2cf9a.jar" />
+        sha1="1a6411087ab88ce5542f593e63a2752b6b0d6f1a">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-4ba7571429a6eafb79a525f3daa8f5d452d129cb.jar" />
     </item>
     <item
         jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-identity/7.5.0/jars/classes.jar"
@@ -205,6 +177,13 @@
         <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-c5ee8a27891ba608dae5f0b1033b88c242a8d226.jar" />
     </item>
     <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-appstate/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="68c140702c7242d914655bcb3164d9e8c45b84cb">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-a2e710c3b1c2c0cb8d9b0d353047e22851508a7d.jar" />
+    </item>
+    <item
         jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-drive/7.5.0/jars/classes.jar"
         jumboMode="false"
         revision="22.0.1"
@@ -212,11 +191,32 @@
         <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-22b192f8c476d87e17bfda3ea069afb70527e89b.jar" />
     </item>
     <item
-        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-plus/7.5.0/jars/classes.jar"
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-cast/7.5.0/jars/classes.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="272bc5d7063f24bc3a33ea1d318cde8f31f5ec4c">
-        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-409dd0e7c81036bbebea0d4c1307321939004354.jar" />
+        sha1="8e3a972f28b8bae817e382257ba177a31bcadbbc">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-5f46e7e4588b7bf60ca989241ac6bbbc5df2cf9a.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.google.android.gms/play-services-gcm/7.5.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="8d736fefa22d896e84a268354b3ed48a42663150">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-dcc3a2c21ecea39efc2084aefda587b0e8c5b8fa.jar" />
+    </item>
+    <item
+        jar="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.1/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="4486e953d1f35f8ccab098b1dd67146366d5f731">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/classes-7a3fe05feb4abf519e74f7138143685497b5f19e.jar" />
+    </item>
+    <item
+        jar="/home/moo/.gradle/caches/modules-2/files-2.1/com.j256.ormlite/ormlite-core/4.48/e579bd2905d0399af5029aaaf9817d5fa0ca88a5/ormlite-core-4.48.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="e579bd2905d0399af5029aaaf9817d5fa0ca88a5">
+        <dex dex="/home/moo/git/Zeiterfassung/zeiterfassung/build/intermediates/pre-dexed/debug/ormlite-core-4.48-a4547055c40098631ffa56183942a1ad630945f9.jar" />
     </item>
 
 </items>

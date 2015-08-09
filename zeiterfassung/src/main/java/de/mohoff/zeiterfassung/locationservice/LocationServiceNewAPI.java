@@ -48,7 +48,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     //public static int timeBetweenMeasures = 1000 * 60; // in ms // 1000 * 60;
     private static float boundaryTreshold = 0.8f;
     private static int amountOfTemporarySavedLocations = 5;
-    private static int REGULAR_UPDATE_INTERVAL = 60 * 1000; // ms, update interval
+    private static int REGULAR_UPDATE_INTERVAL = 150 * 1000; // ms, update interval, 60 * 1000 = 60s
     private static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
     private static String locationProviderType = LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
 
@@ -138,7 +138,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
 
         startForeground(1337, notification);
 
-        Toast.makeText(this, "Service terminated",
+        Toast.makeText(this, "Service created",
                 Toast.LENGTH_LONG).show();
     }
 
@@ -186,6 +186,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
             float prox = locCache.getCurrentInBoundProxFor(tla);
             if (prox > boundaryTreshold) {
                 inBoundTLAs.add(tla);
+                // break; if only one TLA can match a location
             }
         }
     }
@@ -233,6 +234,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     public void handleLocationUpdate(Location loc) {
         Loc currentLoc = convertLocationToLoc(loc);
         locCache.addLocationUpdate(currentLoc);
+        Log.v(TAG, currentLoc.getLatitude() + ", " + currentLoc.getLongitude() + ", " + currentLoc.getAccuracy());
         numberOfUpdates++;
         sendLocationUpdateViaBroadcast(loc.getLatitude(), loc.getLongitude(), loc.getAccuracy());
 

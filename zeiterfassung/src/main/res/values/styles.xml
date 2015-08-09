@@ -1,7 +1,10 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="AppTheme.Base" />
+
+    <!-- Both <v21 and v21 inherit from AppTheme.Base -->
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:activatedBackgroundIndicator">@drawable/navigation_drawer_list_selector</item>
 
         <!--<item name="actionBarStyle">@style/MyActionBarStyle</item>-->
@@ -9,11 +12,31 @@
         <item name="colorPrimary">@color/greenish</item>
         <item name="colorPrimaryDark">@color/greenish</item>
         <item name="colorAccent">@color/green_light</item>
+        <!-- You can also set colorControlNormal, colorControlActivated
+             colorControlHighlight & colorSwitchThumbNormal. -->
 
+        <item name="colorButtonNormal">@color/greenish</item>
     </style>
 
+    <style name="Button" parent="android:style/Widget.Material.Button">
+        <item name="colorButtonNormal">@color/greenish</item>
+    </style>
 
+    <style name="Button.ServiceControl">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">15dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textSize">14sp</item>
+    </style>
 
+    <style name="Button.ServiceControl.Start">
+    </style>
+    <style name="Button.ServiceControl.Stop">
+    </style>
 
     <style name="EditText">
         <item name="colorControlNormal">#0000FF</item>

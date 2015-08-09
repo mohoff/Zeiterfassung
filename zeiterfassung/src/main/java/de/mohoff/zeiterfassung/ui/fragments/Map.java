@@ -31,10 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.mohoff.zeiterfassung.datamodel.Loc;
-import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.ui.MainActivity;
-import de.mohoff.zeiterfassung.legacy.LocationUpdateHandler;
 import de.mohoff.zeiterfassung.legacy.LocationUpdater;
 
 public class Map extends Fragment {
