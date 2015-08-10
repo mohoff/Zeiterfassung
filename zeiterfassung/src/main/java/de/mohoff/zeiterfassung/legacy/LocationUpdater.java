@@ -50,7 +50,7 @@ public class LocationUpdater {
     public void delegateDrawMarker(Location loc){
         if(!locChangeListener.isEmpty()) {
             for(LocationChangeListener lcl : locChangeListener){
-                lcl.handleLocationUpdate(loc);
+                //lcl.onNewLocation(loc);
             }
         }
     }

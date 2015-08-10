@@ -85,6 +85,7 @@ public class LocationCache {
     }
 
     public boolean isFull(){
+        // locationCache.isFull() always returns false in my case...
         return locationCache.size() == locationCache.maxSize();
     }
 

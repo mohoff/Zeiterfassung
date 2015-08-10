@@ -12,6 +12,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
+
+import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.R;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -252,6 +254,11 @@ public class Map extends MapFragment implements LocationChangeListener {
             //handle click here
             markerIBM.hideInfoWindow();
         }*/
+    }
+
+    @Override
+    public void onNewLocation(Loc loc) {
+
     }
 
     /*@Override

@@ -32,20 +32,21 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.ui.MainActivity;
-import de.mohoff.zeiterfassung.legacy.LocationUpdater;
 
-public class Map extends Fragment implements OnMapReadyCallback {
-    Activity parentActivity;
+public class Map extends Fragment implements OnMapReadyCallback, LocationChangeListener {
+    MainActivity parentActivity;
     private static View view;
 
     private MapFragment mapFragment;
+    private GoogleMap map;
+    private int newLocsReceivedWhileMapVisible = 0;
 
-    GoogleMap map;
-    LatLng mostRecentUserLocation = null;
-    List<Loc> userLocations = new ArrayList<>();
+    CircularFifoQueue<Loc> userLocations;
     List<Marker> markers = new ArrayList<Marker>();
     Marker markerUserLocation;
     Marker markerCandidate = null;
@@ -56,12 +57,6 @@ public class Map extends Fragment implements OnMapReadyCallback {
 
     EditText et;
     int radius;
-
-
-    public Map(ArrayList<Loc> locs) {
-        // Required empty public constructor
-        this.userLocations = locs;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,31 +75,11 @@ public class Map extends Fragment implements OnMapReadyCallback {
         } catch (InflateException e) {
             /* map is already there, just return view as it is */
         }
-        
-        parentActivity = getActivity();
+
+        parentActivity = (MainActivity) getActivity();
 
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        /*
-        et = (EditText) findViewById(R.id.editText);
-        updateRadiusFromEditText();
-        */
-
-        // store userLocations temporarly in bundle, to repopulate map after screen rotation
-        /*if(savedInstanceState != null){
-            if(savedInstanceState.containsKey("userLocations")){
-                userLocations = savedInstanceState.getParcelableArrayList("userLocations");
-                for(int i=0; i<userLocations.size(); i++){
-                    drawMarkerForLocation(userLocations.get(i));
-                }
-            }
-            //if(savedInstanceState.containsKey("mostRecentUserLocation")){
-            //    double lat = savedInstanceState.getDoubleArray("mostRecentUserLocation")[0];
-            //    double lng = savedInstanceState.getDoubleArray("mostRecentUserLocation")[1];
-            //    mostRecentUserLocation = new LatLng(lat, lng);
-            //}
-        }*/
 
         return view;
     }
@@ -130,11 +105,18 @@ public class Map extends Fragment implements OnMapReadyCallback {
 
         // set newest markers
 
-        ArrayList<Loc> locs = ((MainActivity) getActivity()).getLocs();
-
-
+        // get most recent locations from MainActivity
+        this.userLocations = parentActivity.getLocs();
+        this.newLocsReceivedWhileMapVisible = 0;
+        parentActivity.setOnNewLocationListener(this); // set listener
 
         super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        parentActivity.setOnNewLocationListener(null); // remove listener
+        super.onPause();
     }
 
     public void onDestroyView() {
@@ -145,136 +127,6 @@ public class Map extends Fragment implements OnMapReadyCallback {
             map = null;
         }
     }
-
-    public void drawLocationUpdate(Loc loc){
-        // transform to my "Loc" datatype
-        locationCache.add(loc);
-        drawMarkerForLocation(loc);
-        if(!markers.isEmpty()){
-            markers.get(markers.size()-2).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
-        }
-        try {
-            // may cause racecondition with second listener implemenatation (following line might get old interpolated position)
-            //drawMarkerForLatLng(luh.getInterpolatedPositionInLatLng());
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-
-
-    }
-
-
-
-    public void drawMarkerForLocation(Loc loc){
-        LatLng latLng = new LatLng(loc.getLatitude(), loc.getLongitude());
-        markerUserLocation = map.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .draggable(false)
-                        .title("acc " + String.valueOf(loc.getAccuracy()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
-                                //.snippet(loc.getExtras().toString())
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
-        );
-        //userLocations.add(loc);
-        markers.add(markerUserLocation);
-    }
-
-    public void drawMarkerForLatLng(LatLng latLng){
-        map.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .draggable(false)
-                                //.title("acc " + String.valueOf(loc.getAccuracyMultiplier()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
-                                //.snippet(loc.getExtras().toString())
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-        );
-    }
-    /*
-    public void updateRadiusFromEditText(){
-        String inputString = et.getText().toString();
-        try{
-            radius = Integer.valueOf(inputString);
-        } catch (Exception e){
-            radius = -1;
-        }
-    }
-    */
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        setUpMapIfNeeded();
-    }*/
-
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        parentActivity.getMenuInflater().inflate(R.menu.map, menu);
-        return true;
-    }*/
-
-    /*@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
-        switch(item.getItemId()) {
-            case R.id.home:
-            case android.R.id.home:
-                Intent intent = new Intent(Map.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-                //overridePendingTransition(R.anim.enter_from_left, R.anim.exit_out_right);
-                return true;
-            case R.id.action_settings:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-
-    }
-*/
-    private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (map == null) {
-            //map = ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.map)).getMap();
-            map = ((MapFragment) MainActivity.fragM.findFragmentById(R.id.map)).getMap();
-
-
-            //map = ((MapFragment) MainActivity.fragM
-            //        .findFragmentById(R.id.map)).getMap();
-
-            // Check if we were successful in obtaining the map.
-            if (map != null) {
-                // The Map is verified. It is now safe to manipulate the map.
-                setUpMap();
-            }
-        }
-    }
-
-    public void setUpMap(){
-
-    }
-
-    public void onMarkerClick(final Marker marker) {
-        System.out.println("marker click!");
-        /*if (marker.equals(markerIBM))
-        {
-            //handle click here
-            markerIBM.hideInfoWindow();
-        }*/
-    }
-
-    /*@Override
-    protected void onSaveInstanceState(Bundle outState) {
-        //if(mostRecentUserLocation != null){
-        //    double[] latLng = {mostRecentUserLocation.latitude, mostRecentUserLocation.longitude};
-        //    outState.putDoubleArray("mostRecentUserLocation", latLng);
-        //}
-        if(!userLocations.isEmpty()){
-            outState.putParcelableArrayList("userLocations", userLocations);
-        }
-
-        super.onSaveInstanceState(outState);
-    }*/
 
     @Override
     public void onAttach(Activity activity) {
@@ -288,19 +140,15 @@ public class Map extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        this.map = googleMap;
         //googleMap.setMyLocationEnabled(true); // displays current user location with bearing on the map
 
-        mostRecentUserLocation = new LatLng(LocationUpdater.mostRecentLocation.getLatitude(), LocationUpdater.mostRecentLocation.getLongitude());
-        markers.add(googleMap.addMarker(new MarkerOptions()
-                        .position(mostRecentUserLocation)
-                        .draggable(false)
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
-        ));
-
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(mostRecentUserLocation, 15));
-
-        for(Loc loc : this.userLocations){
-            drawMarkerForLocation(loc);
+        if(this.userLocations.size() > 0){
+            for(Loc loc : userLocations){
+                addMarkerToMap(this.map, GeneralHelper.convertLocToLatLng(loc));
+            }
+        } else {
+            GeneralHelper.showToast(parentActivity, "no location data available.");
         }
 
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -330,18 +178,6 @@ public class Map extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
-        /*
-        et.addTextChangedListener(new TextWatcher(){
-            public void afterTextChanged(Editable s) {
-                updateRadiusFromEditText();
-                if(circle != null) {
-                    circle.setRadius(radius);
-                }
-            }
-            public void beforeTextChanged(CharSequence s, int start, int count, int after){}
-            public void onTextChanged(CharSequence s, int start, int before, int count){}
-        });
-        */
         map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
             public void onMarkerDragStart(Marker arg0) {
@@ -359,8 +195,39 @@ public class Map extends Fragment implements OnMapReadyCallback {
 
             @Override
             public void onMarkerDrag(Marker arg0) {
-
             }
         });
+    }
+
+    private void addMarkerToMap(GoogleMap map, LatLng latLng){
+        this.markers.add(map.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .draggable(false)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+                //.title("acc " + String.valueOf(loc.getAccuracy()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
+        ));
+        if(this.markers.size() > 1){
+            // change color for old marker
+            this.markers.get(markers.size()-2).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
+            // move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow location updates on the map"
+            map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        } else {
+            // zoom map in to marker, if the marker is the first one on the map
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+        }
+    }
+
+    public void onNewLocation(Loc loc) {
+        newLocsReceivedWhileMapVisible++;
+        if(this.map != null){
+            addMarkerToMap(this.map, GeneralHelper.convertLocToLatLng(loc));
+            // ensure that there are only userLocations.maxSize() locations displayed to prevent memory leak
+            if(this.userLocations.size() == this.userLocations.maxSize()){ // if circularFifoQueue is full...
+                this.markers.get(0).remove(); // remove oldest marker from map
+                this.markers.remove(0); // remove oldest/first element from marker list
+            }
+        } else {
+            GeneralHelper.showToast(parentActivity, "no map object initialized.");
+        }
     }
 }

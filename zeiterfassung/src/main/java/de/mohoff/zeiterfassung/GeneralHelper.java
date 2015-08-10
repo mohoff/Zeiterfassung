@@ -4,9 +4,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.Location;
 import android.os.IBinder;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.locationservice.LocationServiceNewAPI;
 
 /**
@@ -90,6 +94,14 @@ public class GeneralHelper {
     public static void showToast(Context ctx, String msg) {
         Toast toast = Toast.makeText(ctx, msg, Toast.LENGTH_LONG);
         toast.show();
+    }
+
+    public static LatLng convertLocationToLatLng(Location loc){
+        return new LatLng(loc.getLatitude(), loc.getLongitude());
+    }
+
+    public static LatLng convertLocToLatLng(Loc loc){
+        return new LatLng(loc.getLatitude(), loc.getLongitude());
     }
 
 

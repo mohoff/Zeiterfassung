@@ -24,7 +24,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
 import de.mohoff.zeiterfassung.datamodel.Loc;
+import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.locationservice.LocationServiceNewAPI;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListAdapter;
@@ -44,15 +47,17 @@ import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity implements NavigationDrawerListener {
+    private static int LOC_QUEUE_SIZE = 50; // --> set relative to update interval time so max markers on map =~ 2h for example
     SimpleDateFormat sdf;
     public static FragmentManager fragM;
     FragmentTransaction fragT;
 
-    public ArrayList<Loc> getLocs() {
+    public CircularFifoQueue<Loc> getLocs() {
         return locs;
     }
 
-    public ArrayList<Loc> locs = new ArrayList<Loc>();
+    private CircularFifoQueue<Loc> locs = new CircularFifoQueue<Loc>(MainActivity.LOC_QUEUE_SIZE);
+    //private ArrayList<Loc> locs = new ArrayList<Loc>();
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
@@ -71,6 +76,15 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
     private LocationServiceNewAPI service;
     private LocationServiceConnection lsc = null;
     private MainActivity refThis = this;
+
+    // listener for Map fragment
+    // When fragment is active, it can update its map on new locations instantly
+    private LocationChangeListener newLocationListener;
+
+    public void setOnNewLocationListener(LocationChangeListener listen) {
+        newLocationListener = listen;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,7 +256,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
                 fragment = new ManageTLAs();
                 break;
             case 4:
-                fragment = new Map(locs);
+                fragment = new Map();
                 break;
             case 7:
                 fragment = new About();
@@ -330,7 +344,12 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
             double lat = Double.valueOf(intent.getStringExtra("lat"));
             double lng = Double.valueOf(intent.getStringExtra("lng"));
             double accuracy = Double.valueOf(intent.getStringExtra("accuracy"));
-            locs.add(new Loc(lat, lng, accuracy));
+            Loc newLocation = new Loc(lat, lng, accuracy);
+            locs.add(newLocation);
+
+            if (newLocationListener != null) {
+                newLocationListener.onNewLocation(newLocation);
+            }
             // GEHT NOCH NICHT, mapFragment ist jedes mal NULL
             //getFragmentManager().executePendingTransactions();
             //Map mapFragment = (Map)getFragmentManager().findFragmentByTag("MAP");

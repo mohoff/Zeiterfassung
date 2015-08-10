@@ -180,4 +180,9 @@ public class LocationUpdateHandler extends OpenHelperManager implements Location
     public LatLng getInterpolatedPositionInLatLng(){
         return new LatLng(locCache.getInterpolatedPosition().getLatitude(), locCache.getInterpolatedPosition().getLongitude());
     }
+
+    @Override
+    public void onNewLocation(Loc loc) {
+
+    }
 }
