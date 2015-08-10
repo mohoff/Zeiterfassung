@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.FrameLayout;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
@@ -35,12 +37,11 @@ import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 import de.mohoff.zeiterfassung.legacy.LocationUpdater;
 
-public class Map extends Fragment {
+public class Map extends Fragment implements OnMapReadyCallback {
     Activity parentActivity;
     private static View view;
 
-    //LocationUpdater lu;
-    //LocationUpdateHandler luh;
+    private MapFragment mapFragment;
 
     GoogleMap map;
     LatLng mostRecentUserLocation = null;
@@ -79,83 +80,16 @@ public class Map extends Fragment {
         } catch (InflateException e) {
             /* map is already there, just return view as it is */
         }
-
-        //view = (FrameLayout) inflater.inflate(R.layout.fragment_map, container, false);
+        
         parentActivity = getActivity();
-        //lu = LocationUpdater.getInstance(parentActivity);
-        //luh = LocationUpdateHandler.getInstance(parentActivity);
 
-        setUpMapIfNeeded();
-        //lu.addTheListener(this);
-
-
+        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         /*
         et = (EditText) findViewById(R.id.editText);
         updateRadiusFromEditText();
         */
-
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng point) {
-                InputMethodManager imm = (InputMethodManager) parentActivity.getSystemService(
-                        Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(et.getWindowToken(), 0);
-
-                if(markerCandidate != null){
-                    markerCandidate.setPosition(point);
-                    circle.setCenter(point);
-                    circle.setRadius(radius);
-                } else {
-                    markerCandidate = map.addMarker(new MarkerOptions()
-                                    .position(point)
-                                    .draggable(true)
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                    );
-                    CircleOptions circleOptions = new CircleOptions()
-                            .center(point)
-                            .radius(radius)
-                            .fillColor(Color.argb(100, 81, 112, 226))
-                            .strokeWidth(0)
-                            .strokeColor(Color.TRANSPARENT)
-
-                            ;
-                    circle = map.addCircle(circleOptions);
-                }
-            }
-        });
-        /*
-        et.addTextChangedListener(new TextWatcher(){
-            public void afterTextChanged(Editable s) {
-                updateRadiusFromEditText();
-                if(circle != null) {
-                    circle.setRadius(radius);
-                }
-            }
-            public void beforeTextChanged(CharSequence s, int start, int count, int after){}
-            public void onTextChanged(CharSequence s, int start, int before, int count){}
-        });
-        */
-        map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
-            @Override
-            public void onMarkerDragStart(Marker arg0) {
-                circle.setVisible(false);
-            }
-
-            @SuppressWarnings("unchecked")
-            @Override
-            public void onMarkerDragEnd(Marker arg0) {
-                if(arg0.equals(markerCandidate)){
-                    circle.setCenter(arg0.getPosition());
-                    circle.setVisible(true);
-                }
-            }
-
-            @Override
-            public void onMarkerDrag(Marker arg0) {
-
-            }
-        });
 
         // store userLocations temporarly in bundle, to repopulate map after screen rotation
         /*if(savedInstanceState != null){
@@ -171,12 +105,13 @@ public class Map extends Fragment {
             //    mostRecentUserLocation = new LatLng(lat, lng);
             //}
         }*/
+
         return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        if (map != null)
+        /*if (map != null)
             setUpMap();
 
         if (map == null) {
@@ -185,12 +120,21 @@ public class Map extends Fragment {
             // Check if we were successful in obtaining the map.
             if (map != null)
                 setUpMap();
-        }
+        }*/
 
 
-        for(Loc loc : this.userLocations){
-            drawMarkerForLocation(loc);
-        }
+    }
+
+    @Override
+    public void onResume() {
+
+        // set newest markers
+
+        ArrayList<Loc> locs = ((MainActivity) getActivity()).getLocs();
+
+
+
+        super.onResume();
     }
 
     public void onDestroyView() {
@@ -294,6 +238,7 @@ public class Map extends Fragment {
             //map = ((MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.map)).getMap();
             map = ((MapFragment) MainActivity.fragM.findFragmentById(R.id.map)).getMap();
 
+
             //map = ((MapFragment) MainActivity.fragM
             //        .findFragmentById(R.id.map)).getMap();
 
@@ -306,19 +251,7 @@ public class Map extends Fragment {
     }
 
     public void setUpMap(){
-        try {
-            mostRecentUserLocation = new LatLng(LocationUpdater.mostRecentLocation.getLatitude(), LocationUpdater.mostRecentLocation.getLongitude());
-            markers.add(map.addMarker(new MarkerOptions()
-                            .position(mostRecentUserLocation)
-                            .draggable(false)
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
-            ));
-            CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(mostRecentUserLocation, 15);
-            map.animateCamera(cu);
 
-        } catch(Exception e){
-            System.out.println("fehler beim abrufen der mostRecentLocation");
-        }
     }
 
     public void onMarkerClick(final Marker marker) {
@@ -351,5 +284,83 @@ public class Map extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        //googleMap.setMyLocationEnabled(true); // displays current user location with bearing on the map
+
+        mostRecentUserLocation = new LatLng(LocationUpdater.mostRecentLocation.getLatitude(), LocationUpdater.mostRecentLocation.getLongitude());
+        markers.add(googleMap.addMarker(new MarkerOptions()
+                        .position(mostRecentUserLocation)
+                        .draggable(false)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+        ));
+
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(mostRecentUserLocation, 15));
+
+        for(Loc loc : this.userLocations){
+            drawMarkerForLocation(loc);
+        }
+
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                InputMethodManager imm = (InputMethodManager) parentActivity.getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(et.getWindowToken(), 0);
+
+                if (markerCandidate != null) {
+                    markerCandidate.setPosition(point);
+                    circle.setCenter(point);
+                    circle.setRadius(radius);
+                } else {
+                    markerCandidate = map.addMarker(new MarkerOptions()
+                                    .position(point)
+                                    .draggable(true)
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                    );
+                    CircleOptions circleOptions = new CircleOptions()
+                            .center(point)
+                            .radius(radius)
+                            .fillColor(Color.argb(100, 81, 112, 226))
+                            .strokeWidth(0)
+                            .strokeColor(Color.TRANSPARENT);
+                    circle = map.addCircle(circleOptions);
+                }
+            }
+        });
+        /*
+        et.addTextChangedListener(new TextWatcher(){
+            public void afterTextChanged(Editable s) {
+                updateRadiusFromEditText();
+                if(circle != null) {
+                    circle.setRadius(radius);
+                }
+            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after){}
+            public void onTextChanged(CharSequence s, int start, int before, int count){}
+        });
+        */
+        map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker arg0) {
+                circle.setVisible(false);
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public void onMarkerDragEnd(Marker arg0) {
+                if (arg0.equals(markerCandidate)) {
+                    circle.setCenter(arg0.getPosition());
+                    circle.setVisible(true);
+                }
+            }
+
+            @Override
+            public void onMarkerDrag(Marker arg0) {
+
+            }
+        });
     }
 }

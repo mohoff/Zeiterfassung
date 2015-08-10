@@ -140,6 +140,8 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
 
         Toast.makeText(this, "Service created",
                 Toast.LENGTH_LONG).show();
+
+
     }
 
     @Override
@@ -167,6 +169,7 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
 
     // not used anymore
     public boolean isNetworkEnabled() {
+
         return this.locationmanager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 

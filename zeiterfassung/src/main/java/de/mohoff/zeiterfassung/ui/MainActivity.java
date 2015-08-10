@@ -48,6 +48,10 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
     public static FragmentManager fragM;
     FragmentTransaction fragT;
 
+    public ArrayList<Loc> getLocs() {
+        return locs;
+    }
+
     public ArrayList<Loc> locs = new ArrayList<Loc>();
 
     private DrawerLayout drawerLayout;
@@ -374,8 +378,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         if(!result){
             throw new RuntimeException("Unable to bind with service.");
         }
-
     }
+
     protected class LocationServiceConnection implements ServiceConnection {
         public void onServiceConnected(ComponentName name, IBinder service) {
             LocationServiceNewAPI.LocalBinder binder = (LocationServiceNewAPI.LocalBinder) service;
