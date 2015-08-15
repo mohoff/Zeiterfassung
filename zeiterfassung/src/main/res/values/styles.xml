@@ -4,7 +4,7 @@
     <style name="AppTheme" parent="AppTheme.Base" />
 
     <!-- Both <v21 and v21 inherit from AppTheme.Base -->
-    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:activatedBackgroundIndicator">@drawable/navigation_drawer_list_selector</item>
 
         <!--<item name="actionBarStyle">@style/MyActionBarStyle</item>-->
@@ -16,6 +16,7 @@
              colorControlHighlight & colorSwitchThumbNormal. -->
 
         <item name="colorButtonNormal">@color/greenish</item>
+        <!--<item name="android:windowActionBar">false</item>--> <!-- not needed anymore, because we inherit from NoActionBar -->
     </style>
 
     <style name="Button" parent="android:style/Widget.Material.Button">

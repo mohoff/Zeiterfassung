@@ -19,6 +19,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,13 +59,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
     private Fragment nextFragment;
     private boolean nextFragmentAvailable = false;
 
+    private Toolbar toolbar;
+
     public CircularFifoQueue<Loc> getLocs() {
         return locs;
     }
-
     private CircularFifoQueue<Loc> locs = new CircularFifoQueue<Loc>(MainActivity.LOC_QUEUE_SIZE);
     private ArrayList<Loc> locsTmp = new ArrayList<Loc>();
-    //private ArrayList<Loc> locs = new ArrayList<Loc>();
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
@@ -88,11 +89,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
     // When fragment is active, it can update its map on new locations instantly
     private LocationChangeListener newLocationListener;
 
-    public void setOnNewLocationListener(LocationChangeListener listen) {
-        newLocationListener = listen;
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +97,10 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         getDbHelper();
         fragM = getFragmentManager();
         fragT = fragM.beginTransaction();
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
         title = getSupportActionBar().getTitle();
@@ -501,5 +501,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         fragM.beginTransaction()
                 .replace(R.id.content_frame, nextFragment)
                 .commit();
+    }
+
+    public void setOnNewLocationListener(LocationChangeListener listen) {
+      newLocationListener = listen;
     }
 }
