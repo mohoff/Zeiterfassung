@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
@@ -14,6 +15,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,6 +44,7 @@ import de.mohoff.zeiterfassung.ui.MainActivity;
 public class Map extends Fragment implements OnMapReadyCallback, LocationChangeListener {
     MainActivity parentActivity;
     private static View view;
+    private ProgressBar progressBar;
 
     private MapFragment mapFragment;
     private GoogleMap map;
@@ -65,16 +69,21 @@ public class Map extends Fragment implements OnMapReadyCallback, LocationChangeL
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
         if (view != null) {
             ViewGroup parent = (ViewGroup) view.getParent();
             if (parent != null)
                 parent.removeView(view);
         }
         try {
-            view = (FrameLayout) inflater.inflate(R.layout.fragment_map, container, false);
+            view = (RelativeLayout) inflater.inflate(R.layout.fragment_map, container, false);
         } catch (InflateException e) {
             /* map is already there, just return view as it is */
         }
+
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
 
         parentActivity = (MainActivity) getActivity();
 
@@ -154,6 +163,9 @@ public class Map extends Fragment implements OnMapReadyCallback, LocationChangeL
         } else {
             GeneralHelper.showToast(parentActivity, "no location data available.");
         }
+
+        //new LoadingMapTask(userLocations, map).execute();
+        //progressBar.setVisibility(View.GONE);
 
         // TODO: add click- and draglistener to this or other map (to add TLAs)
         /*
@@ -237,4 +249,52 @@ public class Map extends Fragment implements OnMapReadyCallback, LocationChangeL
             GeneralHelper.showToast(parentActivity, "no map object initialized.");
         }
     }
+
+
+    // not applyable because you can't modify UI elements in doInBackground ("map" in this case)
+    private class LoadingMapTask extends AsyncTask<Void, Void, Void> {
+        private CircularFifoQueue<Loc> locs;
+        private GoogleMap map;
+        private boolean markersAdded;
+
+        LoadingMapTask(CircularFifoQueue locs, GoogleMap map){
+            this.locs = locs;
+            this.map = map;
+            this.markersAdded = false;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            // show spinner
+            /*dialog = new ProgressDialog(Main.this);
+            dialog.setMessage("Loading....");
+            dialog.setIndeterminate(true);
+            dialog.setCancelable(true);
+            dialog.show(); //Maybe you should call it in ruinOnUIThread in doInBackGround as suggested from a previous answer
+            */
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if(this.locs.size() > 0){
+                this.markersAdded = true;
+                for( Loc loc : this.locs){
+                    addMarkerToMap(this.map, GeneralHelper.convertLocToLatLng(loc));
+                }
+            } else {
+                //GeneralHelper.showToast(parentActivity, "no location data available.");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void params) {
+            // hide spinner
+            progressBar.setVisibility(View.GONE);
+            if(!this.markersAdded){
+                GeneralHelper.showToast(parentActivity, "no location data available.");
+            }
+        }
+    }
+
 }

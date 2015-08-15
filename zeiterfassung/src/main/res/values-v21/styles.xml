@@ -24,6 +24,16 @@
         <item name="android:colorButtonNormal">@color/greenish</item>
     </style>
 
+    <style name="LoadingSpinner" parent="android:style/Widget.Material.ProgressBar">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:indeterminate">true</item>
+        <item name="android:indeterminateTint">@color/greenish</item>
+        <item name="android:indeterminateTintMode">src_atop</item>
+    </style>
+
 
 
 
