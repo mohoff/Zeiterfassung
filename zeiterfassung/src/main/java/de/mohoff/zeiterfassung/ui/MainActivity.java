@@ -9,10 +9,12 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -53,6 +55,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
     SimpleDateFormat sdf;
     public static FragmentManager fragM;
     FragmentTransaction fragT;
+    private Fragment nextFragment;
+    private boolean nextFragmentAvailable = false;
 
     public CircularFifoQueue<Loc> getLocs() {
         return locs;
@@ -141,6 +145,11 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
             public void onDrawerClosed(View view) {
                 getSupportActionBar().setTitle(title);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+
+                if(nextFragmentAvailable){
+                    replaceFragment(nextFragment);
+                    nextFragmentAvailable = false;
+                }
             }
 
             public void onDrawerOpened(View drawerView) {
@@ -150,8 +159,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         };
         drawerLayout.setDrawerListener(drawerActionBarToggle);
 
+        selectItem(1);
         if (savedInstanceState == null) {
-            selectItem(1);
+            //selectItem(1);
         } else {
             // restore location marker data after screen rotation
             if (savedInstanceState.containsKey("locs")) {
@@ -223,7 +233,16 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
     /* The click listner for ListView in the navigation drawer */
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+            //drawerLayout.closeDrawer(drawerList);
+            /*new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    selectItem(position); // your fragment transactions go here
+                }
+            }, 150);*/
+
+            // old approach: just call following line without Handler.postDelayed()
             selectItem(position);
         }
     }
@@ -250,52 +269,52 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
                 .commit();
     }*/
 
-
-
     private void selectItem(int position) {
         NavigationListItem selected = items[position];
         drawerList.setItemChecked(position, true);
-
+        drawerLayout.closeDrawer(drawerList);
 
         // update the main content by replacing fragments
-        Fragment fragment = new Fragment();
+        nextFragment = new Fragment();
+        nextFragmentAvailable = true;
+
+        // pass arguments to fragment
+        /*Bundle args = new Bundle();
+        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
+        fragment.setArguments(args);*/
 
         switch(position) {
             case 1:
-                fragment = new Overview();
+                nextFragment = new Overview();
                 break;
             case 2:
-                fragment = new ManageTLAs();
+                nextFragment = new ManageTLAs();
                 break;
             case 4:
-                fragment = new Map();
+                nextFragment = new Map();
                 break;
             case 7:
-                fragment = new About();
+                nextFragment = new About();
                 break;
         }
-
 
         if(selected.getType() == 1){
             //drawerList.getSelectedView().setBackgroundColor(0x11000000);
             if (selected.updateActionBarTitle()) {
-                drawerLayout.closeDrawer(drawerList);
+                //drawerLayout.closeDrawer(drawerList);
                 setTitle(selected.getLabel());
             }
-
         }
 
-        fragM.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
-
-
-
-        /*
-        if (drawerLayout.isDrawerOpen(drawerList)) {
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            // user selected other fragment from drawer.
+            // new fragment is loaded in onDrawerClosed()
             drawerLayout.closeDrawer(drawerList);
+        } else {
+            // display inital fragment after app start
+            replaceFragment(nextFragment);
         }
-        */
-
     }
 
     @Override
@@ -476,5 +495,11 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         // add ArrayList to instance state
         outState.putParcelableArrayList("locs", locsTmp);
         super.onSaveInstanceState(outState);
+    }
+
+    private void replaceFragment(Fragment nextFragment){
+        fragM.beginTransaction()
+                .replace(R.id.content_frame, nextFragment)
+                .commit();
     }
 }

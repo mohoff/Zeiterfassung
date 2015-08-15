@@ -165,7 +165,7 @@ public class Map extends Fragment implements OnMapReadyCallback, LocationChangeL
         }
 
         //new LoadingMapTask(userLocations, map).execute();
-        //progressBar.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
 
         // TODO: add click- and draglistener to this or other map (to add TLAs)
         /*
