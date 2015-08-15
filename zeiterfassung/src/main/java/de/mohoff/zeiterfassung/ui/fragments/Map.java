@@ -81,6 +81,10 @@ public class Map extends Fragment implements OnMapReadyCallback, LocationChangeL
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        //if(savedInstanceState!=null && savedInstanceState.containsKey("loadMarkers")){
+
+        //}
+
         return view;
     }
 
@@ -121,11 +125,11 @@ public class Map extends Fragment implements OnMapReadyCallback, LocationChangeL
 
     public void onDestroyView() {
         super.onDestroyView();
-        if (map != null) {
+        /*if (map != null) {
             MainActivity.fragM.beginTransaction()
                     .remove(MainActivity.fragM.findFragmentById(R.id.map)).commit();
             map = null;
-        }
+        }*/
     }
 
     @Override
@@ -151,6 +155,8 @@ public class Map extends Fragment implements OnMapReadyCallback, LocationChangeL
             GeneralHelper.showToast(parentActivity, "no location data available.");
         }
 
+        // TODO: add click- and draglistener to this or other map (to add TLAs)
+        /*
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
@@ -197,6 +203,7 @@ public class Map extends Fragment implements OnMapReadyCallback, LocationChangeL
             public void onMarkerDrag(Marker arg0) {
             }
         });
+        */
     }
 
     private void addMarkerToMap(GoogleMap map, LatLng latLng){

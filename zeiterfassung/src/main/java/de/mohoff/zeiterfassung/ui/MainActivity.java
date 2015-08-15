@@ -10,6 +10,8 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.os.IBinder;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -57,6 +59,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
     }
 
     private CircularFifoQueue<Loc> locs = new CircularFifoQueue<Loc>(MainActivity.LOC_QUEUE_SIZE);
+    private ArrayList<Loc> locsTmp = new ArrayList<Loc>();
     //private ArrayList<Loc> locs = new ArrayList<Loc>();
 
     private DrawerLayout drawerLayout;
@@ -149,7 +152,16 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
 
         if (savedInstanceState == null) {
             selectItem(1);
+        } else {
+            // restore location marker data after screen rotation
+            if (savedInstanceState.containsKey("locs")) {
+                locsTmp = savedInstanceState.getParcelableArrayList("locs");
+                for (Loc e : locsTmp) {
+                    locs.add(e); // --> MapFragment retrieves locs on onResume
+                }
+            }
         }
+
 
         /*// START SERVICE
         Intent i = new Intent(this, LocationService.class);
@@ -453,5 +465,16 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // convert circularFifoQueue to ArrayList
+        for(Loc e : locs) {
+            locsTmp.add(e);
+        }
+        // add ArrayList to instance state
+        outState.putParcelableArrayList("locs", locsTmp);
+        super.onSaveInstanceState(outState);
     }
 }

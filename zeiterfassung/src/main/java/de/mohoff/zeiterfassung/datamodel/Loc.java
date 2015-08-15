@@ -1,6 +1,9 @@
 package de.mohoff.zeiterfassung.datamodel;
 
-public class Loc {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Loc implements Parcelable{
 
     private double latitude;            // mandatory
     private double longitude;           // mandatory
@@ -134,4 +137,35 @@ public class Loc {
     }
 
 
+    // Implemented methods of "Parcelable"
+
+    private Loc(Parcel in) {
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+        timestampInMillis = in.readLong();
+        accuracy = in.readDouble();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeDouble(latitude);
+        out.writeDouble(longitude);
+        out.writeLong(timestampInMillis);
+        out.writeDouble(accuracy);
+    }
+
+    public static final Parcelable.Creator<Loc> CREATOR = new Parcelable.Creator<Loc>() {
+        public Loc createFromParcel(Parcel in) {
+            return new Loc(in);
+        }
+
+        public Loc[] newArray(int size) {
+            return new Loc[size];
+        }
+    };
 }
