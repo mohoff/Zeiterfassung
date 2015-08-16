@@ -54,7 +54,7 @@
             android:exported="false" >
         </service>-->
         <service
-            android:name=".locationservice.LocationServiceNewAPI"
+            android:name=".locationservice.LocationService"
             android:exported="false" >
         </service>
 

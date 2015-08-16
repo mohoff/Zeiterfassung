@@ -11,7 +11,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 
 import de.mohoff.zeiterfassung.datamodel.Loc;
-import de.mohoff.zeiterfassung.locationservice.LocationServiceNewAPI;
+import de.mohoff.zeiterfassung.locationservice.LocationService;
 
 /**
  * Created by TPPOOL01 on 26.11.2014.
@@ -23,7 +23,7 @@ public class GeneralHelper {
 
     // LocationService variables
     private LocationServiceConnection lsc = null;
-    private LocationServiceNewAPI service;
+    private LocationService service;
     private boolean serviceIsRunning = false;
 
     // SINGLETON
@@ -52,11 +52,11 @@ public class GeneralHelper {
 
     // LocationService Methods
     public void startAndConnectToLocationService() {
-        context.startService(new Intent(context, LocationServiceNewAPI.class)); // Calling startService() first prevents it from being killed on unbind()
+        context.startService(new Intent(context, LocationService.class)); // Calling startService() first prevents it from being killed on unbind()
         lsc = new LocationServiceConnection();  // connect to it
 
         boolean result = context.bindService(
-                new Intent(context, LocationServiceNewAPI.class),
+                new Intent(context, LocationService.class),
                 lsc,
                 Context.BIND_AUTO_CREATE
         );
@@ -68,8 +68,8 @@ public class GeneralHelper {
     }
     protected class LocationServiceConnection implements ServiceConnection {
         public void onServiceConnected(ComponentName name, IBinder service) {
-            LocationServiceNewAPI.LocalBinder binder = (LocationServiceNewAPI.LocalBinder) service;
-            instance.service = (LocationServiceNewAPI) binder.getService();
+            LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
+            instance.service = (LocationService) binder.getService();
         }
 
         @Override
@@ -86,7 +86,7 @@ public class GeneralHelper {
     public void stopLocationService(){
         if(serviceIsRunning){
             this.unbindLocationService();
-            service.stopService(new Intent(context, LocationServiceNewAPI.class));
+            service.stopService(new Intent(context, LocationService.class));
             serviceIsRunning = false;
         }
     }

@@ -8,7 +8,6 @@ import android.content.*;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
@@ -36,7 +35,7 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
-import de.mohoff.zeiterfassung.locationservice.LocationServiceNewAPI;
+import de.mohoff.zeiterfassung.locationservice.LocationService;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerAdapter;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItem;
@@ -81,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     private LocationUpdateHandler luh;
     private DatabaseHelper dbHelper = null;
 
-    //private LocationServiceNewAPI service;
+    //private LocationService service;
     private LocationServiceConnection lsc = null;
     //private MainActivity refThis = this;
     private boolean isServiceRunning = false;
@@ -103,47 +102,13 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-
-
-        //drawerFragment.setDrawerListener(this);
-
         title = getSupportActionBar().getTitle();
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
+        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        /*this.items[0] = NavigationListItemSection.create(1, "ALL");
-        this.items[1] = NavigationListItemLabel.create(2, "Overview", "R.drawable.ic_overview", true, this);
-        this.items[2] = NavigationListItemLabel.create(3, "Manage TLAs", "R.drawable.ic_location", true, this);
-        this.items[3] = NavigationListItemSection.create(4, "DEBUG");
-        this.items[4] = NavigationListItemLabel.create(5, "Map", "R.drawable.ic_debug", true, this);
-        this.items[5] = NavigationListItemLabelService.create(6, "Location Service", "drawable/ic_action_edit_location", this, false);
-        //this.items[5] = NavigationListItemLabel.create(6, "Start LocationService", "R.drawable.ic_service_start", false, this);
-        //this.items[6] = NavigationListItemLabel.create(7, "Stop LocationService", "R.drawable.ic_service_stop", false, this);
-        this.items[6] = NavigationListItemSection.create(7, "MISC");
-        this.items[7] = NavigationListItemLabel.create(8, "About", "drawable/ic_action_about", true, this);*/
-
-
-
-
-
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //drawerList = (ListView) findViewById(R.id.left_drawer);
 
-        // Set the adapter for the list view
-        /*drawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.navigation_drawer_item, titles));*/
-
-        //NavigationListAdapter navListAdapter = new NavigationListAdapter(this, R.layout.navigation_drawer_list_item, items);
-        //navListAdapter.setTheListener(this);
-        //drawerList.setAdapter(navListAdapter);
-
-
-        // Set the list's click listener
-        //drawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-        // ActionBarDrawerToggle ties together the the proper interactions
-        // between the sliding drawer and the action bar app icon
         drawerActionBarToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 drawerLayout,          /* DrawerLayout object */
@@ -216,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         buttonStartService = (Button) findViewById(R.id.buttonStartService);
         buttonStopService = (Button) findViewById(R.id.buttonStopService);
 
-        if(isMyServiceRunning(LocationServiceNewAPI.class)){
+        if(isMyServiceRunning(LocationService.class)){
             isServiceRunning = true;
         }
         updateServiceButtons();
@@ -243,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     public void startAndBindToLocationService() {
         boolean bindResult;
         // Calling startService() first prevents it from being killed on unbind()
-        if(startService(new Intent(MainActivity.this, LocationServiceNewAPI.class)) != null){
+        if(startService(new Intent(MainActivity.this, LocationService.class)) != null){
             isServiceRunning = true;
             updateServiceButtons();
 
@@ -258,13 +223,13 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     public void unbindAndStopLocationService(){
         unbindLocationService();
-        /*if(stopService(new Intent(MainActivity.this, LocationServiceNewAPI.class))){
+        /*if(stopService(new Intent(MainActivity.this, LocationService.class))){
             isServiceRunning = false;
             updateServiceButtons();
         }*/
 
 
-        stopService(new Intent(MainActivity.this, LocationServiceNewAPI.class));
+        stopService(new Intent(MainActivity.this, LocationService.class));
         isServiceRunning = false;
         updateServiceButtons();
 
@@ -274,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         // it's ok when service is already bound: Will return TRUE
         lsc = new LocationServiceConnection();  // connect to it
         return bindService(
-                new Intent(this, LocationServiceNewAPI.class),
+                new Intent(this, LocationService.class),
                 lsc,
                 BIND_AUTO_CREATE
         );
@@ -290,8 +255,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     protected class LocationServiceConnection implements ServiceConnection {
         public void onServiceConnected(ComponentName name, IBinder service) {
-            //LocationServiceNewAPI.LocalBinder binder = (LocationServiceNewAPI.LocalBinder) service;
-            //refThis.service = (LocationServiceNewAPI) binder.getService();
+            //LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
+            //refThis.service = (LocationService) binder.getService();
         }
         @Override
         public void onServiceDisconnected(ComponentName name) {
