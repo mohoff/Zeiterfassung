@@ -11,7 +11,7 @@
 
         <item name="colorPrimary">@color/greenish</item>
         <item name="colorPrimaryDark">@color/greenish</item>
-        <item name="colorAccent">@color/green_light</item>
+        <item name="colorAccent">@color/greenish</item>
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
 

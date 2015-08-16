@@ -60,7 +60,7 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
         NavigationListItemLabelHolder navigationListItemLabelHolder = null;
 
         if(convertView == null){
-            convertView = inflater.inflate( R.layout.navigation_drawer_list_label, parentView, false);
+            convertView = inflater.inflate( R.layout.navigation_drawer_list_item, parentView, false);
             ImageView iconView = (ImageView) convertView.findViewById(R.id.navigationListLabelIcon);
             TextView labelView = (TextView) convertView.findViewById(R.id.navigationListLabelText);
 
@@ -159,7 +159,7 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
         NavigationListItemSectionHolder navMenuItemHolder = null;
 
         if(convertView == null){
-            convertView = inflater.inflate( R.layout.navigation_drawer_list_section, parentView, false);
+            convertView = inflater.inflate( R.layout.navigation_drawer_list_headline, parentView, false);
             TextView labelView = (TextView) convertView.findViewById(R.id.navigationListSectionText);
 
             navMenuItemHolder = new NavigationListItemSectionHolder();

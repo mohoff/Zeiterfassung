@@ -13,7 +13,7 @@
         android:textSize="14sp"
         android:paddingTop="7dp"
         android:paddingBottom="7dp"
-        android:textColor="@color/greenish_25"
+        android:textColor="@color/navigation_drawer_items"
         />
     <!-- underline einbauen? (seperator,dividor,...) -->
 </RelativeLayout>

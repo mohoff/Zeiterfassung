@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
+
+<!-- TODO: Move to top part of navigation drawer -->
+
+
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -7,6 +14,8 @@
     android:paddingTop="5dp"
     android:paddingLeft="20dp"
     android:background="?android:attr/activatedBackgroundIndicator">
+
+
 
     <!-- ImageView: layout_height: 30dp was default -->
     <ImageView
@@ -60,5 +69,5 @@
             android:layout_below="@+id/upper"
             android:layout_toRightOf="@+id/navigationListLabelButtonStart"/>
 
-        </RelativeLayout>
+    </RelativeLayout>
 </RelativeLayout>

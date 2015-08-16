@@ -41,21 +41,17 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     private final LocalBinder binder = new LocalBinder();
 
     private GoogleApiClient googleApiClient;
-    private Location currentLocation;
     private LocationRequest locReq;
 
-
-    //public static int timeBetweenMeasures = 1000 * 60; // in ms // 1000 * 60;
+    private static boolean IS_SERVICE_RUNNING = false; // not used right now
     private static float boundaryTreshold = 0.8f;
     private static int amountOfTemporarySavedLocations = 5;
     private static int REGULAR_UPDATE_INTERVAL = 150 * 1000; // ms, update interval, 60 * 1000, 150 * 1000
     private static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
     private static String locationProviderType = LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
 
-    private static LocationUpdater lm = null;
     private static Context ctx;
     private LocationManager locationmanager;
-    private LocationListener locationListener;
     public static Location mostRecentLocation = null;
     /////
     private LocationCache locCache;
@@ -149,8 +145,9 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     @Override
     public void onDestroy() {
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-        googleApiClient.disconnect(); // does nothing if googleApiClient is already disconnected. So no need to check here again.
+        googleApiClient.disconnect(); // does nothing if googleApiClient is already disconnected. So no need to check if already connected or not.
         stopForeground(true);
+        IS_SERVICE_RUNNING = false;
 
         Toast.makeText(this, "Service terminated",
                 Toast.LENGTH_LONG).show();
@@ -163,9 +160,8 @@ public class LocationServiceNewAPI extends Service implements GoogleApiClient.Co
     public int onStartCommand(Intent intent, int flags, int startId) {
         googleApiClient.connect();
 
-
         updateTLAs();
-
+        IS_SERVICE_RUNNING = true;
         return Service.START_STICKY;
     }
 

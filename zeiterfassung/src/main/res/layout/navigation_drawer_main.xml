@@ -25,15 +25,67 @@
           android:layout_weight="1" />
     </LinearLayout>
 
-
-
     <!-- navigation drawer -->
-    <ListView android:id="@+id/left_drawer"
-        android:layout_width="240dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:background="@color/white"/>
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/left_drawer"
+                    android:layout_width="240dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:background="@color/navigation_drawer_bg">
+
+        <RelativeLayout
+            android:id="@+id/nav_header_container"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_alignParentTop="true"
+            android:background="@color/navigation_drawer_top_bg">
+
+            <ImageView
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_action_edit_location"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="60dp"
+                android:layout_centerInParent="true" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                android:weightSum="6"
+                android:paddingBottom="10dp">
+
+                <Button
+                    android:id="@+id/buttonStartService"
+                    style="@style/Button.ServiceControl.Start"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:text="@string/servicecontrol_start"
+                    android:layout_weight="2"
+                    />
+                <Button
+                    android:id="@+id/buttonStopService"
+                    style="@style/Button.ServiceControl.Stop"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:text="@string/servicecontrol_stop"
+                    android:layout_weight="2"
+                    />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/drawerList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/nav_header_container"
+            android:layout_marginTop="15dp"
+            android:scrollbars="vertical"/>
+
+    </RelativeLayout>
 </android.support.v4.widget.DrawerLayout>

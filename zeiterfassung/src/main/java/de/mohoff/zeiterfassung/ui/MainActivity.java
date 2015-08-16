@@ -1,31 +1,34 @@
 package de.mohoff.zeiterfassung.ui;
 
+import android.app.ActivityManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.*;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Location;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Parcelable;
-import android.os.PersistableBundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
@@ -34,12 +37,9 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.locationservice.LocationServiceNewAPI;
+import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerAdapter;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
-import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListAdapter;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItem;
-import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItemLabel;
-import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItemLabelService;
-import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItemSection;
 import de.mohoff.zeiterfassung.ui.fragments.*;
 import de.mohoff.zeiterfassung.ui.fragments.Map;
 import de.mohoff.zeiterfassung.legacy.LocationUpdateHandler;
@@ -48,10 +48,9 @@ import de.mohoff.zeiterfassung.database.DatabaseHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity implements NavigationDrawerListener {
+public class MainActivity extends AppCompatActivity implements NavigationDrawerListener {
     private static int LOC_QUEUE_SIZE = 50; // --> set relative to update interval time so max markers on map =~ 2h for example
     SimpleDateFormat sdf;
     public static FragmentManager fragM;
@@ -60,6 +59,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
     private boolean nextFragmentAvailable = false;
 
     private Toolbar toolbar;
+    private RelativeLayout leftDrawer;
+    private RecyclerView recyclerView;
+    private NavigationDrawerListener drawerListener;
 
     public CircularFifoQueue<Loc> getLocs() {
         return locs;
@@ -73,17 +75,16 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
     private NavigationListItem[] items = new NavigationListItem[8];
     private CharSequence title;
 
-    private Button goToMap;
-    private Button addNewTLA;
-    private Button stopLocationService;
-    private Button manageTLAs;
+    private Button buttonStartService;
+    private Button buttonStopService;
     private TextView outputTV;
     private LocationUpdateHandler luh;
     private DatabaseHelper dbHelper = null;
 
-    private LocationServiceNewAPI service;
+    //private LocationServiceNewAPI service;
     private LocationServiceConnection lsc = null;
-    private MainActivity refThis = this;
+    //private MainActivity refThis = this;
+    private boolean isServiceRunning = false;
 
     // listener for Map fragment
     // When fragment is active, it can update its map on new locations instantly
@@ -103,12 +104,15 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
+
+        //drawerFragment.setDrawerListener(this);
+
         title = getSupportActionBar().getTitle();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        this.items[0] = NavigationListItemSection.create(1, "ALL");
+        /*this.items[0] = NavigationListItemSection.create(1, "ALL");
         this.items[1] = NavigationListItemLabel.create(2, "Overview", "R.drawable.ic_overview", true, this);
         this.items[2] = NavigationListItemLabel.create(3, "Manage TLAs", "R.drawable.ic_location", true, this);
         this.items[3] = NavigationListItemSection.create(4, "DEBUG");
@@ -117,22 +121,26 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         //this.items[5] = NavigationListItemLabel.create(6, "Start LocationService", "R.drawable.ic_service_start", false, this);
         //this.items[6] = NavigationListItemLabel.create(7, "Stop LocationService", "R.drawable.ic_service_stop", false, this);
         this.items[6] = NavigationListItemSection.create(7, "MISC");
-        this.items[7] = NavigationListItemLabel.create(8, "About", "drawable/ic_action_about", true, this);
+        this.items[7] = NavigationListItemLabel.create(8, "About", "drawable/ic_action_about", true, this);*/
+
+
+
+
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerList = (ListView) findViewById(R.id.left_drawer);
+        //drawerList = (ListView) findViewById(R.id.left_drawer);
 
         // Set the adapter for the list view
         /*drawerList.setAdapter(new ArrayAdapter<String>(this,
                 R.layout.navigation_drawer_item, titles));*/
 
-        NavigationListAdapter navListAdapter = new NavigationListAdapter(this, R.layout.navigation_drawer_list_label, items);
-        navListAdapter.setTheListener(this);
-        drawerList.setAdapter(navListAdapter);
+        //NavigationListAdapter navListAdapter = new NavigationListAdapter(this, R.layout.navigation_drawer_list_item, items);
+        //navListAdapter.setTheListener(this);
+        //drawerList.setAdapter(navListAdapter);
 
 
         // Set the list's click listener
-        drawerList.setOnItemClickListener(new DrawerItemClickListener());
+        //drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
@@ -143,6 +151,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
                 R.string.drawer_close  /* "close drawer" description for accessibility */
         ) {
             public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
                 getSupportActionBar().setTitle(title);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
 
@@ -151,18 +160,50 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
                     nextFragmentAvailable = false;
                 }
             }
-
             public void onDrawerOpened(View drawerView) {
-                //getSupportActionBar().setTitle(drawerTitle);
+                super.onDrawerOpened(drawerView);
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+                toolbar.setAlpha(1 - slideOffset / 2);
             }
         };
         drawerLayout.setDrawerListener(drawerActionBarToggle);
+        drawerLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                drawerActionBarToggle.syncState();
+            }
+        });
 
-        selectItem(1);
-        if (savedInstanceState == null) {
-            //selectItem(1);
-        } else {
+        leftDrawer = (RelativeLayout) findViewById(R.id.left_drawer);
+        recyclerView = (RecyclerView) findViewById(R.id.drawerList);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        NavigationDrawerAdapter adapter = new NavigationDrawerAdapter(this, getListItems());
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, recyclerView, new ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                //drawerListener.onItemSelected(view, position); // leads to error...
+                selectItem(position);
+                NavigationDrawerAdapter.CURRENTLY_SELECTED = position;
+                recyclerView.getAdapter().notifyDataSetChanged();
+                drawerLayout.closeDrawer(leftDrawer);
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+            }
+        }));
+
+        // initial display of main fragment with id=1
+        selectItem(0);
+
+        if(savedInstanceState != null){
             // restore location marker data after screen rotation
             if (savedInstanceState.containsKey("locs")) {
                 locsTmp = savedInstanceState.getParcelableArrayList("locs");
@@ -172,108 +213,150 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
             }
         }
 
+        buttonStartService = (Button) findViewById(R.id.buttonStartService);
+        buttonStopService = (Button) findViewById(R.id.buttonStopService);
 
-        /*// START SERVICE
-        Intent i = new Intent(this, LocationService.class);
-        // potentially add data to the intent
-        //i.putExtra("KEY1", "Value to be used by the service");
-        this.startService(i);
-        */
+        if(isMyServiceRunning(LocationServiceNewAPI.class)){
+            isServiceRunning = true;
+        }
+        updateServiceButtons();
 
         sdf = new SimpleDateFormat("dd.MM.yyyy - HH:mm");
-        /*outputTV = (TextView) findViewById(R.id.textView2);
+    }
 
-        goToMap = (Button) findViewById(R.id.button);
-        addNewTLA = (Button) findViewById(R.id.buttonTLA);
-        stopLocationService = (Button) findViewById(R.id.buttonStopService);
-        manageTLAs = (Button) findViewById(R.id.buttonManageTLA);
-        goToMap.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                Intent intent = new Intent(MainActivity.this, Map.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-        addNewTLA.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                Intent intent = new Intent(MainActivity.this, AddTargetLocationArea.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-        stopLocationService.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                unbindLocationService();
-                service.stopService(new Intent(MainActivity.this, LocationServiceNewAPI.class));
-            }
-        });
-        manageTLAs.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                Intent intent = new Intent(MainActivity.this, ManageTLA.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+    private void replaceFragment(Fragment nextFragment){
+        fragM.beginTransaction()
+                .replace(R.id.content_frame, nextFragment)
+                .commit();
+    }
 
-        */
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-        //startAndConnectToLocationService();
+    public void startAndBindToLocationService() {
+        boolean bindResult;
+        // Calling startService() first prevents it from being killed on unbind()
+        if(startService(new Intent(MainActivity.this, LocationServiceNewAPI.class)) != null){
+            isServiceRunning = true;
+            updateServiceButtons();
+
+            bindResult = bindLocationService();
+        } else {
+            throw new RuntimeException("Unable to start service.");
+        }
+        if(!bindResult){
+            throw new RuntimeException("Unable to start service.");
+        }
+    }
+
+    public void unbindAndStopLocationService(){
+        unbindLocationService();
+        /*if(stopService(new Intent(MainActivity.this, LocationServiceNewAPI.class))){
+            isServiceRunning = false;
+            updateServiceButtons();
+        }*/
+
+
+        stopService(new Intent(MainActivity.this, LocationServiceNewAPI.class));
+        isServiceRunning = false;
+        updateServiceButtons();
+
+    }
+
+    private boolean bindLocationService(){
+        // it's ok when service is already bound: Will return TRUE
+        lsc = new LocationServiceConnection();  // connect to it
+        return bindService(
+                new Intent(this, LocationServiceNewAPI.class),
+                lsc,
+                BIND_AUTO_CREATE
+        );
+    }
+
+    public void unbindLocationService(){
+        // it's ok when service is already unbound
+        if(lsc != null){
+            unbindService(lsc);
+            lsc = null;
+        }
+    }
+
+    protected class LocationServiceConnection implements ServiceConnection {
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            //LocationServiceNewAPI.LocalBinder binder = (LocationServiceNewAPI.LocalBinder) service;
+            //refThis.service = (LocationServiceNewAPI) binder.getService();
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            //service = null;
+        }
     }
 
     @Override
     public void StartButtonClicked() {
-        startAndConnectToLocationService();
+        startAndBindToLocationService();
     }
 
     @Override
     public void StopButtonClicked() {
-        stopLocationService();
+        unbindAndStopLocationService();
     }
 
-    /* The click listner for ListView in the navigation drawer */
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-            //drawerLayout.closeDrawer(drawerList);
-            /*new Handler().postDelayed(new Runnable() {
+    private void updateServiceButtons(){
+        if(isServiceRunning){
+            // manage start button
+            buttonStartService.getBackground().setColorFilter(getResources().getColor(R.color.grey_25), PorterDuff.Mode.MULTIPLY);
+            buttonStartService.setEnabled(false);
+            buttonStartService.setTextColor(getResources().getColor(R.color.white)); // need to set text color explicitly after setEnabled(false). Else text color gets grey somehow
+            buttonStartService.setOnClickListener(null);
+            // manage stop button
+            buttonStopService.getBackground().setColorFilter(getResources().getColor(R.color.greenish), PorterDuff.Mode.MULTIPLY);
+            buttonStopService.setEnabled(true);
+            buttonStopService.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void run() {
-                    selectItem(position); // your fragment transactions go here
+                public void onClick(View v) {
+                    // stop location service
+                    StopButtonClicked();
+                    //if (navDrawerListener != null) {
+                    //   navDrawerListener.StopButtonClicked();
+                    //}
                 }
-            }, 150);*/
-
-            // old approach: just call following line without Handler.postDelayed()
-            selectItem(position);
+            });
+        } else {
+            // manage start button
+            buttonStartService.getBackground().setColorFilter(getResources().getColor(R.color.greenish), PorterDuff.Mode.MULTIPLY);
+            buttonStartService.setEnabled(true);
+            buttonStartService.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // start and connect to location service
+                    StartButtonClicked();
+                    //if (navDrawerListener != null) {
+                    //    navDrawerListener.StartButtonClicked();
+                    //}
+                }
+            });
+            // manage stop button
+            buttonStopService.getBackground().setColorFilter(getResources().getColor(R.color.grey_25), PorterDuff.Mode.MULTIPLY);
+            buttonStopService.setEnabled(false);
+            buttonStopService.setTextColor(getResources().getColor(R.color.white)); // need to set text color explicitly after setEnabled(false). Else text color gets grey somehow
+            buttonStopService.setOnClickListener(null);
         }
     }
 
-    private void selectItemWithView(View v, int position){
-        TextView label = (TextView)v.findViewById(R.id.navigationListLabelText);
-        label.setTypeface(Typeface.DEFAULT_BOLD);
+    @Override
+    public void onItemSelected(View view, int position) {
+        selectItem(position);
     }
-
-    /*/public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
-        Fragment fragment = new MyFragment1();
-        FragmentManager fragmentManager = getFragmentManager();
-        switch(position) {
-            case 0:
-                fragment = new MyFragment1();
-                break;
-            case 1:
-                fragment = new MyFragment2();
-                break;
-        }
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
-                .commit();
-    }*/
 
     private void selectItem(int position) {
-        NavigationListItem selected = items[position];
-        drawerList.setItemChecked(position, true);
-        drawerLayout.closeDrawer(drawerList);
-
         // update the main content by replacing fragments
         nextFragment = new Fragment();
         nextFragmentAvailable = true;
@@ -284,33 +367,24 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         fragment.setArguments(args);*/
 
         switch(position) {
-            case 1:
+            case 0:
                 nextFragment = new Overview();
                 break;
-            case 2:
+            case 1:
                 nextFragment = new ManageTLAs();
                 break;
-            case 4:
+            case 2:
                 nextFragment = new Map();
                 break;
-            case 7:
+            case 4:
                 nextFragment = new About();
                 break;
         }
 
-        if(selected.getType() == 1){
-            //drawerList.getSelectedView().setBackgroundColor(0x11000000);
-            if (selected.updateActionBarTitle()) {
-                //drawerLayout.closeDrawer(drawerList);
-                setTitle(selected.getLabel());
-            }
-        }
-
-
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
             // user selected other fragment from drawer.
             // new fragment is loaded in onDrawerClosed()
-            drawerLayout.closeDrawer(drawerList);
+            drawerLayout.closeDrawer(leftDrawer);
         } else {
             // display inital fragment after app start
             replaceFragment(nextFragment);
@@ -322,11 +396,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         this.title = title;
         getSupportActionBar().setTitle(title);
     }
-
-    /**
-     * When using the ActionBarDrawerToggle, you must call it during
-     * onPostCreate() and onConfigurationChanged()...
-     */
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -351,9 +420,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         }
         unbindLocationService();
     }
-
-
-
 
     // BroadcastReceiver, which receives Events from LocationService, such as "newTimeslotStarted" as message
     private BroadcastReceiver timeslotReceiver = new BroadcastReceiver() {
@@ -412,46 +478,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
 
     public void timeslotSealedEvent(long millis, String activityName, String locationName) {
         String humanReadable = sdf.format(millis);
-        outputTV.append("QUIT: " + humanReadable + ",   " +locationName + " @" + activityName + "\n");
+        outputTV.append("QUIT: " + humanReadable + ",   " + locationName + " @" + activityName + "\n");
     }
-
-    public void startAndConnectToLocationService() {
-        startService(new Intent(MainActivity.this, LocationServiceNewAPI.class)); // Calling startService() first prevents it from being killed on unbind()
-        lsc = new LocationServiceConnection();  // connect to it
-
-        boolean result = bindService(
-                new Intent(this, LocationServiceNewAPI.class),
-                lsc,
-                BIND_AUTO_CREATE
-        );
-
-        if(!result){
-            throw new RuntimeException("Unable to bind with service.");
-        }
-    }
-
-    protected class LocationServiceConnection implements ServiceConnection {
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            LocationServiceNewAPI.LocalBinder binder = (LocationServiceNewAPI.LocalBinder) service;
-            refThis.service = (LocationServiceNewAPI) binder.getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            service = null;
-        }
-    }
-    public void unbindLocationService(){
-        if(lsc != null){
-            unbindService(lsc);
-            lsc = null;
-        }
-    }
-    public void stopLocationService(){
-        this.unbindLocationService();
-        stopService(new Intent(MainActivity.this, LocationServiceNewAPI.class));
-    }
-
 
     private DatabaseHelper getDbHelper() {
         if (dbHelper == null) {
@@ -461,11 +489,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         return dbHelper;
     }
 
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        //  adds items to the toolbar
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
@@ -488,6 +514,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        // save locations before screen rotation in order to recover map markers after
         // convert circularFifoQueue to ArrayList
         for(Loc e : locs) {
             locsTmp.add(e);
@@ -497,13 +524,67 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerL
         super.onSaveInstanceState(outState);
     }
 
-    private void replaceFragment(Fragment nextFragment){
-        fragM.beginTransaction()
-                .replace(R.id.content_frame, nextFragment)
-                .commit();
-    }
+
 
     public void setOnNewLocationListener(LocationChangeListener listen) {
       newLocationListener = listen;
+    }
+
+    private ArrayList<String> getListItems(){
+        ArrayList<String> list = new ArrayList<>();
+        /*list.add(new NavigationDrawerItem(true, "Overview"));
+        list.add(new NavigationDrawerItem(true, "Manage TLAs"));
+        list.add(new NavigationDrawerItem(true, "Map"));
+        list.add(new NavigationDrawerItem(true, "Location Service"));
+        list.add(new NavigationDrawerItem(true, "About"));*/
+        list.add("Overview");
+        list.add("Manage TLAs");
+        list.add("Map");
+        list.add("---------------"); // list[3] now hardcoded as separator (only hardcoded possible I think)
+        list.add("About");
+        return list;
+    }
+
+    public static interface ClickListener {
+        public void onClick(View view, int position);
+        public void onLongClick(View view, int position);
+    }
+
+    static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
+        private GestureDetector gestureDetector;
+        private ClickListener clickListener;
+
+        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, final ClickListener clickListener) {
+            this.clickListener = clickListener;
+            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return true;
+                }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
+                    if (child != null && clickListener != null) {
+                        clickListener.onLongClick(child, recyclerView.getChildPosition(child));
+                    }
+                }
+            });
+        }
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+
+            View child = rv.findChildViewUnder(e.getX(), e.getY());
+            if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
+                clickListener.onClick(child, rv.getChildPosition(child));
+            }
+            return false;
+        }
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+        }
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        }
     }
 }
