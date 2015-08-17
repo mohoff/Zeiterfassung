@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung.ui;
+package de.mohoff.zeiterfassung.legacy;
 
 
 import android.app.Activity;

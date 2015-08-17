@@ -5,15 +5,12 @@
     android:tag="MANAGETLAS"
     tools:context="de.mohoff.zeiterfassung.ui.fragments.ManageTLAs">
 
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/listView" android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" android:layout_alignParentTop="true"
-        android:descendantFocusability="beforeDescendants"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:divider="@null"
         android:dividerHeight="15dip"
-        android:background="#FF025167"
         android:padding="15dip"/>
-
 </FrameLayout>

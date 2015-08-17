@@ -165,9 +165,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             }
         }));
 
-        // initial display of main fragment with id=1
-        selectItem(0);
 
+
+        // TODO: remove "locs" from savedInstanceState when Map-fragment is destroyed?!
         if(savedInstanceState != null){
             // restore location marker data after screen rotation
             if (savedInstanceState.containsKey("locs")) {
@@ -176,6 +176,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                     locs.add(e); // --> MapFragment retrieves locs on onResume
                 }
             }
+        } else {
+            // initial display of main fragment with id=0
+            selectItem(0);
         }
 
         buttonStartService = (Button) findViewById(R.id.buttonStartService);
