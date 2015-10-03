@@ -1,18 +1,13 @@
 package de.mohoff.zeiterfassung.ui;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
@@ -29,16 +24,18 @@ import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
 /**
  * Created by moo on 8/17/15.
  */
-public class AdapterManageTLA extends RecyclerView.Adapter<AdapterManageTLA.TLAViewHolder>{
+public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHolder>{ //RecyclerView.Adapter<AdapterManageTLA.TLAViewHolder>{
     private Context context;
     private DatabaseHelper dbHelper = null;
-    private LayoutInflater li;
+    //private LayoutInflater li;
     List<TargetLocationArea> tlas;
     List<String> activityNames = new ArrayList<String>();
-    List<EditText> editTextList = new ArrayList<EditText>();
-    private boolean inEditMode = false;
+    //List<EditText> editTextList = new ArrayList<EditText>();
+    //private boolean inEditMode = false;
 
     private Map<String, AdapterManageTLAInner> locationAdapterMap = new HashMap<>();
+    private final static int VIEWTYPE_NORMAL = 1;
+    private final static int VIEWTYPE_ADD = 2;
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public AdapterManageTLA(Context context) {
@@ -46,75 +43,135 @@ public class AdapterManageTLA extends RecyclerView.Adapter<AdapterManageTLA.TLAV
         this.tlas = dbHelper.getAllTLAs();
         this.activityNames = dbHelper.getDistinctActivityNames();
         this.context = context;
-
-        li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        //li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public static class TLAViewHolder extends RecyclerView.ViewHolder {
+    // Activity ViewHolder (outer holder)
+    public static class ActViewHolder extends RecyclerView.ViewHolder {
         EditText activityName;
         RecyclerView recyclerView;
+        ImageButton deleteButton;
 
-        TLAViewHolder(View itemView) {
+        ActViewHolder(View itemView) {
             super(itemView);
-            recyclerView = (RecyclerView)itemView.findViewById(R.id.innerRecyclerView);
-            activityName = (EditText)itemView.findViewById(R.id.activityName);
-            //locationName = (EditText)itemView.findViewById(R.id.locationName);
+            recyclerView = (RecyclerView) itemView.findViewById(R.id.innerRecyclerView);
+            activityName = (EditText) itemView.findViewById(R.id.activityName);
+            deleteButton = (ImageButton) itemView.findViewById(R.id.deleteActivityButton);
         }
     }
+
+    // Location ViewHolder (inner holder)
+    public static class LocViewHolder extends RecyclerView.ViewHolder {
+        public TextView locationName;
+        public ImageButton repinButton;
+        public ImageButton deleteButton;
+
+        public LocViewHolder(View view) {
+            super(view);
+            locationName = (TextView) view.findViewById(R.id.locationName);
+            repinButton = (ImageButton) view.findViewById(R.id.repinLocationButton);
+            deleteButton = (ImageButton) view.findViewById(R.id.deleteLocationButton);
+        }
+    }
+
+    // AddButton ViewHolder (for outer and inner)
+    public static class AddHolder extends RecyclerView.ViewHolder {
+        ImageButton addButton;
+
+        AddHolder(View itemView) {
+            super(itemView);
+            addButton = (ImageButton) itemView.findViewById(R.id.addActivityButton);
+        }
+    }
+
 
     // Create new views (invoked by the layout manager)
     @Override
-    public AdapterManageTLA.TLAViewHolder onCreateViewHolder(ViewGroup parent,
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                    int viewType) {
-        // create a new view
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_manage_tlas_card_outer, parent, false);
-        // set the view's size, margins, paddings and layout parameters
+        // show normal Activity
+        if(viewType == VIEWTYPE_NORMAL) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.fragment_manage_tlas_card_outer, parent, false);
 
+            ActViewHolder outerHolder = new ActViewHolder(v);
+            outerHolder.recyclerView.setHasFixedSize(false);
+            de.mohoff.zeiterfassung.ui.LinearLayoutManager innerLinLayoutManager = new de.mohoff.zeiterfassung.ui.LinearLayoutManager(context);
+            innerLinLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            outerHolder.recyclerView.setLayoutManager(innerLinLayoutManager);
 
-        TLAViewHolder outerHolder = new TLAViewHolder(v);
-        outerHolder.recyclerView.setHasFixedSize(false);
-        de.mohoff.zeiterfassung.ui.LinearLayoutManager innerLinLayoutManager = new de.mohoff.zeiterfassung.ui.LinearLayoutManager(context);
-        innerLinLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        outerHolder.recyclerView.setLayoutManager(innerLinLayoutManager);
-
-        return outerHolder;
+            return outerHolder;
+        }
+        // show "add" option as card listed last
+        if(viewType == VIEWTYPE_ADD) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.fragment_manage_tlas_card_outer_add, parent, false);
+            return new AddHolder(v);
+        }
+        return null;
     }
-
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(TLAViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if(holder.getItemViewType() == VIEWTYPE_NORMAL) {
+            ActViewHolder TLAHolder = (ActViewHolder) holder;
+            // - get element from your dataset at this position
+            // - replace the contents of the view with that element
+            final String currentActivity = activityNames.get(position);
+            final List<TargetLocationArea> relevantTLAs = new ArrayList<TargetLocationArea>();
 
-        final String currentActivity = activityNames.get(position);
-        final List<TargetLocationArea> relevantTLAs = new ArrayList<TargetLocationArea>();
-
-        for(TargetLocationArea tla : tlas){
-            if(tla.getActivityName().equals(currentActivity)){
-                relevantTLAs.add(tla);
+            for (TargetLocationArea tla : tlas) {
+                if (tla.getActivityName().equals(currentActivity)) {
+                    relevantTLAs.add(tla);
+                }
             }
+            TLAHolder.activityName.setText(currentActivity);
+            TLAHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO: Popup "Do you really want to delete this activity?"
+                    if (dbHelper.deleteTLAsByActivity(currentActivity) == 1) {
+                        // TODO: show toast "Activity and related Locations deleted."
+                        notifyDataSetChanged();
+                    } else {
+                        // TODO: show toast "Couldn't delete Activity. Does it still exist?"
+                    }
+                }
+            });
+
+            // Create an adapter if none exists
+            if (!locationAdapterMap.containsKey(currentActivity)) {
+                locationAdapterMap.put(currentActivity, new AdapterManageTLAInner(context, relevantTLAs));
+            }
+
+            TLAHolder.recyclerView.setAdapter(locationAdapterMap.get(currentActivity));
+
+        } else if (holder.getItemViewType() == VIEWTYPE_ADD) {
+            AddHolder addButtonHolder = (AddHolder) holder;
+            addButtonHolder.addButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO: add on click listener for "add new activty"
+                    // TODO: also provide this action in top menubar with "+"-icon
+                }
+            });
         }
-        holder.activityName.setText(currentActivity);
-
-
-        for(TargetLocationArea tla : relevantTLAs) {
-
-            //holder.outerCardView.addView();
-        }
-
-        // Create an adapter if none exists
-        if (!locationAdapterMap.containsKey(currentActivity)) {
-            locationAdapterMap.put(currentActivity, new AdapterManageTLAInner(context, relevantTLAs));
-        }
-
-        holder.recyclerView.setAdapter(locationAdapterMap.get(currentActivity));
     }
 
     @Override
     public int getItemCount() {
-        return activityNames.size();
+        return activityNames.size() + 1; // +1 to add a addEntry at the end ...
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        // if position is last index
+        if (position == getItemCount()-1) {
+            return VIEWTYPE_ADD;
+        } else {
+            return VIEWTYPE_NORMAL;
+        }
     }
 
     private DatabaseHelper getDbHelper() {
@@ -130,18 +187,9 @@ public class AdapterManageTLA extends RecyclerView.Adapter<AdapterManageTLA.TLAV
 
 
 
-    private class AdapterManageTLAInner extends RecyclerView.Adapter<AdapterManageTLAInner.ViewHolder> {
+    private class AdapterManageTLAInner extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Context context;
         List<TargetLocationArea> relevantTLAs;
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            public TextView locationName;
-
-            public ViewHolder(View view) {
-                super(view);
-                locationName = (TextView) view.findViewById(R.id.locationName);
-            }
-        }
 
         public AdapterManageTLAInner(Context context, List<TargetLocationArea> relevantTLAs) {
             this.context = context;
@@ -149,37 +197,73 @@ public class AdapterManageTLA extends RecyclerView.Adapter<AdapterManageTLA.TLAV
         }
 
         @Override
-        public AdapterManageTLAInner.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            //Log.d(TAG, "onCreateViewHolder(" + parent.getId() + ", " + i + ")");
-            // Create a new view by inflating the row item xml.
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_manage_tlas_card_inner, parent, false);
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-            // Set the view to the ViewHolder
-            ViewHolder holder = new ViewHolder(v);
-            //holder.mCoverImageView.setOnClickListener(BookListAdapter.this); // Download or Open
-            //holder.mCoverImageView.setTag(holder);
-
-            return holder;
+            // show normal Location
+            if(viewType == VIEWTYPE_NORMAL) {
+                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_manage_tlas_card_inner, parent, false);
+                return new LocViewHolder(v);
+            }
+            // show "add" option as card listed last
+            if(viewType == VIEWTYPE_ADD) {
+                View v = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.fragment_manage_tlas_card_inner_add, parent, false);
+                return new AddHolder(v);
+            }
+            return null;
         }
 
         @Override
-        public void onBindViewHolder(AdapterManageTLAInner.ViewHolder holder, int position) {
-            TargetLocationArea tla = relevantTLAs.get(position);
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            if(holder.getItemViewType() == VIEWTYPE_NORMAL) {
+                LocViewHolder locHolder = (LocViewHolder) holder;
+                final TargetLocationArea tla = relevantTLAs.get(position);
 
-            holder.locationName.setText(tla.getLocationName());
+                locHolder.locationName.setText(tla.getLocationName());
+
+                locHolder.repinButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO: Redirect to map to repin and resize marker. + Save,cancel
+                    }
+                });
+                locHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO: Popup "Do you really want to delete this activity?"
+                        if (dbHelper.deleteTLAById(tla.get_id()) == 1) {
+                            // TODO: show toast "Activity and related Locations deleted."
+                            notifyDataSetChanged();
+                        } else {
+                            // TODO: show toast "Couldn't delete Activity. Does it still exist?"
+                        }
+                    }
+                });
+            } else if (holder.getItemViewType() == VIEWTYPE_ADD) {
+                AddHolder addButtonHolder = (AddHolder) holder;
+                addButtonHolder.addButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO: add on click listener for "add new activty"
+                        // TODO: also provide this action in top menubar with "+"-icon
+                    }
+                });
+            }
         }
 
         @Override
         public int getItemCount() {
-            return relevantTLAs.size();
+            return relevantTLAs.size() + 1;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            // if position is last index
+            if (position == getItemCount()-1) {
+                return VIEWTYPE_ADD;
+            } else {
+                return VIEWTYPE_NORMAL;
+            }
         }
     }
-
-
-
-    // custom LinearLayoutManager
-
-
-
-
 }

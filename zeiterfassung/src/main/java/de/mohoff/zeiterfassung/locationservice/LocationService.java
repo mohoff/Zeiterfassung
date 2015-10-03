@@ -33,7 +33,6 @@ import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
-import de.mohoff.zeiterfassung.legacy.LocationUpdater;
 
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String TAG = LocationService.class.getSimpleName();
@@ -244,7 +243,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     public static long getNormalizedTimestamp() {
-        return System.currentTimeMillis() - (long) (boundaryTreshold * amountOfTemporarySavedLocations * LocationUpdater.timeBetweenMeasures);
+        return System.currentTimeMillis() - (long) (boundaryTreshold * amountOfTemporarySavedLocations * REGULAR_UPDATE_INTERVAL);
     }
 
     public Loc getInterpolatedPosition() {
@@ -277,7 +276,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     public static long getPastTimestampForBoundaryEvents(Loc loc){
         //return loc.getTimestampInMillis() - (int)((amountOfTemporarySavedLocations-amountOfTemporarySavedLocations*boundaryTreshold) * LocationUpdater.timeBetweenMeasures);
-        return loc.getTimestampInMillis() - amountOfTemporarySavedLocations * LocationUpdater.timeBetweenMeasures;
+        return loc.getTimestampInMillis() - amountOfTemporarySavedLocations * REGULAR_UPDATE_INTERVAL;
     }
 
     public static Loc convertLocationToLoc(Location loc) {

@@ -38,8 +38,10 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/activityName"
                     android:text="home"
-                    android:layout_toRightOf="@+id/activityIcon"/>
-                <!-- activity icon -->
+                    android:layout_toRightOf="@+id/activityIcon"
+                    android:singleLine="true"
+                    android:maxLength="100"/>
+                <!-- activity icon/color -->
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -48,7 +50,7 @@
                     android:id="@+id/activityIcon"
                     android:layout_alignParentLeft="true"
                     />
-                <!-- activity delete -->
+                <!-- delete button -->
                 <ImageButton
                     style="@style/ImageButton"
                     android:layout_width="wrap_content"

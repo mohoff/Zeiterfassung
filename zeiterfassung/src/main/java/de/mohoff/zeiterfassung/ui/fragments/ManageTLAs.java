@@ -31,7 +31,7 @@ public class ManageTLAs extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
 
         // used when size of recyclerView doesn't change (can we use it here?)
-        recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(false);
 
         // use a linear layout manager
         linLayoutManager = new LinearLayoutManager(getActivity());

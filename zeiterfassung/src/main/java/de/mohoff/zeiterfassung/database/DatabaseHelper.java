@@ -110,10 +110,34 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return result;
     }
 
-    public int deleteTargetLocationAreaBy(String activity, String location){
+    public int deleteTLA(String activity, String location){
         DeleteBuilder<TargetLocationArea, Integer> deleteBuilder = targetareasREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("activityName", activity).and().eq("locationName", location);
+            deleteBuilder.delete();
+            return 1;
+        } catch(SQLException e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public int deleteTLAById(int id){
+        DeleteBuilder<TargetLocationArea, Integer> deleteBuilder = targetareasREDAO.deleteBuilder();
+        try {
+            deleteBuilder.where().eq("_id", id);
+            deleteBuilder.delete();
+            return 1;
+        } catch(SQLException e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public int deleteTLAsByActivity(String activity){
+        DeleteBuilder<TargetLocationArea, Integer> deleteBuilder = targetareasREDAO.deleteBuilder();
+        try {
+            deleteBuilder.where().eq("activityName", activity);
             deleteBuilder.delete();
             return 1;
         } catch(SQLException e){

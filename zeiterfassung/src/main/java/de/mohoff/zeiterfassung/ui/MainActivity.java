@@ -41,7 +41,6 @@ import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItem;
 import de.mohoff.zeiterfassung.ui.fragments.*;
 import de.mohoff.zeiterfassung.ui.fragments.Map;
-import de.mohoff.zeiterfassung.legacy.LocationUpdateHandler;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 
@@ -77,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     private Button buttonStartService;
     private Button buttonStopService;
     private TextView outputTV;
-    private LocationUpdateHandler luh;
     private DatabaseHelper dbHelper = null;
 
     //private LocationService service;
