@@ -53,12 +53,12 @@ public class Map extends MapAbstract implements LocationChangeListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return super.onCreateViewWithLayout(inflater, container, savedInstanceState, R.layout.fragment_map);
     }
 
     @Override
     public void onResume() {
-        // set newest markers
+        // set newest fixMarkers
 
         // get most recent locations from MainActivity
         userLocations = parentActivity.getLocs();

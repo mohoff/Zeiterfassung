@@ -110,6 +110,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return result;
     }
 
+    public TargetLocationArea getTLAById(int id){
+        QueryBuilder<TargetLocationArea, Integer> queryBuilder = targetareasREDAO.queryBuilder();
+        try{
+            queryBuilder.where().eq("_id", id);
+            PreparedQuery<TargetLocationArea> preparedQuery = queryBuilder.prepare();
+            return targetareasREDAO.query(preparedQuery).get(0);
+        } catch (SQLException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public int deleteTLA(String activity, String location){
         DeleteBuilder<TargetLocationArea, Integer> deleteBuilder = targetareasREDAO.deleteBuilder();
         try {

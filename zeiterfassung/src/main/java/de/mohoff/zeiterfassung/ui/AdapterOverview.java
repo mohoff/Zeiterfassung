@@ -19,7 +19,7 @@ import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
 
-public class CardAdapterOverview extends RecyclerView.Adapter<CardAdapterOverview.ViewHolder> {
+public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHolder> {
     private DatabaseHelper dbHelper = null;
     private ArrayList<Timeslot> data = new ArrayList<Timeslot>();
     private int lastPosition = 99999;
@@ -51,8 +51,8 @@ public class CardAdapterOverview extends RecyclerView.Adapter<CardAdapterOvervie
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public CardAdapterOverview(Context context) {
-        getDbHelper();
+    public AdapterOverview(Context context) {
+        getDbHelper(context);
         this.context = context;
         this.data.add(new Timeslot(1416759002267L, 1416760002267L, "activity1", "act1, location1"));
         this.data.add(new Timeslot(1416754002267L, 1416758002267L, "activity2", "act2, location1"));
@@ -70,7 +70,7 @@ public class CardAdapterOverview extends RecyclerView.Adapter<CardAdapterOvervie
 
     // Create new views (invoked by the layout manager)
     @Override
-    public CardAdapterOverview.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public AdapterOverview.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).
         inflate(R.layout.activity_main_cards_additionalinfo, parent, false);
         return new ViewHolder(itemView);
@@ -127,7 +127,7 @@ public class CardAdapterOverview extends RecyclerView.Adapter<CardAdapterOvervie
         return data.size();
     }
 
-    private DatabaseHelper getDbHelper() {
+    private DatabaseHelper getDbHelper(Context context) {
         if (dbHelper == null) {
             dbHelper =
                     OpenHelperManager.getHelper(context, DatabaseHelper.class);

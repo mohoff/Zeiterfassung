@@ -1,6 +1,10 @@
 package de.mohoff.zeiterfassung.ui;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +24,10 @@ import java.util.Map;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
+import de.mohoff.zeiterfassung.ui.fragments.About;
+import de.mohoff.zeiterfassung.ui.fragments.ManageTLAs;
+import de.mohoff.zeiterfassung.ui.fragments.MapManageTLAs;
+import de.mohoff.zeiterfassung.ui.fragments.Overview;
 
 /**
  * Created by moo on 8/17/15.
@@ -115,7 +123,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if(holder.getItemViewType() == VIEWTYPE_NORMAL) {
-            ActViewHolder TLAHolder = (ActViewHolder) holder;
+            ActViewHolder actHolder = (ActViewHolder) holder;
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             final String currentActivity = activityNames.get(position);
@@ -126,8 +134,8 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                     relevantTLAs.add(tla);
                 }
             }
-            TLAHolder.activityName.setText(currentActivity);
-            TLAHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
+            actHolder.activityName.setText(currentActivity);
+            actHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     // TODO: Popup "Do you really want to delete this activity?"
@@ -145,7 +153,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                 locationAdapterMap.put(currentActivity, new AdapterManageTLAInner(context, relevantTLAs));
             }
 
-            TLAHolder.recyclerView.setAdapter(locationAdapterMap.get(currentActivity));
+            actHolder.recyclerView.setAdapter(locationAdapterMap.get(currentActivity));
 
         } else if (holder.getItemViewType() == VIEWTYPE_ADD) {
             AddHolder addButtonHolder = (AddHolder) holder;
@@ -224,7 +232,16 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                 locHolder.repinButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TODO: Redirect to map to repin and resize marker. + Save,cancel
+                        Fragment nextFragment = new MapManageTLAs();
+                        // pass TLAId to map fragment
+                        Bundle args = new Bundle();
+                        args.putInt("TLAId", tla.get_id());
+                        nextFragment.setArguments(args);
+
+                        ((Activity) context).getFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.content_frame, nextFragment)
+                                .commit();
                     }
                 });
                 locHolder.deleteButton.setOnClickListener(new View.OnClickListener() {

@@ -23,7 +23,6 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
     public static int CURRENTLY_SELECTED = 0;
 
-
     //List<NavigationDrawerItem> data = Collections.emptyList();
     List<String> data = Collections.emptyList();
     private LayoutInflater inflater;

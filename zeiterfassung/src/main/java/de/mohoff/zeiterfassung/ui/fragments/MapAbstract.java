@@ -2,6 +2,7 @@ package de.mohoff.zeiterfassung.ui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -22,6 +24,7 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
@@ -30,6 +33,7 @@ import java.util.List;
 
 import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
@@ -44,16 +48,42 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     protected MapFragment mapFragment;
     protected GoogleMap map;
 
+    protected DatabaseHelper dbHelper = null;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    public View onCreateViewWithLayout(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState, int layout) {
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null)
+                parent.removeView(view);
+        }
+        try {
+            view = (RelativeLayout) inflater.inflate(layout, container, false);
+        } catch (InflateException e) {
+            /* map is already there, just return view as it is */
+        }
+        //return this.onCreateView(inflater, container, savedInstanceState);
+
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
+        parentActivity = (MainActivity) getActivity();
+
+        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        return view;
+    }
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
-        if (view != null) {
+        /*if (view != null) {
             ViewGroup parent = (ViewGroup) view.getParent();
             if (parent != null)
                 parent.removeView(view);
@@ -61,8 +91,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         try {
             view = (RelativeLayout) inflater.inflate(R.layout.fragment_map, container, false);
         } catch (InflateException e) {
-            /* map is already there, just return view as it is */
-        }
+            // map is already there, just return view as it is
+        }*/
 
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
@@ -126,6 +156,19 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
             // zoom map in to marker, if the marker is the first one on the map
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
         }
+    }
+
+    protected void centerMapTo(LatLng cameraCenter){
+        CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(cameraCenter, 15);
+        map.animateCamera(cu);
+    }
+
+    protected DatabaseHelper getDbHelper(Context context) {
+        if (dbHelper == null) {
+            dbHelper =
+                    OpenHelperManager.getHelper(context, DatabaseHelper.class);
+        }
+        return dbHelper;
     }
     
 

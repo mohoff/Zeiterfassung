@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import de.mohoff.zeiterfassung.ui.CardAdapterOverview;
+import de.mohoff.zeiterfassung.ui.AdapterOverview;
 import de.mohoff.zeiterfassung.ui.MyItemAnimator;
 import de.mohoff.zeiterfassung.R;
 
@@ -36,7 +36,7 @@ public class Overview extends Fragment {
         llm.setStackFromEnd(true);
 
         //recList.setHasFixedSize(true); // allows for optimizations
-        recList.setAdapter(new CardAdapterOverview(getActivity()));
+        recList.setAdapter(new AdapterOverview(getActivity()));
         //recList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
 
