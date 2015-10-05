@@ -7,6 +7,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.InflateException;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
+import de.mohoff.zeiterfassung.ui.MainActivity;
 
 /**
  * Created by moo on 8/16/15.
@@ -47,6 +49,32 @@ public class MapManageTLAs extends MapAbstract {
     EditText radiusValue;
     ImageButton saveButton;
     // TODO: Replace button with appropriate SAVE icon
+
+    int colorButtonDisabled;
+    int colorButtonEnabled;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        MainActivity main = (MainActivity) getActivity();
+        main.getDrawerToggle().setDrawerIndicatorEnabled(false);
+        main.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // needed to indicate that the fragment would
+        // like to add items to the Options Menu
+        setHasOptionsMenu(true);
+
+        // TODO: To animate the drawer when switching fragments: https://github.com/keklikhasan/LDrawer
+
+        // work around for bug "fragment not attached to activity anymore"
+        // Appears when navigation to this fragment the 2nd time.
+        // The call of getResources() can't complete because of the bug.
+        // TODO: Are there other ways to stay attached to activity?
+        if(isAdded()){
+            colorButtonDisabled = getResources().getColor(R.color.grey_25);
+            colorButtonEnabled = getResources().getColor(R.color.greenish);
+        }
+
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -104,13 +132,30 @@ public class MapManageTLAs extends MapAbstract {
         return v;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Get item selected and deal with it
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //called when the up affordance/carat in actionbar is pressed
+                getActivity().onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void updateButtonColor(){
         // Provide color feedback. Disable button if radius hasn't changed.
         if (radius == candidateTLA.getRadius()) {
-            saveButton.setColorFilter(getResources().getColor(R.color.grey_25));
+            saveButton.setColorFilter(colorButtonDisabled);
             //saveButton.setClickable(false);
         } else {
-            saveButton.setColorFilter(getResources().getColor(R.color.greenish));
+            saveButton.setColorFilter(colorButtonEnabled);
             //saveButton.setClickable(true);
         }
     }
@@ -118,6 +163,10 @@ public class MapManageTLAs extends MapAbstract {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         super.onMapReady(googleMap);
+        // Make sure we start with an empty map. After supporting proper back/up-navigation,
+        // the variable googleMap doesn't represent an empty map after navigating to this fragment
+        // more than once.
+        googleMap.clear();
         // Inside drawExistingTLAs(), cameraCenter will be assigned.
         // Therefore it's necessary to call both methods in this order.
         drawExistingTLAs();

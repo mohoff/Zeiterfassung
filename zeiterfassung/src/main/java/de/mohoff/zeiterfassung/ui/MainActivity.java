@@ -6,9 +6,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.*;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -69,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
-    private ActionBarDrawerToggle drawerActionBarToggle;
+    private ActionBarDrawerToggle drawerToggle;
     private NavigationListItem[] items = new NavigationListItem[8];
     private CharSequence title;
 
@@ -97,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         fragT = fragM.beginTransaction();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //toolbar.setTitle("Zeiterfassung");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -104,10 +103,12 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+        //mDrawerToggle.setDrawerIndicatorEnabled(false);
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        drawerActionBarToggle = new ActionBarDrawerToggle(
+        drawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 drawerLayout,          /* DrawerLayout object */
                 R.string.drawer_open,  /* "open drawer" description for accessibility */
@@ -133,11 +134,12 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 toolbar.setAlpha(1 - slideOffset / 2);
             }
         };
-        drawerLayout.setDrawerListener(drawerActionBarToggle);
+
+        drawerLayout.setDrawerListener(drawerToggle);
         drawerLayout.post(new Runnable() {
             @Override
             public void run() {
-                drawerActionBarToggle.syncState();
+                drawerToggle.syncState();
             }
         });
 
@@ -367,14 +369,32 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        drawerActionBarToggle.syncState();
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Close navigation drawer if it's open. If not, go back to previous fragment if there is one
+        // on the back-stack.
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(leftDrawer);
+        } else if (getFragmentManager().getBackStackEntryCount() > 0){
+            getFragmentManager().popBackStack();
+            drawerToggle.setDrawerIndicatorEnabled(true);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    public ActionBarDrawerToggle getDrawerToggle(){
+        return drawerToggle;
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
-        drawerActionBarToggle.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -466,7 +486,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
         // ActionBarDrawerToggle will take care of this.
-        if (drawerActionBarToggle.onOptionsItemSelected(item)) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 

@@ -240,7 +240,9 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
 
                         ((Activity) context).getFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.content_frame, nextFragment)
+                                .add(R.id.content_frame, nextFragment)
+                                //.replace(R.id.content_frame, nextFragment)
+                                .addToBackStack(null)
                                 .commit();
                     }
                 });
