@@ -3,8 +3,10 @@ package de.mohoff.zeiterfassung.ui;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
@@ -32,14 +35,14 @@ import de.mohoff.zeiterfassung.ui.fragments.Overview;
 /**
  * Created by moo on 8/17/15.
  */
+// --- Outer adapter ---
 public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHolder>{ //RecyclerView.Adapter<AdapterManageTLA.TLAViewHolder>{
     private Context context;
     private DatabaseHelper dbHelper = null;
     //private LayoutInflater li;
     List<TargetLocationArea> tlas;
     List<String> activityNames = new ArrayList<String>();
-    //List<EditText> editTextList = new ArrayList<EditText>();
-    //private boolean inEditMode = false;
+    private AdapterManageTLA outerAdapter = this;
 
     private Map<String, AdapterManageTLAInner> locationAdapterMap = new HashMap<>();
     private final static int VIEWTYPE_NORMAL = 1;
@@ -51,7 +54,6 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
         this.tlas = dbHelper.getAllTLAs();
         this.activityNames = dbHelper.getDistinctActivityNames();
         this.context = context;
-        //li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     // Activity ViewHolder (outer holder)
@@ -122,39 +124,54 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
         if(holder.getItemViewType() == VIEWTYPE_NORMAL) {
-            ActViewHolder actHolder = (ActViewHolder) holder;
+            final ActViewHolder actHolder = (ActViewHolder) holder;
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            final String currentActivity = activityNames.get(position);
-            final List<TargetLocationArea> relevantTLAs = new ArrayList<TargetLocationArea>();
+            final String activity = activityNames.get(position);
 
-            for (TargetLocationArea tla : tlas) {
-                if (tla.getActivityName().equals(currentActivity)) {
-                    relevantTLAs.add(tla);
-                }
+            // Create an adapter if none exists, and put in the map
+            if (!locationAdapterMap.containsKey(activity)) {
+                locationAdapterMap.put(activity, new AdapterManageTLAInner(this, context, getRelevantTLAsByActivity(tlas, activity)));
             }
-            actHolder.activityName.setText(currentActivity);
+
+            actHolder.recyclerView.setAdapter(locationAdapterMap.get(activity));
+
+            actHolder.activityName.setText(activity);
             actHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: Popup "Do you really want to delete this activity?"
-                    if (dbHelper.deleteTLAsByActivity(currentActivity) == 1) {
-                        // TODO: show toast "Activity and related Locations deleted."
-                        notifyDataSetChanged();
-                    } else {
-                        // TODO: show toast "Couldn't delete Activity. Does it still exist?"
-                    }
+                    AlertDialog alertDialog = new AlertDialog.Builder(
+                            context)
+                            .setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    // Delete action
+                                    if (dbHelper.deleteTLAsByActivity(activity) == 1) {
+                                        GeneralHelper.showToast(context, "Activity deleted.");
+                                        actHolder.recyclerView.setAdapter(null);
+                                        updateList(outerAdapter, null); // outerAdapter == this
+                                    } else {
+                                        GeneralHelper.showToast(context, "Couldn't delete Activity. Does it still exist?");
+                                    }
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    // Cancel action
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setTitle("Delete Activity")
+                            .setMessage("Are you sure that you want to delete Activity \"" + activity + "\" with all its Locations?")
+                            .create();
+                    // TODO: add app icon to the alertDialog.
+                    alertDialog.show();
                 }
             });
-
-            // Create an adapter if none exists
-            if (!locationAdapterMap.containsKey(currentActivity)) {
-                locationAdapterMap.put(currentActivity, new AdapterManageTLAInner(context, relevantTLAs));
-            }
-
-            actHolder.recyclerView.setAdapter(locationAdapterMap.get(currentActivity));
-
         } else if (holder.getItemViewType() == VIEWTYPE_ADD) {
             AddHolder addButtonHolder = (AddHolder) holder;
             addButtonHolder.addButton.setOnClickListener(new View.OnClickListener() {
@@ -174,7 +191,8 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        // if position is last index
+        // Check if position number corresponds to the last index. If so, make this element the
+        // "add"-Panel. Else treat it as regular list element.
         if (position == getItemCount()-1) {
             return VIEWTYPE_ADD;
         } else {
@@ -182,37 +200,57 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    private DatabaseHelper getDbHelper() {
-        if (dbHelper == null) {
-            dbHelper =
-                    OpenHelperManager.getHelper(context, DatabaseHelper.class);
+    // Updates the the complete list (outer and inner adapter). To be called when there has happened
+    // a DB-change in order to reflect that on UI.
+    private void updateList(AdapterManageTLA outerAdapter, AdapterManageTLAInner innerAdapter){
+        // To update the outer adapter, we first have to retrieve all TLAs from the DB.
+        this.tlas = dbHelper.getAllTLAs();
+        this.activityNames = dbHelper.getDistinctActivityNames();
+        outerAdapter.notifyDataSetChanged();
+
+        // To update the inner adapter, we first have to compose the relevant TLA list from scratch.
+        // When a whole Activity is deleted, innerAdapter is null so we need to check here. In this
+        // case, the inner recyclerView will be garbage collected. SetAdapter(null) is called inside
+        // alertDialog.
+        if (innerAdapter != null) {
+            String activity = innerAdapter.relevantTLAs.get(0).getActivityName();
+            innerAdapter.relevantTLAs = getRelevantTLAsByActivity(this.tlas, activity);
+            innerAdapter.notifyDataSetChanged();
         }
-        return dbHelper;
     }
 
+    // Helper function to reduce all TLAs to a set which elements all correspond to one Activity.
+    private List<TargetLocationArea> getRelevantTLAsByActivity(List<TargetLocationArea> list, String activity){
+        ArrayList<TargetLocationArea> relevantTLAs = new ArrayList<>();
+        for (TargetLocationArea entry : list) {
+            if (entry.getActivityName().equals(activity)) {
+                relevantTLAs.add(entry);
+            }
+        }
+        return relevantTLAs;
+    }
 
-
-
-
-
+    // --- Inner adapter ---
     private class AdapterManageTLAInner extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Context context;
         List<TargetLocationArea> relevantTLAs;
+        AdapterManageTLAInner innerAdapter = this;
+        AdapterManageTLA outerAdapter;
 
-        public AdapterManageTLAInner(Context context, List<TargetLocationArea> relevantTLAs) {
+        public AdapterManageTLAInner(AdapterManageTLA outerAdapter, Context context, List<TargetLocationArea> relevantTLAs) {
+            this.outerAdapter = outerAdapter;
             this.context = context;
             this.relevantTLAs = relevantTLAs;
         }
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-            // show normal Location
+            // Show normal Location
             if(viewType == VIEWTYPE_NORMAL) {
                 View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_manage_tlas_card_inner, parent, false);
                 return new LocViewHolder(v);
             }
-            // show "add" option as card listed last
+            // Show "add" option as card listed last
             if(viewType == VIEWTYPE_ADD) {
                 View v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.fragment_manage_tlas_card_inner_add, parent, false);
@@ -225,6 +263,8 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             if(holder.getItemViewType() == VIEWTYPE_NORMAL) {
                 LocViewHolder locHolder = (LocViewHolder) holder;
+
+                // Get TLA at position to setup textView and clickListeners below
                 final TargetLocationArea tla = relevantTLAs.get(position);
 
                 locHolder.locationName.setText(tla.getLocationName());
@@ -249,13 +289,33 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                 locHolder.deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TODO: Popup "Do you really want to delete this activity?"
-                        if (dbHelper.deleteTLAById(tla.get_id()) == 1) {
-                            // TODO: show toast "Activity and related Locations deleted."
-                            notifyDataSetChanged();
-                        } else {
-                            // TODO: show toast "Couldn't delete Activity. Does it still exist?"
-                        }
+                        AlertDialog alertDialog = new AlertDialog.Builder(
+                                context)
+                                .setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int i) {
+                                        // Delete action
+                                        if (dbHelper.deleteTLAById(tla.get_id()) == 1) {
+                                            GeneralHelper.showToast(context, "Location deleted.");
+                                            updateList(outerAdapter, innerAdapter); // innerAdapter == this
+                                        } else {
+                                            GeneralHelper.showToast(context, "Couldn't delete Location. Does it still exist?");
+                                        }
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int i) {
+                                        // Cancel action
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setTitle("Delete Location")
+                                .setMessage("Are you sure that you want to delete Location \"" + tla.getLocationName() + "\"?")
+                                .create();
+                                // TODO: add app icon to the alertDialog.
+                        alertDialog.show();
                     }
                 });
             } else if (holder.getItemViewType() == VIEWTYPE_ADD) {
@@ -263,8 +323,8 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                 addButtonHolder.addButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TODO: add on click listener for "add new activty"
-                        // TODO: also provide this action in top menubar with "+"-icon
+                        // TODO: Add on click listener for "add new activty"
+                        // TODO: Also provide this action in top menubar with "+"-icon. Or by placing the round red bottom right button (see material design)
                     }
                 });
             }
@@ -284,5 +344,13 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                 return VIEWTYPE_NORMAL;
             }
         }
+    }
+
+    private DatabaseHelper getDbHelper() {
+        if (dbHelper == null) {
+            dbHelper =
+                    OpenHelperManager.getHelper(context, DatabaseHelper.class);
+        }
+        return dbHelper;
     }
 }

@@ -69,6 +69,8 @@ public class MapManageTLAs extends MapAbstract {
         // The call of getResources() can't complete because of the bug.
         // TODO: Are there other ways to stay attached to activity?
         if(isAdded()){
+            // getResources() only works when fragment is attached to activity. That is what we check
+            // with isAdded().
             colorButtonDisabled = getResources().getColor(R.color.grey_25);
             colorButtonEnabled = getResources().getColor(R.color.greenish);
         }
