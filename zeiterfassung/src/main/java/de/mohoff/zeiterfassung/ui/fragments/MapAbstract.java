@@ -50,6 +50,9 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
 
     protected MapFragment mapFragment;
     protected GoogleMap map;
+    // Should be replaced with "greenish_50" in onCreateView().
+    // Work around for "fragment not attached to activity" error.
+    int color = Color.BLACK;
 
     protected DatabaseHelper dbHelper = null;
 
@@ -104,6 +107,10 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
 
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        if(isAdded()) {
+            color = getResources().getColor(R.color.greenish_50);
+        }
 
         return view;
     }
@@ -179,11 +186,6 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     }
 
     protected Polyline addPolylineToMap(GoogleMap map, CircularFifoQueue<Loc> queueLocs){
-        int color = Color.BLACK;
-        if(getActivity() != null) {
-            // Can somehow getResources() be used here?
-            color = ((MainActivity)getActivity()).colorGreenish50;
-        }
         PolylineOptions options = new PolylineOptions()  // .geodesic(false)
                 .color(color)
                 .width(15);

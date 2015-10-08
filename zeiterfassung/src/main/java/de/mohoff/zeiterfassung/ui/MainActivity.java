@@ -47,10 +47,10 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerListener {
-    // In order to avoid "fragment not attached to activity" errors, some colors are preassigned.
+    /*// In order to avoid "fragment not attached to activity" errors, some colors are preassigned.
     // Now fragments can access below color variables anytime.
     public int colorGreenish = getResources().getColor(R.color.greenish);
-    public int colorGreenish50 = getResources().getColor(R.color.greenish_50);
+    public int colorGreenish50 = getResources().getColor(R.color.greenish_50);*/
     // Set relative to update interval time so max markers on map =~ 2h for example
     // NOT the same as queueSize in LocationCache.class
     private static int LOC_QUEUE_SIZE = 50;
