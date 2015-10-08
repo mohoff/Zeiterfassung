@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
@@ -42,8 +43,9 @@ import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class Map extends MapAbstract implements LocationChangeListener {
-    CircularFifoQueue<Loc> userLocations;
+    CircularFifoQueue<Loc> userLocs = new CircularFifoQueue<>();
     List<Marker> markers = new ArrayList<Marker>();
+    Polyline currentPolyline;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,15 +62,20 @@ public class Map extends MapAbstract implements LocationChangeListener {
     public void onResume() {
         // set newest fixMarkers
 
-        // get most recent locations from MainActivity
-        userLocations = parentActivity.getLocs();
+        // Get most recent locations from MainActivity and convert to LatLngs (google map objects)
+        //CircularFifoQueue<Loc> userLocs = parentActivity.getLocs();
+        //for(Loc loc : userLocs){
+        //    userLatLngs.add(GeneralHelper.convertLocToLatLng(loc));
+        //}
+        userLocs = parentActivity.getLocs();
+
         parentActivity.setOnNewLocationListener(this); // set listener
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        parentActivity.setOnNewLocationListener(null); // remove listener
+        //parentActivity.setOnNewLocationListener(null); // remove listener
         super.onPause();
     }
 
@@ -86,23 +93,39 @@ public class Map extends MapAbstract implements LocationChangeListener {
     public void onMapReady(GoogleMap googleMap) {
         super.onMapReady(googleMap);
 
-        if(userLocations != null && userLocations.size() > 0){
-            for(Loc loc : userLocations){
-                super.addMarkerToMap(markers, map, GeneralHelper.convertLocToLatLng(loc));
+        if(userLocs != null && userLocs.size() > 0){
+            for(Loc loc : userLocs){
+                super.addMarkerToMap(map, markers,
+                        GeneralHelper.convertLocToLatLng(loc),
+                        GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()));
             }
+            currentPolyline = super.addPolylineToMap(map, userLocs);
         } else {
             GeneralHelper.showToast(parentActivity, "no location data available.");
         }
     }
 
     public void onNewLocation(Loc loc) {
+        LatLng latLng = GeneralHelper.convertLocToLatLng(loc);
+        float opacity = GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy());
+
+        userLocs.add(loc);
         if(map != null){
-            addMarkerToMap(markers, map, GeneralHelper.convertLocToLatLng(loc));
-            // ensure that there are only userLocations.maxSize() locations displayed to prevent memory leak
-            if(userLocations.size() == userLocations.maxSize()){ // if circularFifoQueue is full...
-                markers.get(0).remove(); // remove oldest marker from map
-                markers.remove(0); // remove oldest/first element from marker list
+            // Update markers
+            addMarkerToMap(map, markers, latLng, opacity);
+            // Ensure that there are only userLocations.maxSize() locations displayed to prevent memory leak
+            if(userLocs.size() == userLocs.maxSize()){ // if circularFifoQueue is full...
+                // Remove oldest marker from map
+                markers.get(0).remove();
+                // Remove oldest/first element from marker list
+                markers.remove(0);
             }
+
+            // Update polyline
+            if(currentPolyline != null){
+                currentPolyline.remove();
+            }
+            currentPolyline = super.addPolylineToMap(map, userLocs);
         } else {
             GeneralHelper.showToast(parentActivity, "no map object initialized.");
         }
@@ -143,7 +166,7 @@ public class Map extends MapAbstract implements LocationChangeListener {
             if(this.locs.size() > 0){
                 this.markersAdded = true;
                 for( Loc loc : this.locs){
-                    addMarkerToMap(this.markers, this.map, GeneralHelper.convertLocToLatLng(loc));
+                    addMarkerToMap(map, markers, GeneralHelper.convertLocToLatLng(loc), 1);
                 }
             } else {
                 //GeneralHelper.showToast(parentActivity, "no location data available.");

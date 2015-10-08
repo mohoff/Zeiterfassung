@@ -47,7 +47,13 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerListener {
-    private static int LOC_QUEUE_SIZE = 50; // --> set relative to update interval time so max markers on map =~ 2h for example
+    // In order to avoid "fragment not attached to activity" errors, some colors are preassigned.
+    // Now fragments can access below color variables anytime.
+    public int colorGreenish = getResources().getColor(R.color.greenish);
+    public int colorGreenish50 = getResources().getColor(R.color.greenish_50);
+    // Set relative to update interval time so max markers on map =~ 2h for example
+    // NOT the same as queueSize in LocationCache.class
+    private static int LOC_QUEUE_SIZE = 50;
     SimpleDateFormat sdf;
     public static FragmentManager fragM;
     FragmentTransaction fragT;
@@ -62,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     public CircularFifoQueue<Loc> getLocs() {
         return locs;
     }
-    private CircularFifoQueue<Loc> locs = new CircularFifoQueue<Loc>(MainActivity.LOC_QUEUE_SIZE);
-    private ArrayList<Loc> locsTmp = new ArrayList<Loc>();
+    private CircularFifoQueue<Loc> locs = new CircularFifoQueue<>(MainActivity.LOC_QUEUE_SIZE);
+    private ArrayList<Loc> locsTmp = new ArrayList<>();
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
@@ -189,6 +195,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         }
         updateServiceButtons();
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(timeslotReceiver,
+                new IntentFilter("locationServiceTimeslotEvents"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(locUpdateReceiver,
+                new IntentFilter("locationServiceLocUpdateEvents"));
+
         sdf = new SimpleDateFormat("dd.MM.yyyy - HH:mm");
     }
 
@@ -231,11 +242,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             updateServiceButtons();
         }*/
 
-
         stopService(new Intent(MainActivity.this, LocationService.class));
         isServiceRunning = false;
         updateServiceButtons();
-
     }
 
     private boolean bindLocationService(){
@@ -399,12 +408,16 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         if (dbHelper != null) {
             OpenHelperManager.releaseHelper();
             dbHelper = null;
         }
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(timeslotReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(locUpdateReceiver);
+
         unbindLocationService();
+        super.onDestroy();
     }
 
     // BroadcastReceiver, which receives Events from LocationService, such as "newTimeslotStarted" as message
@@ -445,16 +458,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     @Override
     protected void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(timeslotReceiver,
-                new IntentFilter("locationServiceTimeslotEvents"));
-        LocalBroadcastManager.getInstance(this).registerReceiver(locUpdateReceiver,
-                new IntentFilter("locationServiceLocUpdateEvents"));
     }
+
     @Override
     protected void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(timeslotReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(locUpdateReceiver);
     }
 
     public void timeslotStartedEvent(long millis, String activityName, String locationName) {
@@ -510,10 +518,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         super.onSaveInstanceState(outState);
     }
 
-
-
     public void setOnNewLocationListener(LocationChangeListener listen) {
-      newLocationListener = listen;
+        newLocationListener = listen;
     }
 
     private ArrayList<String> getListItems(){

@@ -3,6 +3,7 @@ package de.mohoff.zeiterfassung.ui.fragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,6 +25,8 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -110,6 +113,11 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
     }
@@ -136,26 +144,55 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.map = googleMap;
-        //googleMap.setMyLocationEnabled(true); // displays current user location with bearing on the map
+        // Disable "Navigation" and "GPS Pointer" buttons whiche are visible by default
+        map.getUiSettings().setMapToolbarEnabled(false);
+        // Enables "Show my location" button which shows current location with bearing on the map
+        // map.getUiSettings().setMyLocationButtonEnabled(true);
+
         progressBar.setVisibility(View.GONE);
     }
 
-    protected void addMarkerToMap(List<Marker> markers, GoogleMap map, LatLng latLng){
-        markers.add(map.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .draggable(false)
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+    protected void addMarkerToMap(GoogleMap map, List<Marker> markers, LatLng latLng, float opacity){
+        Marker marker = map.addMarker(new MarkerOptions()
+                .position(latLng)
+                .draggable(false)
+                .alpha(opacity)
+                .icon(BitmapDescriptorFactory.defaultMarker(193))      // BitmapDescriptorFactory.HUE_MAGENTA
                 //.title("acc " + String.valueOf(loc.getAccuracy()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
-        ));
-        if(markers.size() > 1){
-            // change color for old marker
-            markers.get(markers.size()-2).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
-            // move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow location updates on the map"
-            map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        );
+        if(markers != null){
+            markers.add(marker);
+            if(markers.size() > 1){
+                // Change color for old marker
+                markers.get(markers.size()-2).setIcon(BitmapDescriptorFactory.defaultMarker(0)); // BitmapDescriptorFactory.HUE_VIOLET
+                // Move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow location updates on the map"
+                map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            } else {
+                // Zoom map in to marker, if the marker is the first one on the map
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+            }
         } else {
-            // zoom map in to marker, if the marker is the first one on the map
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+            // No list "markers" is passed, so we are in "Add new TLA/Zone".
+            // Just move camera towards desired position without resetting the zoom level every time.
+            map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         }
+    }
+
+    protected Polyline addPolylineToMap(GoogleMap map, CircularFifoQueue<Loc> queueLocs){
+        int color = Color.BLACK;
+        if(getActivity() != null) {
+            // Can somehow getResources() be used here?
+            color = ((MainActivity)getActivity()).colorGreenish50;
+        }
+        PolylineOptions options = new PolylineOptions()  // .geodesic(false)
+                .color(color)
+                .width(15);
+
+        for(Loc loc : queueLocs){
+            options.add(GeneralHelper.convertLocToLatLng(loc));
+        }
+
+        return map.addPolyline(options);
     }
 
     protected void centerMapTo(LatLng cameraCenter){

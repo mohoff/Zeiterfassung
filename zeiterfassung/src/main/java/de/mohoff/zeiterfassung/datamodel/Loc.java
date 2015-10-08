@@ -3,6 +3,8 @@ package de.mohoff.zeiterfassung.datamodel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class Loc implements Parcelable{
 
     private double latitude;            // mandatory

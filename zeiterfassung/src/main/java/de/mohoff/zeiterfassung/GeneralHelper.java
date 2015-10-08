@@ -10,6 +10,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.locationservice.LocationService;
 
@@ -96,12 +99,28 @@ public class GeneralHelper {
         toast.show();
     }
 
-    public static LatLng convertLocationToLatLng(Location loc){
+    public static LatLng convertLocToLatLng(Loc loc){
         return new LatLng(loc.getLatitude(), loc.getLongitude());
     }
 
-    public static LatLng convertLocToLatLng(Loc loc){
-        return new LatLng(loc.getLatitude(), loc.getLongitude());
+    public static List<LatLng> convertListLocToListLatLng(List<Loc> listLoc){
+        List<LatLng> listLatLng = new ArrayList<LatLng>();
+        for(Loc loc : listLoc){
+            listLatLng.add(convertLocToLatLng(loc));
+        }
+        return listLatLng;
+    }
+
+    public static float getOpacityFromAccuracy(double accuracy){
+        // acc < 50m : 1        --> == opaque
+        // acc 100m  : 0.8      --> == 80% opaque / 20% transparent
+        // acc 200m  : 0.6      --> ...
+        // acc 500m  : 0        --> == 100% transparent
+        // acc 1000m : -1
+        float unclampedOpacity = 1.0f - (float) ((int)accuracy/50) /10.0f;
+
+        // clamp unclampedOpacity to interval [ 0.2 , 1 ]
+        return Math.max(1.0f, Math.min(0.2f, unclampedOpacity));
     }
 
 
