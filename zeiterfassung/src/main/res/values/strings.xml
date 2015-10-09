@@ -3,6 +3,7 @@
 
     <color name="transparent">#00000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="white_90">#EEFFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="almost_black">#FF111111</color>
     <color name="almost_white">#FFEEEEEE</color>
@@ -30,6 +31,7 @@
     <color name="greenish_15">#26025167</color>
     <color name="greenish_10">#1A025167</color>
     <color name="greenish_5">#0D025167</color>
+    <color name="greenish_light">#FF037899</color>
 
     <color name="navigation_drawer_bg">@color/white</color>
     <color name="navigation_drawer_top_bg">@color/greenish_10</color>

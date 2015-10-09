@@ -2,7 +2,9 @@ package de.mohoff.zeiterfassung.ui.fragments;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.location.Address;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.InflateException;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -23,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import de.mohoff.zeiterfassung.GeneralHelper;
@@ -31,23 +35,25 @@ import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
 /**
- * Created by moo on 8/16/15.
+ * Created by moo on 10/9/15.
  */
-public class MapManageTLAs extends MapAbstract {
+public class MapAddTLA extends MapAbstract {
     View v;
 
     ArrayList<TargetLocationArea> areas = new ArrayList<TargetLocationArea>();
     ArrayList<Marker> fixMarkers = new ArrayList<Marker>();
     ArrayList<Circle> fixCircles = new ArrayList<Circle>();
     private LatLng cameraCenter;
+    LatLng lookupLatLng;
 
-    int candidateTLAId;
     TargetLocationArea candidateTLA;
     Marker candidateMarker = null;
     Circle candidateCircle = null;
-    int radius;
+    int radius = 100;
     EditText radiusValue;
-    ImageButton saveButton;
+    EditText addressValue;
+    ImageButton searchButton;
+    FloatingActionButton saveButton;
     // TODO: Replace button with appropriate SAVE icon
 
     int colorButtonDisabled;
@@ -80,12 +86,8 @@ public class MapManageTLAs extends MapAbstract {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        v = super.onCreateViewWithLayout(inflater, container, savedInstanceState, R.layout.fragment_map_edittext);
+        v = super.onCreateViewWithLayout(inflater, container, savedInstanceState, R.layout.fragment_map_add_tla);
         super.getDbHelper(getActivity());
-
-        candidateTLAId = getArguments().getInt("TLAId");
-        candidateTLA = dbHelper.getTLAById(candidateTLAId);
-        radius = candidateTLA.getRadius();
 
         radiusValue = (EditText) v.findViewById(R.id.radiusValue);
         radiusValue.setText(String.valueOf(radius));
@@ -95,13 +97,12 @@ public class MapManageTLAs extends MapAbstract {
                 try {
                     radius = Integer.valueOf(inputString);
                 } catch (Exception e) {
-                    radius = candidateTLA.getRadius();
                     // TODO: show Toast: "Input is not a number."
                 }
                 if (candidateCircle != null) {
                     candidateCircle.setRadius(radius);
                 }
-                updateButtonColor();
+                //updateButtonColor();
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -111,14 +112,42 @@ public class MapManageTLAs extends MapAbstract {
             }
         });
 
-        saveButton = (ImageButton) v.findViewById(R.id.saveButton);
+        addressValue = (EditText) v.findViewById(R.id.addressValue);
+
+        searchButton = (ImageButton) v.findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(addressValue.getText() == null){
+                    GeneralHelper.showToast(parentActivity, "Please enter address or place first.");
+                } else {
+                    try {
+                        // Do the lookup
+                        Address lookupResult = geocoder.getFromLocationName(addressValue.getText().toString(), 1).get(0);
+                        lookupLatLng = new LatLng(lookupResult.getLatitude(), lookupResult.getLongitude());
+                        // Add marker and circle for the lookup position to the map
+                        candidateMarker = map.addMarker(
+                                createMarkerOptions(lookupLatLng, true, "", "", BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                        );
+                        candidateCircle = map.addCircle(
+                                createCircleOptions(lookupLatLng, radius, Color.argb(100, 81, 112, 226))
+                        );
+                        // Move camera to lookup position
+                        centerMapTo(lookupLatLng);
+                    } catch (IOException e){
+                        GeneralHelper.showToast(parentActivity, "Lookup failed. Do you have internet connection?");
+                    } catch (IllegalArgumentException e) {
+                        GeneralHelper.showToast(parentActivity, "Lookup failed. Please enter a valid address or place.");
+                    }
+                }
+            }
+        });
+
+        saveButton = (FloatingActionButton) v.findViewById(R.id.saveButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (radius == candidateTLA.getRadius()) {
-                    GeneralHelper.showToast(getActivity(), "Input is already saved.");
-                    // cancel save process
-                } else if (radius < 50){
+                if (radius < 50) {
                     GeneralHelper.showToast(getActivity(), "Input must be >= 50 meters.");
                     // cancel save process
                 } else {
@@ -129,7 +158,7 @@ public class MapManageTLAs extends MapAbstract {
 
             }
         });
-        updateButtonColor();
+        //updateButtonColor();
 
         return v;
     }
@@ -151,6 +180,9 @@ public class MapManageTLAs extends MapAbstract {
     }
 
     private void updateButtonColor(){
+
+        // TODO: rework this
+
         // Provide color feedback. Disable button if radius hasn't changed.
         if (radius == candidateTLA.getRadius()) {
             saveButton.setColorFilter(colorButtonDisabled);
@@ -200,48 +232,45 @@ public class MapManageTLAs extends MapAbstract {
                 // which would be this EditText again. By using android:focusable="true" and
                 // android:focusableInTouchMode="true" for the parent layout, it absorbs the focus.
                 radiusValue.clearFocus();
-                // hide keyboard
+                addressValue.clearFocus();
                 GeneralHelper.hideSoftKeyboard(getActivity());
+
+                // In case there is a marker and circle on the map already, remove them both.
+                if(candidateMarker != null && candidateCircle != null){
+                    candidateMarker.remove();
+                    candidateCircle.remove();
+                }
+
+                candidateMarker = map.addMarker(
+                        createMarkerOptions(point, true, "", "", BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                );
+                candidateCircle = map.addCircle(
+                        createCircleOptions(point, radius, Color.argb(100, 81, 112, 226))
+                );
             }
         });
     }
 
     public void drawExistingTLAs(){
-        for(TargetLocationArea tla : dbHelper.getAllTLAs()){
-            // TODO: provide appropriate colors: gray (uneditable) and greenish (editable)
+         for(TargetLocationArea tla : dbHelper.getAllTLAs()){
 
-            // Make marker and circle uneditable by default.
-            // When TLA is the one to edit, make it editable (see below)
-            boolean isDraggable = false;
-            float markerHue = BitmapDescriptorFactory.HUE_ROSE;
-            int circleColor = Color.HSVToColor(100, new float[]{BitmapDescriptorFactory.HUE_ROSE, 1, 1});
+              int circleColor = Color.HSVToColor(100, new float[]{BitmapDescriptorFactory.HUE_ROSE, 1, 1});
+              LatLng latLng = new LatLng(tla.getLatitude(), tla.getLongitude());
 
-            if (candidateTLAId == tla.get_id()) {
-                // make marker and circle editable
-                isDraggable = true;
-                markerHue = BitmapDescriptorFactory.HUE_RED;
-                circleColor = Color.HSVToColor(100, new float[]{BitmapDescriptorFactory.HUE_RED, 1, 1});
-                // assign camera center
-                cameraCenter = new LatLng(tla.getLatitude(), tla.getLongitude());
-            }
+              // TODO: we want gray markers (custom markers) and gray fill colors to show that. Via .icon() ?
 
-            LatLng latLng = new LatLng(tla.getLatitude(), tla.getLongitude());
-
-            Marker marker = map.addMarker(
-                    createMarkerOptions(latLng, isDraggable, "", "", BitmapDescriptorFactory.defaultMarker(markerHue))
-            );
-            Circle circle = map.addCircle(
+              Marker marker = map.addMarker(
+                    createMarkerOptions(latLng, false, "", "", BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
+              );
+              Circle circle = map.addCircle(
                     createCircleOptions(latLng, tla.getRadius(), circleColor)
-            );
+              );
+              fixMarkers.add(marker);
+              fixCircles.add(circle);
 
-            if (candidateTLAId == tla.get_id()) {
-                candidateMarker = marker;
-                candidateCircle = circle;
-            } else {
-                fixMarkers.add(marker);
-                fixCircles.add(circle);
-            }
-
+             // TODO: rework cameraCenter so the map viewport is wrapping all TLAs
+             cameraCenter = new LatLng(tla.getLatitude(), tla.getLongitude());
         }
+
     }
 }

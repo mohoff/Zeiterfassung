@@ -5,7 +5,7 @@
                 android:tag="MAP"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                tools:context="de.mohoff.zeiterfassung.ui.fragments.Map">
+                tools:context="de.mohoff.zeiterfassung.ui.fragments.MapManageTLAs">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/map"

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Color;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,8 +21,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -50,6 +53,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
 
     protected MapFragment mapFragment;
     protected GoogleMap map;
+    protected Geocoder geocoder;
     // Should be replaced with "greenish_50" in onCreateView().
     // Work around for "fragment not attached to activity" error.
     int color = Color.BLACK;
@@ -58,6 +62,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        parentActivity = (MainActivity) getActivity();
+        geocoder = new Geocoder(getActivity());
         super.onCreate(savedInstanceState);
     }
 
@@ -77,8 +83,6 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
 
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
-
-        parentActivity = (MainActivity) getActivity();
 
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -203,6 +207,25 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(cameraCenter, 15);
         map.animateCamera(cu);
     }
+
+    protected MarkerOptions createMarkerOptions(LatLng pos, boolean isDraggable, String title, String snippet, BitmapDescriptor bitmapDescriptor){
+        return new MarkerOptions()
+                .position(pos)
+                .draggable(isDraggable)
+                .title(title)
+                .snippet(snippet)
+                .icon(bitmapDescriptor);
+    }
+
+    protected CircleOptions createCircleOptions(LatLng pos, int radius, int fillColor){
+        return new CircleOptions()
+                .center(pos)
+                .radius(radius)
+                .fillColor(fillColor)
+                .strokeWidth(0)
+                .strokeColor(Color.TRANSPARENT);
+    }
+
 
     protected DatabaseHelper getDbHelper(Context context) {
         if (dbHelper == null) {
