@@ -175,8 +175,10 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 // Move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow location updates on the map"
                 map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             } else {
-                // Zoom map in to marker, if the marker is the first one on the map
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                // Zoom map in to marker, if the marker is the first one on the map.
+                // Zoom level 17 turns out to be nice because its the lowest one in which you can
+                // see building outlines.
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
             }
         } else {
             // No list "markers" is passed, so we are in "Add new TLA/Zone".

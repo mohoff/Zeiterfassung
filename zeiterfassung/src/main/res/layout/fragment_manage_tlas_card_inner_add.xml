@@ -12,16 +12,16 @@
     card_view:cardCornerRadius="2dp"
     card_view:cardElevation="1dp"
     card_view:cardUseCompatPadding="true"
-    card_view:contentPaddingTop="-3dp"
-    card_view:contentPaddingBottom="-3dp">
+    card_view:contentPaddingTop="0dp"
+    card_view:contentPaddingBottom="0dp">
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="5dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:id="@+id/locationWrapper">
 
         <ImageButton
@@ -29,9 +29,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/addActivityButton"
-            android:src="@drawable/ic_action_about"
+            android:src="@drawable/ic_add_white_24dp"
             android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true"
+            android:clickable="false"
+            android:focusable="false"/>
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>

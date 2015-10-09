@@ -55,6 +55,7 @@ public class MapManageTLAs extends MapAbstract {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // TODO: Do we have to add isAdded() here?
         MainActivity main = (MainActivity) getActivity();
         main.getDrawerToggle().setDrawerIndicatorEnabled(false);
         main.getSupportActionBar().setDisplayHomeAsUpEnabled(true);

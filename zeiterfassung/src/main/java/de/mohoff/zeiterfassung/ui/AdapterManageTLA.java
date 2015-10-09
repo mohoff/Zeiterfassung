@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -28,6 +29,7 @@ import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
 import de.mohoff.zeiterfassung.ui.fragments.About;
+import de.mohoff.zeiterfassung.ui.fragments.AddTLA;
 import de.mohoff.zeiterfassung.ui.fragments.ManageTLAs;
 import de.mohoff.zeiterfassung.ui.fragments.MapManageTLAs;
 import de.mohoff.zeiterfassung.ui.fragments.Overview;
@@ -86,10 +88,12 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     // AddButton ViewHolder (for outer and inner)
     public static class AddHolder extends RecyclerView.ViewHolder {
+        CardView cardView;
         ImageButton addButton;
 
         AddHolder(View itemView) {
             super(itemView);
+            cardView = (CardView) itemView.findViewById(R.id.card_view_outer);
             addButton = (ImageButton) itemView.findViewById(R.id.addActivityButton);
         }
     }
@@ -174,11 +178,17 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
             });
         } else if (holder.getItemViewType() == VIEWTYPE_ADD) {
             AddHolder addButtonHolder = (AddHolder) holder;
-            addButtonHolder.addButton.setOnClickListener(new View.OnClickListener() {
+            addButtonHolder.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: add on click listener for "add new activty"
                     // TODO: also provide this action in top menubar with "+"-icon
+                    // TODO: Combine following code with onClickListener for Location-addButton. Latter with arguments, so Activity can be preset in AddTLA-View.
+                    Fragment nextFragment = new AddTLA();
+                    ((Activity) context).getFragmentManager()
+                            .beginTransaction()
+                            .add(R.id.content_frame, nextFragment)
+                            .addToBackStack(null)
+                            .commit();
                 }
             });
         }

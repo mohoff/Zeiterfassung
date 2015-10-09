@@ -11,6 +11,9 @@
         <item name="android:colorPrimaryDark">@color/greenish</item>
         <!-- UI Controls Collors (TextView, EdditView, Slider, Checkboxes -->
         <item name="android:colorAccent">@color/greenish</item>
+        <!-- e.g. for EditText bottom underline color -->
+        <!-- Apparently, colorAccent does it too e eramor mo -->
+        <!--<item name="android:colorControlNormal">@color/greenish</item>-->
         <!-- StatusBar Title Text Color -->
         <item name="android:textColorPrimary">@color/white</item>
         <!-- MainContent Background Color -->
@@ -22,6 +25,12 @@
 
     <style name="Button" parent="android:style/Widget.Material.Button">
         <item name="android:colorButtonNormal">@color/greenish</item>
+    </style>
+
+    <style name="ImageButton" parent="android:style/Widget.Material.ImageButton">
+        <item name="android:tint">@color/greenish</item>
+        <item name="android:tintMode">src_atop</item>
+        <item name="android:background">@color/transparent</item>
     </style>
 
     <style name="LoadingSpinner" parent="android:style/Widget.Material.ProgressBar">

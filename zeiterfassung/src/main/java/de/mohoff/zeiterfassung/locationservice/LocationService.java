@@ -44,7 +44,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private static boolean IS_SERVICE_RUNNING = false; // not used right now
     private static float boundaryTreshold = 0.8f;
     private static int amountOfTemporarySavedLocations = 5;
-    private static int REGULAR_UPDATE_INTERVAL = 120 * 1000; // ms, update interval, 60 * 1000, 150 * 1000
+    private static int REGULAR_UPDATE_INTERVAL = 120 * 1000; // ms, update interval, 60 * 1000, 150 * 1000, 120 * 1000
     private static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
     private static String locationProviderType = LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
 
