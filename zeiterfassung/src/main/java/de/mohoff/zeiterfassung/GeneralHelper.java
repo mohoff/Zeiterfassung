@@ -1,6 +1,7 @@
 package de.mohoff.zeiterfassung;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -128,17 +129,23 @@ public class GeneralHelper {
         return Math.max(1.0f, Math.min(0.2f, unclampedOpacity));
     }
 
-    public static void hideSoftKeyboard(Activity context) {
-        View v = context.getCurrentFocus();
+    public static void hideSoftKeyboard(Activity activity) {
+        View v = activity.getCurrentFocus();
         if (v != null) {
-            InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
-
-        /*InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);*/
     }
 
+    public static void hideSoftKeyboardWithView(Activity activity, View v) {
+        InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
 
-
+    public static void clearBackStack(Activity activity){
+        FragmentManager fm = activity.getFragmentManager();
+        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+            fm.popBackStack();
+        }
+    }
 }

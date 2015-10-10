@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import de.mohoff.zeiterfassung.ui.AdapterManageTLA;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
+import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class ManageTLAs extends Fragment {
     private DatabaseHelper dbHelper = null;
@@ -45,5 +46,15 @@ public class ManageTLAs extends Fragment {
         recyclerView.setClickable(false); // taken from old listView. Can use here?
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        if(getFragmentManager().getBackStackEntryCount() > 0){
+            ((MainActivity)getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(false);
+        } else {
+            ((MainActivity)getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(true);
+        }
+        super.onResume();
     }
 }

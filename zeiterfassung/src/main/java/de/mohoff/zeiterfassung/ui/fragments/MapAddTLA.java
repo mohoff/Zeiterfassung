@@ -1,5 +1,6 @@
 package de.mohoff.zeiterfassung.ui.fragments;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Address;
@@ -54,6 +55,7 @@ public class MapAddTLA extends MapAbstract {
     EditText addressValue;
     ImageButton searchButton;
     FloatingActionButton saveButton;
+    String activityName, locationName;
     // TODO: Replace button with appropriate SAVE icon
 
     int colorButtonDisabled;
@@ -69,6 +71,9 @@ public class MapAddTLA extends MapAbstract {
         // needed to indicate that the fragment would
         // like to add items to the Options Menu
         setHasOptionsMenu(true);
+
+
+
 
         // TODO: To animate the drawer when switching fragments: https://github.com/keklikhasan/LDrawer
 
@@ -88,6 +93,9 @@ public class MapAddTLA extends MapAbstract {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = super.onCreateViewWithLayout(inflater, container, savedInstanceState, R.layout.fragment_map_add_tla);
         super.getDbHelper(getActivity());
+
+        activityName = getArguments().getString("activityName");
+        locationName = getArguments().getString("locationName");
 
         radiusValue = (EditText) v.findViewById(R.id.radiusValue);
         radiusValue.setText(String.valueOf(radius));
@@ -147,15 +155,26 @@ public class MapAddTLA extends MapAbstract {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (radius < 50) {
+                if (candidateMarker == null) {
+                    GeneralHelper.showToast(getActivity(), "Please pin an area on the map first.");
+                } else if (radius < 50) {
                     GeneralHelper.showToast(getActivity(), "Input must be >= 50 meters.");
                     // cancel save process
                 } else {
-                    GeneralHelper.showToast(getActivity(), "Successfully saved.");
-                    // TODO: Check if entered radius is valid (> 50m && not near other TLAs).
-                    // TODO: Save new radius into DB.
+                    // TODO: Check if entered radius is not near other TLAs.
+                    LatLng pos = candidateMarker.getPosition();
+                    int result = dbHelper.createNewTLA(pos.latitude, pos.longitude, radius, activityName, locationName);
+                    if (result != 1) {
+                        GeneralHelper.showToast(getActivity(), "Couldn't add TLA. Does it already exist?");
+                    } else {
+                        GeneralHelper.showToast(getActivity(), "TLA successfully added.");
+                        // Clear back stack because add-operation succeeded.
+                        GeneralHelper.clearBackStack(getActivity());
+                        // Go back to ManageTLAs fragment with clean back stack
+                        Fragment nextFragment = new ManageTLAs();
+                        parentActivity.replaceFragment(nextFragment, false);
+                    }
                 }
-
             }
         });
         //updateButtonColor();
@@ -172,7 +191,7 @@ public class MapAddTLA extends MapAbstract {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                // Called when the up affordance/carat in actionbar is pressed
+                // Called when the up arrow/carat in actionbar is pressed
                 getActivity().onBackPressed();
                 return true;
         }
@@ -196,6 +215,9 @@ public class MapAddTLA extends MapAbstract {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         super.onMapReady(googleMap);
+        // Set top padding to move the compass button below the input area so it becomes visible.
+        // TODO: Check if absolute pixel padding works out on other devices/resolutions.
+        googleMap.setPadding(0,350,0,0);
         // Make sure we start with an empty map. After supporting proper back/up-navigation,
         // the variable googleMap doesn't represent an empty map after navigating to this fragment
         // more than once.

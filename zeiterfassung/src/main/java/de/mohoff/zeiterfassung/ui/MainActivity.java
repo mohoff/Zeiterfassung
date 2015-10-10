@@ -31,6 +31,7 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
+import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.locationservice.LocationService;
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
 
                 if(nextFragmentAvailable){
-                    replaceFragment(nextFragment);
+                    replaceFragment(nextFragment, false);
                     nextFragmentAvailable = false;
                 }
             }
@@ -201,12 +202,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 new IntentFilter("locationServiceLocUpdateEvents"));
 
         sdf = new SimpleDateFormat("dd.MM.yyyy - HH:mm");
-    }
-
-    private void replaceFragment(Fragment nextFragment){
-        fragM.beginTransaction()
-                .replace(R.id.content_frame, nextFragment)
-                .commit();
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -364,7 +359,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             drawerLayout.closeDrawer(leftDrawer);
         } else {
             // display inital fragment after app start
-            replaceFragment(nextFragment);
+            replaceFragment(nextFragment, false);
         }
     }
 
@@ -383,15 +378,47 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     @Override
     public void onBackPressed() {
+        GeneralHelper.hideSoftKeyboard(this);
+
         // Close navigation drawer if it's open. If not, go back to previous fragment if there is one
         // on the back-stack.
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
             drawerLayout.closeDrawer(leftDrawer);
         } else if (getFragmentManager().getBackStackEntryCount() > 0){
             getFragmentManager().popBackStack();
-            drawerToggle.setDrawerIndicatorEnabled(true);
+            if(getFragmentManager().getBackStackEntryCount() > 0){
+                drawerToggle.setDrawerIndicatorEnabled(false);
+            } else {
+                drawerToggle.setDrawerIndicatorEnabled(true);
+            }
+
         } else {
+            //drawerToggle.setDrawerIndicatorEnabled(true);
             super.onBackPressed();
+        }
+    }
+
+    /*private void replaceFragment(Fragment nextFragment){
+        fragM.beginTransaction()
+                .replace(R.id.content_frame, nextFragment)
+                .commit();
+    }*/
+
+    public void replaceFragment(Fragment fragment, boolean addToBackStack){
+        String backStateName = fragment.getClass().getName();
+        String fragmentTag = backStateName;
+
+        FragmentManager manager = getFragmentManager();
+        boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
+
+        if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null) { //fragment not in back stack, create it.
+            FragmentTransaction ft = manager.beginTransaction();
+            ft.replace(R.id.content_frame, fragment, fragmentTag);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            if(addToBackStack) {
+                ft.addToBackStack(backStateName);
+            }
+            ft.commit();
         }
     }
 
@@ -457,6 +484,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     @Override
     protected void onResume() {
+        //GeneralHelper.clearBackStack(this);
+        //drawerToggle.setDrawerIndicatorEnabled(false);
         super.onResume();
     }
 

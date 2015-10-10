@@ -30,8 +30,8 @@ public class AddTLA extends Fragment {
     private DatabaseHelper dbHelper = null;
     private String activityNames[];
 
-    private String inputActivityName;
-    private String inputLocationName;
+    private String inputActivityName = "";
+    private String inputLocationName = "";
 
     public AddTLA() {
         // Required empty public constructor
@@ -61,7 +61,7 @@ public class AddTLA extends Fragment {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                 android.R.layout.simple_dropdown_item_1line, activityNames);
-        AutoCompleteTextView autoCompleteView = (AutoCompleteTextView) view.findViewById(R.id.inputActivity);
+        final AutoCompleteTextView autoCompleteView = (AutoCompleteTextView) view.findViewById(R.id.inputActivity);
         autoCompleteView.setAdapter(adapter);
         autoCompleteView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -69,19 +69,19 @@ public class AddTLA extends Fragment {
                 AutoCompleteTextView tv = (AutoCompleteTextView) v;
                 if (!hasFocus) {
                     inputActivityName = tv.getText().toString();
-                    GeneralHelper.hideSoftKeyboard(context);
+                    GeneralHelper.hideSoftKeyboardWithView(context, v);
                 }
             }
         });
 
-        EditText editText = (EditText) view.findViewById(R.id.inputLocation);
+        final EditText editText = (EditText) view.findViewById(R.id.inputLocation);
         editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 EditText et = (EditText) v;
                 if (!hasFocus) {
                     inputLocationName = et.getText().toString();
-                    GeneralHelper.hideSoftKeyboard(context);
+                    GeneralHelper.hideSoftKeyboardWithView(context, v);
                 }
             }
         });
@@ -90,18 +90,20 @@ public class AddTLA extends Fragment {
         pinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment nextFragment = new MapAddTLA();
-                // pass TLAId to map fragment
-                Bundle args = new Bundle();
-                args.putString("activityName", inputActivityName);
-                args.putString("locationName", inputLocationName);
-                nextFragment.setArguments(args);
+                autoCompleteView.clearFocus();
+                editText.clearFocus();
+                if (inputActivityName == "" || inputLocationName == "") {
+                    GeneralHelper.showToast(context, "Please enter both names first.");
+                } else {
+                    Fragment nextFragment = new MapAddTLA();
+                    // pass TLAId to map fragment
+                    Bundle args = new Bundle();
+                    args.putString("activityName", inputActivityName);
+                    args.putString("locationName", inputLocationName);
+                    nextFragment.setArguments(args);
 
-                context.getFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.content_frame, nextFragment)
-                        .addToBackStack(null)
-                        .commit();
+                    context.replaceFragment(nextFragment, true);
+                }
             }
         });
 

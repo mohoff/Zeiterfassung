@@ -39,7 +39,7 @@ import de.mohoff.zeiterfassung.ui.fragments.Overview;
  */
 // --- Outer adapter ---
 public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHolder>{ //RecyclerView.Adapter<AdapterManageTLA.TLAViewHolder>{
-    private Context context;
+    private MainActivity context;
     private DatabaseHelper dbHelper = null;
     //private LayoutInflater li;
     List<TargetLocationArea> tlas;
@@ -51,11 +51,11 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
     private final static int VIEWTYPE_ADD = 2;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public AdapterManageTLA(Context context) {
+    public AdapterManageTLA(Activity context) {
         getDbHelper();
         this.tlas = dbHelper.getAllTLAs();
         this.activityNames = dbHelper.getDistinctActivityNames();
-        this.context = context;
+        this.context = (MainActivity)context;
     }
 
     // Activity ViewHolder (outer holder)
@@ -184,11 +184,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                     // TODO: also provide this action in top menubar with "+"-icon
                     // TODO: Combine following code with onClickListener for Location-addButton. Latter with arguments, so Activity can be preset in AddTLA-View.
                     Fragment nextFragment = new AddTLA();
-                    ((Activity) context).getFragmentManager()
-                            .beginTransaction()
-                            .add(R.id.content_frame, nextFragment)
-                            .addToBackStack(null)
-                            .commit();
+                    context.replaceFragment(nextFragment, true);
                 }
             });
         }
@@ -242,12 +238,12 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     // --- Inner adapter ---
     private class AdapterManageTLAInner extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        Context context;
+        MainActivity context;
         List<TargetLocationArea> relevantTLAs;
         AdapterManageTLAInner innerAdapter = this;
         AdapterManageTLA outerAdapter;
 
-        public AdapterManageTLAInner(AdapterManageTLA outerAdapter, Context context, List<TargetLocationArea> relevantTLAs) {
+        public AdapterManageTLAInner(AdapterManageTLA outerAdapter, MainActivity context, List<TargetLocationArea> relevantTLAs) {
             this.outerAdapter = outerAdapter;
             this.context = context;
             this.relevantTLAs = relevantTLAs;
@@ -288,12 +284,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                         args.putInt("TLAId", tla.get_id());
                         nextFragment.setArguments(args);
 
-                        ((Activity) context).getFragmentManager()
-                                .beginTransaction()
-                                .add(R.id.content_frame, nextFragment)
-                                //.replace(R.id.content_frame, nextFragment)
-                                .addToBackStack(null)
-                                .commit();
+                        context.replaceFragment(nextFragment, true);
                     }
                 });
                 locHolder.deleteButton.setOnClickListener(new View.OnClickListener() {

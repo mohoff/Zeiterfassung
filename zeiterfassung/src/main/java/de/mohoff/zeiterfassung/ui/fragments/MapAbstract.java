@@ -64,6 +64,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     public void onCreate(Bundle savedInstanceState) {
         parentActivity = (MainActivity) getActivity();
         geocoder = new Geocoder(getActivity());
+        dbHelper = getDbHelper(parentActivity);
         super.onCreate(savedInstanceState);
     }
 

@@ -91,7 +91,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     // in deployment: split activity- and location-creation
-    public int createNewTargetLocationArea(double latitude, double longitude, int radius, String activity, String location){
+    public int createNewTLA(double latitude, double longitude, int radius, String activity, String location){
         getTargetLocationAreaREDAO();
 
         TargetLocationArea tla = new TargetLocationArea((float)latitude, (float)longitude, radius, activity, location);
@@ -192,11 +192,11 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public void _createSampleTLAs(){
         int status;
-        status = createNewTargetLocationArea(48.743715, 9.095967, 50, "home", "vaihingen allmandring 26d");
-        status = createNewTargetLocationArea(48.243962, 9.928635, 75, "home", "burgrieden mittelweg 10");
-        status = createNewTargetLocationArea(48.742120 ,9.101002, 100, "uni", "hdm raum 011");
-        status = createNewTargetLocationArea(48.745847, 9.105381, 50, "sbahn", "station uni");
-        status = createNewTargetLocationArea(48.665458, 9.037194, 150, "work", "ibm boeblingen");
+        status = createNewTLA(48.743715, 9.095967, 50, "home", "vaihingen allmandring 26d");
+        status = createNewTLA(48.243962, 9.928635, 75, "home", "burgrieden mittelweg 10");
+        status = createNewTLA(48.742120, 9.101002, 100, "uni", "hdm raum 011");
+        status = createNewTLA(48.745847, 9.105381, 50, "sbahn", "station uni");
+        status = createNewTLA(48.665458, 9.037194, 150, "work", "ibm boeblingen");
     }
 
 
