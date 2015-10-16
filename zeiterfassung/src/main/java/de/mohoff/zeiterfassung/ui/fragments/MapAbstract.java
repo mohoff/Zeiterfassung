@@ -178,7 +178,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 // Change color for old marker
                 markers.get(markers.size()-2).setIcon(BitmapDescriptorFactory.defaultMarker(0)); // BitmapDescriptorFactory.HUE_VIOLET
                 // Move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow location updates on the map"
-                map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                // Really reset zoomLevel each call to 17?
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
             } else {
                 // Zoom map in to marker, if the marker is the first one on the map.
                 // Zoom level 17 turns out to be nice because its the lowest one in which you can

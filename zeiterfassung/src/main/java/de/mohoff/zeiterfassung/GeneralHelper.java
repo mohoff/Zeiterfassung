@@ -16,10 +16,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
+import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.locationservice.LocationService;
 
 /**
@@ -146,6 +150,26 @@ public class GeneralHelper {
         FragmentManager fm = activity.getFragmentManager();
         for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
             fm.popBackStack();
+        }
+    }
+
+    public static void setupLocationCache(DatabaseHelper dbHelper){
+        // Check if LocationCache is currently initialized.
+        // If not, set parameters for LocationCache and eventually populate it with locs from DB dump.
+        if(LocationCache.getInstance().getPassiveCache() == null ||
+                LocationCache.getInstance().getPassiveCache().isEmpty()){
+            LocationCache.getInstance().setParameters(LocationService.ACTIVE_CACHE_SIZE,
+                    LocationService.PASSIVE_CACHE_SIZE,
+                    LocationService.REGULAR_UPDATE_INTERVAL,
+                    LocationService.INTERPOLATION_VARIANCE
+            );
+            List<Loc> locs = dbHelper.getLocs(System.currentTimeMillis() - LocationService.REGULAR_UPDATE_INTERVAL * LocationService.PASSIVE_CACHE_SIZE);
+            // Bring List into CircularFifoQueue
+            CircularFifoQueue<Loc> tmp = new CircularFifoQueue<>(LocationService.PASSIVE_CACHE_SIZE);
+            for(Loc entry : locs){
+                tmp.add(entry);
+            }
+            LocationCache.getInstance().setPassiveCache(tmp);
         }
     }
 }

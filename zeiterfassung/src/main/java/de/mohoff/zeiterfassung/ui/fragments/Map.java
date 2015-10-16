@@ -39,11 +39,12 @@ import java.util.List;
 import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class Map extends MapAbstract implements LocationChangeListener {
-    CircularFifoQueue<Loc> userLocs = new CircularFifoQueue<>();
+    //CircularFifoQueue<Loc> userLocs = new CircularFifoQueue<>();
     List<Marker> markers = new ArrayList<Marker>();
     Polyline currentPolyline;
 
@@ -67,7 +68,7 @@ public class Map extends MapAbstract implements LocationChangeListener {
         //for(Loc loc : userLocs){
         //    userLatLngs.add(GeneralHelper.convertLocToLatLng(loc));
         //}
-        userLocs = parentActivity.getLocs();
+        //userLocs = parentActivity.getLocs();
 
         parentActivity.setOnNewLocationListener(this); // set listener
         super.onResume();
@@ -93,13 +94,13 @@ public class Map extends MapAbstract implements LocationChangeListener {
     public void onMapReady(GoogleMap googleMap) {
         super.onMapReady(googleMap);
 
-        if(userLocs != null && userLocs.size() > 0){
-            for(Loc loc : userLocs){
+        if(LocationCache.getInstance().getPassiveCache() != null && LocationCache.getInstance().getPassiveCache().size() > 0){
+            for(Loc loc : LocationCache.getInstance().getPassiveCache()){
                 super.addMarkerToMap(map, markers,
                         GeneralHelper.convertLocToLatLng(loc),
                         GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()));
             }
-            currentPolyline = super.addPolylineToMap(map, userLocs);
+            currentPolyline = super.addPolylineToMap(map, LocationCache.getInstance().getPassiveCache());
         } else {
             GeneralHelper.showToast(parentActivity, "no location data available.");
         }
@@ -109,12 +110,13 @@ public class Map extends MapAbstract implements LocationChangeListener {
         LatLng latLng = GeneralHelper.convertLocToLatLng(loc);
         float opacity = GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy());
 
-        userLocs.add(loc);
+        //userLocs.add(loc);
         if(map != null){
             // Update markers
             addMarkerToMap(map, markers, latLng, opacity);
-            // Ensure that there are only userLocations.maxSize() locations displayed to prevent memory leak
-            if(userLocs.size() == userLocs.maxSize()){ // if circularFifoQueue is full...
+            // Ensure that there are only passiveCache.maxSize() markers displayed to prevent memory leak.
+            // If passiveQueue is full and at least one drop happened already in it, remove oldest marker.
+            if(LocationCache.getInstance().hasFirstPassiveQueueDropHappened()){
                 // Remove oldest marker from map
                 markers.get(0).remove();
                 // Remove oldest/first element from marker list
@@ -125,7 +127,7 @@ public class Map extends MapAbstract implements LocationChangeListener {
             if(currentPolyline != null){
                 currentPolyline.remove();
             }
-            currentPolyline = super.addPolylineToMap(map, userLocs);
+            currentPolyline = super.addPolylineToMap(map, LocationCache.getInstance().getPassiveCache());
         } else {
             GeneralHelper.showToast(parentActivity, "no map object initialized.");
         }
@@ -136,7 +138,7 @@ public class Map extends MapAbstract implements LocationChangeListener {
 
 
 
-    // not applyable because you can't modify UI elements in doInBackground ("map" in this case)
+    // not applicable because you can't modify UI elements in doInBackground ("map" in this case)
     private class LoadingMapTask extends AsyncTask<Void, Void, Void> {
         private CircularFifoQueue<Loc> locs;
         private GoogleMap map;

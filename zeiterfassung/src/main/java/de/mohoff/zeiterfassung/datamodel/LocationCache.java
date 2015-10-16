@@ -8,40 +8,69 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
  * Created by Moritz on 03.10.2014.
  */
 public class LocationCache {
-    public int queueSize;
-    public int updateInterval;
-    private static float interpolationVariance = 1;
+    private int activeQueueSize, passiveQueueSize;
+    private int updateInterval;
+    private float interpolationVariance;
 
-    private CircularFifoQueue locationCache; // fifo based queue
-    private CircularFifoQueue interpolatedCache; // fifo based queue
+    // activeCache holds all locations which are used by the next interpolatedPosition calculation.
+    private CircularFifoQueue activeCache;
+    // activeInterpolatedCache should be as big as activeCache and holds all interpolated locations
+    // which were computed from activeCache
+    private CircularFifoQueue activeInterpolatedCache;
+    // passiveCache serves as a bigger location cache which provides its data to maps for drawing markers.
+    // For users it might be interesting to see a wider range covered by map markers compared to the
+    // amount of locations in activeCache.
+    private CircularFifoQueue passiveCache;
+    private boolean firstPassiveCacheDropHappened;
+    // interpolatedPosition holds the most recent interpolated position which is used to check for
+    // "area-entered" and "area-left" events.
     private Loc interpolatedPosition;
 
-    public LocationCache(int queueSize, int updateInterval){
-        this.queueSize = queueSize;
+    private static final LocationCache cache = new LocationCache();
+    public static LocationCache getInstance(){
+        return cache;
+    }
+
+    public void setParameters(int activeQueueSize, int passiveQueueSize, int updateInterval, float interpolationVariance){
+        this.activeQueueSize = activeQueueSize;
+        activeCache = new CircularFifoQueue<>(activeQueueSize);
+        activeInterpolatedCache = new CircularFifoQueue<>(activeQueueSize);
+
+        this.passiveQueueSize = passiveQueueSize;
+        passiveCache = new CircularFifoQueue<>(passiveQueueSize);
+        this.firstPassiveCacheDropHappened = false;
+
         this.updateInterval = updateInterval;
-        locationCache = new CircularFifoQueue<Loc>(queueSize);
-        interpolatedCache = new CircularFifoQueue<Loc>(queueSize);
+        this.interpolationVariance = interpolationVariance;
+    }
+
+    public CircularFifoQueue<Loc> getPassiveCache(){
+        return passiveCache;
+    }
+
+    public void setPassiveCache(CircularFifoQueue<Loc> cache){
+        passiveCache = cache;
     }
 
     public float validateInBoundsForTLA(TargetLocationArea tla){
         float positives = 0;
 
-        for(int i=0; i<interpolatedCache.size(); i++){
-            Loc loc = (Loc)interpolatedCache.get(i);
+        for(int i=0; i< activeInterpolatedCache.size(); i++){
+            Loc loc = (Loc) activeInterpolatedCache.get(i);
             int distanceToTLABorder = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude())) - tla.getRadius();
             if(distanceToTLABorder < 0){
                 positives++;
             }
         }
-        return positives/(float)interpolatedCache.size();
+        return positives/(float) activeInterpolatedCache.size();
     }
 
     public float getCurrentInBoundProxFor(TargetLocationArea tla){
         float positives = 0;
-        float all = locationCache.size();
+        float all = activeCache.size();
 
-        for(int i=0; i<interpolatedCache.size(); i++){
-            Loc loc = (Loc) interpolatedCache.get(i);
+        for(int i=0; i< activeInterpolatedCache.size(); i++){
+            Loc loc = (Loc) activeInterpolatedCache.get(i);
             //int distanceDebug = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude()));
             int distanceTLABorderToUser = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude())) - tla.getRadius();
             if(distanceTLABorderToUser <= 0){
@@ -79,14 +108,27 @@ public class LocationCache {
     }
 
     public void addLocationUpdate(Loc myLoc){
-        locationCache.add(myLoc);
+        activeCache.add(myLoc);
+        if(isPassiveCacheFull()){
+            firstPassiveCacheDropHappened = true;
+        }
+        passiveCache.add(myLoc);
         _calcInterpolatedPosition();
 
     }
 
-    public boolean isFull(){
-        // locationCache.isFull() always returns false in my case...
-        return locationCache.size() == locationCache.maxSize();
+    public boolean isActiveCacheFull(){
+        // locationCache.isActiveCacheFull() always returns false in my case...
+        return activeCache.size() == activeCache.maxSize();
+    }
+
+    public boolean isPassiveCacheFull(){
+        // locationCache.isActiveCacheFull() always returns false in my case...
+        return passiveCache.size() == passiveCache.maxSize();
+    }
+
+    public boolean hasFirstPassiveQueueDropHappened(){
+        return firstPassiveCacheDropHappened;
     }
 
     public Loc getInterpolatedPosition() {
@@ -98,15 +140,15 @@ public class LocationCache {
     }
 
     private double _getStartWeight(int i, int size){
-        return interpolationVariance * (((double)(i+1)/(double)locationCache.size()) + 0.5);
+        return interpolationVariance * (((double)(i+1)/(double)activeCache.size()) + 0.5);
     }
 
     public double _getAgeMultiplier(Loc loc, long currentTime){
         long millisInPast = currentTime - loc.getTimestampInMillis();
-        int optimalTimeInCache = queueSize * updateInterval; // ms
+        int optimalTimeInCache = activeQueueSize * updateInterval; // ms
         double ageMultiplier = 0; // default. If more than 15min in past, don't weight this location/timestamp anymore
 
-        long tresholdTimeToScoreOfZero = queueSize * updateInterval * 3; // 3 for 3*5=15min in past is treshold
+        long tresholdTimeToScoreOfZero = activeQueueSize * updateInterval * 3; // 3 for 3*5=15min in past is treshold
         double slopeOfRegression = 1.5 / (double) tresholdTimeToScoreOfZero;
         if(millisInPast <= tresholdTimeToScoreOfZero){
             // [0 - 1,5]
@@ -116,14 +158,14 @@ public class LocationCache {
     }
 
     private void _calcInterpolatedPosition(){
-        int cacheSize = locationCache.size();
+        int cacheSize = activeCache.size();
         float[] score = new float[cacheSize];
         float scoreSum = 0;
         double latSumCounter = 0, lngSumCounter = 0;
         long currentTime = System.currentTimeMillis();
 
         for(int i=0; i<cacheSize; i++){
-            Loc loc = (Loc) locationCache.get(i);
+            Loc loc = (Loc) activeCache.get(i);
             double ageMultiplier = _getAgeMultiplier(loc, currentTime);
             double accuracyMultiplier = loc.getAccuracyMultiplier();
 
@@ -136,7 +178,7 @@ public class LocationCache {
         }
 
         interpolatedPosition = new Loc(latSumCounter/scoreSum, lngSumCounter/scoreSum);
-        interpolatedCache.add(interpolatedPosition);
+        activeInterpolatedCache.add(interpolatedPosition);
 
         // LEGACY
         /*

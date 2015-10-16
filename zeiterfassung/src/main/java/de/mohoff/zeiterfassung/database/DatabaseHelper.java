@@ -15,7 +15,11 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
 
@@ -32,15 +36,15 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME = "database.db";
 
     // any time you make changes to your database objects, you may have to increase the database version
-    private static final int DATABASE_VERSION = 1;
-
-    private int amountOfTimeslots = 0;
+    private static final int DATABASE_VERSION = 2;
 
     // the DAO object we use to access the SimpleData table
     private Dao<Timeslot, Integer> timeslotDAO = null;
     private RuntimeExceptionDao<Timeslot, Integer> timeslotREDAO = null;
     private Dao<TargetLocationArea, Integer> targetareasDAO = null;
     private RuntimeExceptionDao<TargetLocationArea, Integer> targetareasREDAO = null;
+    private Dao<Loc, Integer> locDAO = null;
+    private RuntimeExceptionDao<Loc, Integer> locREDAO = null;
 
 
     public DatabaseHelper(Context context) {
@@ -82,7 +86,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             Timeslot ts = new Timeslot(millis, activityName, locationName);
             int result = -1;
             result = timeslotREDAO.create(ts);
-            amountOfTimeslots++;
+            //amountOfTimeslots++;
             return result;
         } else {
             // timeslot with this locationName and activityName is already open --> don't create new one
@@ -194,8 +198,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         int status;
         status = createNewTLA(48.743715, 9.095967, 50, "home", "vaihingen allmandring 26d");
         status = createNewTLA(48.243962, 9.928635, 75, "home", "burgrieden mittelweg 10");
-        status = createNewTLA(48.742120, 9.101002, 100, "uni", "hdm raum 011");
+        status = createNewTLA(48.742120, 9.101002, 100, "uni", "hdm");
         status = createNewTLA(48.745847, 9.105381, 50, "sbahn", "station uni");
+        status = createNewTLA(48.74319107, 9.10227019, 75, "bar", "wuba");
+        status = createNewTLA(48.74642511, 9.10120401, 75, "bar", "sansibar");
+        status = createNewTLA(48.74506944, 9.09997154, 75, "bar", "boddschi");
+        status = createNewTLA(48.74311678, 9.09741271, 75, "bar", "unithekle");
+        status = createNewTLA(48.77232266, 9.15882993, 100, "sport", "mgfitness");
         status = createNewTLA(48.665458, 9.037194, 150, "work", "ibm boeblingen");
     }
 
@@ -210,6 +219,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             Log.i(DatabaseHelper.class.getName(), "onCreate");
             TableUtils.createTable(connectionSource, Timeslot.class);
             TableUtils.createTable(connectionSource, TargetLocationArea.class);
+            TableUtils.createTable(connectionSource, Loc.class);
         } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
             throw new RuntimeException(e);
@@ -225,6 +235,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             Log.i(DatabaseHelper.class.getName(), "onUpgrade");
             TableUtils.dropTable(connectionSource, Timeslot.class, true);
             TableUtils.dropTable(connectionSource, TargetLocationArea.class, true);
+            TableUtils.dropTable(connectionSource, Loc.class, true);
             // after we drop the old databases, we create the new ones
             onCreate(db, connectionSource);
         } catch (SQLException e) {
@@ -248,6 +259,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
         return targetareasDAO;
     }
+    public Dao<Loc, Integer> getLocDAO() throws SQLException {
+        if (locDAO == null) {
+            locDAO = getDao(Loc.class);
+        }
+        return locDAO;
+    }
     /**
      * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our SimpleData class. It will
      * create it or just give the cached value. RuntimeExceptionDao only through RuntimeExceptions.
@@ -264,6 +281,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
         return targetareasREDAO;
     }
+    public RuntimeExceptionDao<Loc, Integer> getLocREDAO() {
+        if (locREDAO == null) {
+            locREDAO = getRuntimeExceptionDao(Loc.class);
+        }
+        return locREDAO;
+    }
     /**
      * Close the database connections and clear any cached DAOs.
      */
@@ -274,6 +297,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         timeslotREDAO = null;
         targetareasDAO = null;
         targetareasREDAO = null;
+        locDAO = null;
+        locREDAO = null;
     }
 
 
@@ -324,13 +349,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public List<Timeslot> getAllTimeslots(){
         getTimeslotREDAO();
-        List<Timeslot> timeslots = new ArrayList<Timeslot>();
+        List<Timeslot> timeslots = new ArrayList<>();
 
         try {
             timeslots = timeslotREDAO.queryForAll();
         } catch (Exception e){
             e.printStackTrace();
-            timeslots = null;
         }
         return timeslots;
     }
@@ -415,6 +439,52 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
 
         return timeslots;
+    }
+
+    public int dumpLocs(CircularFifoQueue<Loc> cache){
+        getLocREDAO();
+        int result = -1;
+
+        // Remove existing records first
+        try {
+            // Dropping and creating table will reset autoincrement for _id.
+            TableUtils.dropTable(connectionSource, Loc.class, true);
+            TableUtils.createTable(connectionSource, Loc.class);
+            //TableUtils.clearTable(connectionSource, Loc.class);
+        } catch (SQLException e){
+            e.printStackTrace();
+            return result;
+        }
+
+        // Dump new records
+        for(Loc record : cache){
+            try {
+                getLocDAO();
+                result = locDAO.create(record);
+            } catch(SQLException e){
+                e.printStackTrace();
+                return result;
+            }
+        }
+        return result;
+    }
+
+    public List<Loc> getLocs(long maxAge){
+        getLocREDAO();
+        List<Loc> locList = new ArrayList<>();
+
+        QueryBuilder<Loc, Integer> queryBuilder = locREDAO.queryBuilder();
+        try {
+            queryBuilder.where().gt("timestampInMillis", maxAge);
+            // Smallest (=older) timestamps first, so they are put in queue first later on.
+            queryBuilder.orderBy("timestampInMillis", true);
+            PreparedQuery<Loc> preparedQuery = queryBuilder.prepare();
+            locList = locREDAO.query(preparedQuery);
+        } catch (Exception e){
+            e.printStackTrace();
+            return locList;
+        }
+        return locList;
     }
 
 }

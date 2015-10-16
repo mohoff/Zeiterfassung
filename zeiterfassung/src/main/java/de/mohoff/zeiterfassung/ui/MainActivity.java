@@ -33,6 +33,7 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
+import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.locationservice.LocationService;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerAdapter;
@@ -45,6 +46,7 @@ import de.mohoff.zeiterfassung.database.DatabaseHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerListener {
@@ -66,11 +68,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     private RecyclerView recyclerView;
     private NavigationDrawerListener drawerListener;
 
-    public CircularFifoQueue<Loc> getLocs() {
+    /*public CircularFifoQueue<Loc> getLocs() {
         return locs;
-    }
-    private CircularFifoQueue<Loc> locs = new CircularFifoQueue<>(MainActivity.LOC_QUEUE_SIZE);
-    private ArrayList<Loc> locsTmp = new ArrayList<>();
+    }*/
+    //private CircularFifoQueue<Loc> locs = new CircularFifoQueue<>(MainActivity.LOC_QUEUE_SIZE);
+    //private ArrayList<Loc> locsTmp = new ArrayList<>();
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
@@ -173,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         }));
 
 
-
+        /*
         // TODO: remove "locs" from savedInstanceState when Map-fragment is destroyed?!
         if(savedInstanceState != null){
             // restore location marker data after screen rotation
@@ -185,6 +187,18 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             }
         } else {
             // initial display of main fragment with id=0
+            selectItem(0);
+        }
+        */
+
+        // Initializes LocationCache (singleton) and fills it with locations from DB if the
+        // locations are not too old.
+        // TODO: Check if it also needs to be called in onCreate() of LocationService.
+        GeneralHelper.setupLocationCache(dbHelper);
+
+
+        // Show overview at initial app start
+        if(savedInstanceState == null){
             selectItem(0);
         }
 
@@ -468,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             double lng = Double.valueOf(intent.getStringExtra("lng"));
             double accuracy = Double.valueOf(intent.getStringExtra("accuracy"));
             Loc newLocation = new Loc(lat, lng, accuracy);
-            locs.add(newLocation);
+            //locs.add(newLocation);
 
             if (newLocationListener != null) {
                 newLocationListener.onNewLocation(newLocation);
@@ -496,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     public void timeslotStartedEvent(long millis, String activityName, String locationName) {
         String humanReadable = sdf.format(millis);
-        outputTV.append("ENTER: " + humanReadable + ",   " +locationName + " @" + activityName + "\n");
+        outputTV.append("ENTER: " + humanReadable + ",   " + locationName + " @" + activityName + "\n");
     }
 
     public void timeslotSealedEvent(long millis, String activityName, String locationName) {
@@ -539,11 +553,13 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     public void onSaveInstanceState(Bundle outState) {
         // save locations before screen rotation in order to recover map markers after
         // convert circularFifoQueue to ArrayList
+        /*
         for(Loc e : locs) {
             locsTmp.add(e);
         }
         // add ArrayList to instance state
         outState.putParcelableArrayList("locs", locsTmp);
+        */
         super.onSaveInstanceState(outState);
     }
 

@@ -2,6 +2,7 @@ package de.mohoff.zeiterfassung.locationservice;
 
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +36,7 @@ import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
+import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String TAG = LocationService.class.getSimpleName();
@@ -43,16 +47,18 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     private static boolean IS_SERVICE_RUNNING = false; // not used right now
     private static float boundaryTreshold = 0.8f;
-    private static int amountOfTemporarySavedLocations = 5;
-    private static int REGULAR_UPDATE_INTERVAL = 120 * 1000; // ms, update interval, 60 * 1000, 150 * 1000, 120 * 1000
-    private static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
+    public static int ACTIVE_CACHE_SIZE = 5;
+    public static int PASSIVE_CACHE_SIZE = 50;
+    public static int REGULAR_UPDATE_INTERVAL = 10 * 1000; // ms, update interval, 60 * 1000, 150 * 1000, 120 * 1000
+    public static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
+    public static float INTERPOLATION_VARIANCE = 1.0f;
     private static String locationProviderType = LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
 
     private static Context ctx;
     private LocationManager locationmanager;
     public static Location mostRecentLocation = null;
     /////
-    private LocationCache locCache;
+    //private LocationCache locCache;
     private DatabaseHelper databaseHelper = null;
     private boolean inBound = false;
     private int numberOfUpdates = 0;
@@ -110,15 +116,22 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     public void onCreate() {
         super.onCreate();
-        locCache = new LocationCache(amountOfTemporarySavedLocations, LocationService.REGULAR_UPDATE_INTERVAL);
+        getHelper();
+        //LocationCache.getInstance().setParameters(ACTIVE_CACHE_SIZE, PASSIVE_CACHE_SIZE, REGULAR_UPDATE_INTERVAL, INTERPOLATION_VARIANCE);
         locationmanager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent intent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         Notification notification = new Notification.Builder(this)
                 .setContentTitle("Location Tracking")
                 .setContentText("Location Tracking active")
                 .setSmallIcon(R.drawable.status_locationservice)
-                .setOngoing(false)
+                .setOngoing(true)
                         //.setLargeIcon(R.drawable.status_locationservice)
+                .setContentIntent(intent)
+                .setPriority(Notification.PRIORITY_MIN)
                 .build();
 
         googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
@@ -137,7 +150,10 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         Toast.makeText(this, "Service created",
                 Toast.LENGTH_LONG).show();
 
-
+        // Retrieve stored locations from DB. Parameter is maxAge, a timestamp in milliseconds.
+        // All locations younger than maxAge are retrieved.
+        //List<Loc> locs = databaseHelper.getLocs(System.currentTimeMillis() - REGULAR_UPDATE_INTERVAL * PASSIVE_CACHE_SIZE);
+        //CircularFifoQueue<Loc> test = LocationCache.getInstance().getPassiveCache();
     }
 
     @Override
@@ -149,6 +165,10 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         Toast.makeText(this, "Service terminated",
                 Toast.LENGTH_LONG).show();
+
+        // Store locs in DB in order to retrieve them when service is recreated soon and stored locs
+        // aren't too old already.
+        databaseHelper.dumpLocs(LocationCache.getInstance().getPassiveCache());
 
         super.onDestroy();
     }
@@ -182,7 +202,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         inBoundTLAs.clear();
 
         for (TargetLocationArea tla : TLAs) {
-            float prox = locCache.getCurrentInBoundProxFor(tla);
+            float prox = LocationCache.getInstance().getCurrentInBoundProxFor(tla);
             if (prox > boundaryTreshold) {
                 inBoundTLAs.add(tla);
                 // break; if only one TLA can match a location
@@ -229,27 +249,34 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
 
     public void handleLocationUpdate(Location loc) {
+        Log.v(TAG, loc.getLatitude() + ", " + loc.getLongitude() + ", " + loc.getAccuracy());
+
         Loc currentLoc = convertLocationToLoc(loc);
-        locCache.addLocationUpdate(currentLoc);
-        Log.v(TAG, currentLoc.getLatitude() + ", " + currentLoc.getLongitude() + ", " + currentLoc.getAccuracy());
-        numberOfUpdates++;
+        // Put loc in activeCache and passiveCache
+        LocationCache.getInstance().addLocationUpdate(currentLoc);
+        // Order is important: First update cache, then send broadcast because Broadcast-Receivers
+        // might access LocationCache.
         sendLocationUpdateViaBroadcast(loc.getLatitude(), loc.getLongitude(), loc.getAccuracy());
 
-        if ((numberOfUpdates % 2 == 0) && locCache.isFull()) {
+        numberOfUpdates++;
+        if ((numberOfUpdates % 2 == 0) && LocationCache.getInstance().isActiveCacheFull()) {
             updateTLAsAndTimeslots();
         }
     }
 
     public static long getNormalizedTimestamp() {
-        return System.currentTimeMillis() - (long) (boundaryTreshold * amountOfTemporarySavedLocations * REGULAR_UPDATE_INTERVAL);
+        return System.currentTimeMillis() - (long) (boundaryTreshold * ACTIVE_CACHE_SIZE * REGULAR_UPDATE_INTERVAL);
     }
 
     public Loc getInterpolatedPosition() {
-        return locCache.getInterpolatedPosition();
+        return LocationCache.getInstance().getInterpolatedPosition();
     }
 
     public LatLng getInterpolatedPositionInLatLng() {
-        return new LatLng(locCache.getInterpolatedPosition().getLatitude(), locCache.getInterpolatedPosition().getLongitude());
+        return new LatLng(
+                LocationCache.getInstance().getInterpolatedPosition().getLatitude(),
+                LocationCache.getInstance().getInterpolatedPosition().getLongitude()
+        );
     }
 
     // broadcast for timeslot events
@@ -273,8 +300,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     public static long getPastTimestampForBoundaryEvents(Loc loc){
-        //return loc.getTimestampInMillis() - (int)((amountOfTemporarySavedLocations-amountOfTemporarySavedLocations*boundaryTreshold) * LocationUpdater.timeBetweenMeasures);
-        return loc.getTimestampInMillis() - amountOfTemporarySavedLocations * REGULAR_UPDATE_INTERVAL;
+        //return loc.getTimestampInMillis() - (int)((ACTIVE_CACHE_SIZE-ACTIVE_CACHE_SIZE*boundaryTreshold) * LocationUpdater.timeBetweenMeasures);
+        return loc.getTimestampInMillis() - ACTIVE_CACHE_SIZE * REGULAR_UPDATE_INTERVAL;
     }
 
     public static Loc convertLocationToLoc(Location loc) {

@@ -4,16 +4,30 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 
-public class Loc implements Parcelable{
 
+@DatabaseTable(tableName = "locdump")
+public class Loc implements Parcelable{  //, daoClass = Loc.class)
+
+    @DatabaseField(generatedId = true) // autoincrement primary key
+    private int _id;
+    @DatabaseField(canBeNull = false)
     private double latitude;            // mandatory
+    @DatabaseField(canBeNull = false)
     private double longitude;           // mandatory
+    @DatabaseField(canBeNull = false,  unique = true)
     private long timestampInMillis;     // mandatory
+    @DatabaseField
     private double accuracy;
     private double accuracyMultiplier;
+    @DatabaseField
     private int altitude;
+    @DatabaseField
     private int speed;
+
+    public Loc(){}
 
     public Loc(double latitude, double longitude) {
         this.latitude = latitude;
