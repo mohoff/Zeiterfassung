@@ -2,7 +2,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_view"
-    android:layout_width="match_parent"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     card_view:cardCornerRadius="4dp"
     card_view:cardElevation="2dp"
@@ -13,10 +13,13 @@
     android:layout_marginRight="5dp"
     android:padding="0dp">
 
+    <!-- 70% width for activity, location, etc.
+         30% width for starttime, duration, endtime -->
     <LinearLayout
+        android:id="@+id/linLayout"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:weightSum="1.0">
         <LinearLayout
             android:orientation="vertical"
@@ -42,6 +45,7 @@
                     android:id="@+id/activity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
                     android:text="ACTIVITY NAME"
                     android:maxWidth="200dp"
                     android:textSize="20sp"
@@ -56,48 +60,47 @@
                     android:text="LOCATION"
                     android:textSize="12sp"
                     android:maxWidth="200dp"
+                    android:gravity="center_vertical"
                     android:layout_below="@id/activity"
                     android:layout_alignLeft="@+id/activity"/>
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="-20dp">
+                <ImageView
+                    android:id="@+id/icon2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="invisible"
+                    android:src="@drawable/ic_action_discard"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/grey_05"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_toRightOf="@id/icon2"/>
+                <TextView
+                    android:id="@+id/textToday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="8dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="Today: 4h 23min"
+                    android:textSize="12sp"
+                    android:layout_toRightOf="@id/icon2"
+                    android:textColor="@color/grey_25"/>
             </RelativeLayout>
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="fill_parent"
-            android:layout_weight="0.41"
-            android:layout_marginRight="40dp"
-            android:layout_marginLeft="-40dp">
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/endDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="YESTERDAY"
-                    android:textSize="12sp"
-                    android:paddingLeft="10dp"
-                    android:gravity="right"
-                    android:layout_alignParentBottom="true"
-                    android:paddingRight="10dp"
-                    android:textColor="@color/white"
-                    android:background="@color/grey_10"/>
-                <TextView
-                    android:id="@+id/startDate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="07.12.14"
-                    android:textSize="12sp"
-                    android:layout_alignParentTop="true"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:gravity="right"
-                    android:layout_alignRight="@id/endDate"
-                    android:textColor="@color/white"
-                    android:background="@color/greenish_75"/>
-            </RelativeLayout>
+            android:layout_weight="0.3"
+            android:gravity="center">
             <RelativeLayout
                 android:id="@+id/timeArea"
                 android:layout_width="wrap_content"
@@ -110,11 +113,13 @@
                     android:layout_alignParentTop="true"
                     android:gravity="center_horizontal"
                     android:layout_centerHorizontal="true"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:minWidth="60dp"
                     android:text="12:46"
                     android:textColor="@color/white"
                     android:background="@color/greenish_100"
+                    android:singleLine="true"
                     android:textSize="12sp"/>
                 <TextView
                     android:id="@+id/duration"
@@ -122,7 +127,9 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:gravity="center_horizontal"
-                    android:text="1h 5min"
+                    android:text="2 d\n4 h\n35 min\n3 sec"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
                     android:textSize="12sp"/>
                 <TextView
                     android:id="@+id/endTime"
@@ -131,31 +138,75 @@
                     android:layout_alignParentBottom="true"
                     android:gravity="center_horizontal"
                     android:layout_centerHorizontal="true"
-                    android:paddingLeft="15dp"
-                    android:paddingRight="15dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:minWidth="60dp"
                     android:text="13:51"
                     android:textColor="@color/white"
-                    android:background="@color/grey_25"
+                    android:background="@color/grey_50"
                     android:textSize="12sp"/>
+
+                <!-- lines between starttime and duration -->
                 <View
                     android:layout_height="fill_parent"
                     android:layout_width="2dp"
                     android:layout_below="@id/startTime"
                     android:layout_above="@id/duration"
                     android:layout_centerHorizontal="true"
-                    android:background="@color/greenish_100"
-                    android:layout_marginBottom="4dp"/>
+                    android:background="@color/greenish_100"/>
+                <View
+                    android:layout_height="2dp"
+                    android:layout_width="5dp"
+                    android:layout_above="@id/duration"
+                    android:layout_centerHorizontal="true"
+                    android:background="@color/greenish_100"/>
+
+                <!-- lines between duration and endtime -->
                 <View
                     android:layout_height="fill_parent"
                     android:layout_width="2dp"
                     android:layout_below="@id/duration"
                     android:layout_above="@id/endTime"
                     android:layout_centerHorizontal="true"
-                    android:background="@color/grey_25"
-                    android:layout_marginTop="4dp"/>
-            </RelativeLayout>
-
+                    android:background="@color/grey_50"/>
+                <View
+                    android:layout_height="2dp"
+                    android:layout_width="5dp"
+                    android:layout_below="@id/duration"
+                    android:layout_centerHorizontal="true"
+                    android:background="@color/grey_50"/>
+        </RelativeLayout>
         </LinearLayout>
-
     </LinearLayout>
+
+    <!-- start date -->
+    <TextView
+        android:id="@+id/startDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+        android:text="Yesterday"
+        android:textSize="12sp"
+        android:singleLine="true"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:minWidth="90dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:background="@color/greenish_50"/>
+    <!-- end date -->
+    <TextView
+        android:id="@+id/endDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_alignBottom="@+id/linLayout"
+        android:text="15.10.2015"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:minWidth="90dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:textColor="@color/white"
+        android:background="@color/grey_25"/>
 </android.support.v7.widget.CardView>

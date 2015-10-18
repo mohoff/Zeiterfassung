@@ -150,6 +150,7 @@
                     android:text="12:46"
                     android:textColor="@color/white"
                     android:background="@color/greenish_100"
+                    android:singleLine="true"
                     android:textSize="12sp"/>
                 <TextView
                     android:id="@+id/duration"

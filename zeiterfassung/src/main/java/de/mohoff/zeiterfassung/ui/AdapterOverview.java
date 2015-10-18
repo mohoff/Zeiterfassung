@@ -34,9 +34,9 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
         public ImageView icon;
         public TextView activity;
         public TextView location;
-        public TextView startTime;
+        public TextView startTime, startDate;
         public TextView duration;
-        public TextView endTime;
+        public TextView endTime, endDate;
 
         public ViewHolder(View v){
             super(v);
@@ -45,8 +45,10 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
             this.activity = (TextView) v.findViewById(R.id.activity);
             this.location = (TextView) v.findViewById(R.id.location);
             this.startTime = (TextView) v.findViewById(R.id.startTime);
+            this.startDate = (TextView) v.findViewById(R.id.startDate);
             this.duration = (TextView) v.findViewById(R.id.duration);
             this.endTime = (TextView) v.findViewById(R.id.endTime);
+            this.endDate = (TextView) v.findViewById(R.id.endDate);
         }
     }
 
@@ -54,6 +56,7 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
     public AdapterOverview(Context context) {
         getDbHelper(context);
         this.context = context;
+        /*
         this.data.add(new Timeslot(1416759002267L, 1416760002267L, "activity1", "act1, location1"));
         this.data.add(new Timeslot(1416754002267L, 1416758002267L, "activity2", "act2, location1"));
         this.data.add(new Timeslot(1416751002267L, 1416752002267L, "activity3", "act3, location1"));
@@ -64,7 +67,7 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
         this.data.add(new Timeslot(1416674002267L, 1416698002267L, "activity3", "act3, location1"));
         this.data.add(new Timeslot(1416524002267L, 1416558002267L, "activity4", "act4, location1"));
         this.data.add(new Timeslot(1416224002267L, 1416728002267L, "activity5", "act5, location1"));
-
+        */
         this.data.addAll(dbHelper.getAllTimeslots());
     }
 
@@ -72,7 +75,7 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
     @Override
     public AdapterOverview.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).
-        inflate(R.layout.activity_main_cards_additionalinfo, parent, false);
+        inflate(R.layout.fragment_overview_card, parent, false);
         return new ViewHolder(itemView);
 
         /*
@@ -90,19 +93,15 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Timeslot timeslot = data.get(position);
-        // data.get(position-1) and data.get(position+1) for previous and next ViewHolders...
-        if(position < 10){
-            // set a background color for dummy data
-            holder.container.setCardBackgroundColor(context.getResources().getColor(R.color.greenish_5));
-        } else {
-            holder.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
-        }
 
+        holder.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
         holder.icon.setImageResource(R.drawable.ic_action_edit_location);
         holder.activity.setText(timeslot.getActivity());
         holder.location.setText(timeslot.getLocation());
         holder.startTime.setText(timeslot.getReadableStartTime());
+        holder.startDate.setText(timeslot.getReadableStartDate());
         holder.endTime.setText(timeslot.getReadableEndTime());
+        holder.endDate.setText(timeslot.getReadableEndDate());
         holder.duration.setText(timeslot.getReadableDuration()); // e.g. "1d 2h 14min"
 
         setAnimation(holder.container, position);

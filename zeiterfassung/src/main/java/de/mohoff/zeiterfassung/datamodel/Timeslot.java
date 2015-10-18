@@ -23,11 +23,7 @@ public class Timeslot {
     @DatabaseField(canBeNull = false)
     private String location;
 
-    private boolean sealed = false;
-
-    private String readableStarttime;
-    private String readableEndtime;
-    private String readableDuration;
+    private int dayInMillis = 1000 * 60 * 60 * 24;
 
     public Timeslot(){}
 
@@ -85,19 +81,13 @@ public class Timeslot {
     }
 
     private String getReadableDate(long time){
-        boolean wasToday = this.isSameDay(System.currentTimeMillis(), time);
-        boolean wasYesterday = false;
-        if(!wasToday){
-            wasYesterday = this.isSameDay(System.currentTimeMillis(), time);
-            if(wasYesterday){
-                return "Yesterday";
-            } else {
-                // older than "yesterday"
-                return new SimpleDateFormat("dd.MM.yy").format(new Date(time));
-            }
-        } else {
+        if (isSameDay(System.currentTimeMillis(), time)){
             return "Today";
         }
+        if (isSameDay(System.currentTimeMillis() - dayInMillis, time)){
+            return "Yesterday";
+        }
+        return new SimpleDateFormat("dd.MM.yyyy").format(new Date(time));
     }
 
     private String getReadableTime(long time){
@@ -116,7 +106,7 @@ public class Timeslot {
         if(endtime != 0){
             return getReadableDate(this.endtime);
         } else {
-            return "";
+            return "pending";
         }
     }
 
@@ -124,7 +114,7 @@ public class Timeslot {
         if(endtime != 0){
             return getReadableTime(this.endtime);
         } else {
-            return "";
+            return "pending";
         }
     }
 
@@ -140,7 +130,7 @@ public class Timeslot {
         }
         durationInMinutes = minutesEnd - minutesStart;
 
-        // split time into day, hours, minutes
+        // split time into days, hours and minutes
         long days = durationInMinutes/(60*24);
         long rest = durationInMinutes%(60*24);
         long hours = rest/60;
@@ -150,19 +140,24 @@ public class Timeslot {
         // generate output string
         String output = "";
         if(days != 0){
-            output += hours + "d ";
+            output += days + " d";
         }
         if(hours != 0){
-            output += hours + "h ";
+            if(!output.equals("")){
+                output += "\n";
+            }
+            output += hours + " h";
         }
         if(minutes != 0){
-            output += minutes + "min";
+            if(!output.equals("")){
+                output += "\n";
+            }
+            output += minutes + " min";
         }
 
         return output;
     }
 
-    // STATIC METHODS
     public static boolean isSameDay(long timestamp1, long timestamp2){
         Date startDate = new Date(timestamp1);
         Date endDate = new Date(timestamp2);
@@ -173,11 +168,7 @@ public class Timeslot {
         cal.setTime(endDate);
         int endDay = cal.get(Calendar.DAY_OF_MONTH);
 
-        if (startDay == endDay) {
-            return true;
-        } else {
-            return false;
-        }
+        return startDay == endDay;
     }
 
     public static String getDurationReadableGeneric(long millis1, long millis2){

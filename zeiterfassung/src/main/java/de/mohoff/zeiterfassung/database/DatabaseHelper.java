@@ -204,7 +204,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         status = createNewTLA(48.74642511, 9.10120401, 75, "bar", "sansibar");
         status = createNewTLA(48.74506944, 9.09997154, 75, "bar", "boddschi");
         status = createNewTLA(48.74311678, 9.09741271, 75, "bar", "unithekle");
-        status = createNewTLA(48.77232266, 9.15882993, 100, "sport", "mgfitness");
+        status = createNewTLA(48.77232266, 9.15882993, 50, "freizeit", "mgfitness");
+        status = createNewTLA(48.73002512, 9.111964, 75, "freizeit", "corso kino");
         status = createNewTLA(48.665458, 9.037194, 150, "work", "ibm boeblingen");
     }
 
