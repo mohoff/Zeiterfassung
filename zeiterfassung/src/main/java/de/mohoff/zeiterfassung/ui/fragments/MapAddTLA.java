@@ -64,18 +64,39 @@ public class MapAddTLA extends MapAbstract {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO: Do we have to add isAdded() here?
-        //MainActivity main = (MainActivity) getActivity();
-        parentActivity.getDrawerToggle().setDrawerIndicatorEnabled(false);
-        parentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         // needed to indicate that the fragment would
         // like to add items to the Options Menu
         setHasOptionsMenu(true);
 
 
-
-
         // TODO: To animate the drawer when switching fragments: https://github.com/keklikhasan/LDrawer
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        v = super.onCreateViewWithLayout(inflater, container, savedInstanceState, R.layout.fragment_map_add_tla);
+
+        activityName = getArguments().getString("activityName");
+        locationName = getArguments().getString("locationName");
+
+        radiusValue = (EditText) v.findViewById(R.id.radiusValue);
+        addressValue = (EditText) v.findViewById(R.id.addressValue);
+        searchButton = (ImageButton) v.findViewById(R.id.searchButton);
+        saveButton = (FloatingActionButton) v.findViewById(R.id.saveButton);
+
+        return v;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        super.getDbHelper(getActivity());
+
+        // TODO: Do we have to add isAdded() here?
+        //MainActivity main = (MainActivity) getActivity();
+        parentActivity.getDrawerToggle().setDrawerIndicatorEnabled(false);
+        parentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // work around for bug "fragment not attached to activity anymore"
         // Appears when navigation to this fragment the 2nd time.
@@ -87,17 +108,7 @@ public class MapAddTLA extends MapAbstract {
             colorButtonDisabled = getResources().getColor(R.color.grey_25);
             colorButtonEnabled = getResources().getColor(R.color.greenish);
         }
-    }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        v = super.onCreateViewWithLayout(inflater, container, savedInstanceState, R.layout.fragment_map_add_tla);
-        super.getDbHelper(getActivity());
-
-        activityName = getArguments().getString("activityName");
-        locationName = getArguments().getString("locationName");
-
-        radiusValue = (EditText) v.findViewById(R.id.radiusValue);
         radiusValue.setText(String.valueOf(radius));
         radiusValue.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
@@ -120,13 +131,10 @@ public class MapAddTLA extends MapAbstract {
             }
         });
 
-        addressValue = (EditText) v.findViewById(R.id.addressValue);
-
-        searchButton = (ImageButton) v.findViewById(R.id.searchButton);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(addressValue.getText() == null){
+                if (addressValue.getText() == null) {
                     GeneralHelper.showToast(parentActivity, "Please enter address or place first.");
                 } else {
                     try {
@@ -142,7 +150,7 @@ public class MapAddTLA extends MapAbstract {
                         );
                         // Move camera to lookup position
                         centerMapTo(lookupLatLng);
-                    } catch (IOException e){
+                    } catch (IOException e) {
                         GeneralHelper.showToast(parentActivity, "Lookup failed. Do you have internet connection?");
                     } catch (IllegalArgumentException e) {
                         GeneralHelper.showToast(parentActivity, "Lookup failed. Please enter a valid address or place.");
@@ -151,7 +159,6 @@ public class MapAddTLA extends MapAbstract {
             }
         });
 
-        saveButton = (FloatingActionButton) v.findViewById(R.id.saveButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,9 +184,6 @@ public class MapAddTLA extends MapAbstract {
                 }
             }
         });
-        //updateButtonColor();
-
-        return v;
     }
 
     @Override

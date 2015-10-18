@@ -24,8 +24,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,17 +47,17 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private static float boundaryTreshold = 0.8f;
     public static int ACTIVE_CACHE_SIZE = 5;
     public static int PASSIVE_CACHE_SIZE = 50;
-    public static int REGULAR_UPDATE_INTERVAL = 10 * 1000; // ms, update interval, 60 * 1000, 150 * 1000, 120 * 1000
+    public static int REGULAR_UPDATE_INTERVAL = 60 * 1000; // ms, update interval, 60 * 1000, 150 * 1000, 120 * 1000
     public static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
     public static float INTERPOLATION_VARIANCE = 1.0f;
     private static String locationProviderType = LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
 
-    private static Context ctx;
+    //private static Context ctx;
     private LocationManager locationmanager;
     public static Location mostRecentLocation = null;
     /////
     //private LocationCache locCache;
-    private DatabaseHelper databaseHelper = null;
+    private DatabaseHelper dbHelper = null;
     private boolean inBound = false;
     private int numberOfUpdates = 0;
     private TargetLocationArea nearestTLA = null;
@@ -105,8 +103,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     @Override
     public IBinder onBind(Intent intent) {
-        getHelper();
-        databaseHelper._createSampleTLAs();
+        getHelper(this);
+        dbHelper._createSampleTLAs();
         googleApiClient.connect();
 
         return binder;
@@ -116,7 +114,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     public void onCreate() {
         super.onCreate();
-        getHelper();
+        getHelper(this);
         //LocationCache.getInstance().setParameters(ACTIVE_CACHE_SIZE, PASSIVE_CACHE_SIZE, REGULAR_UPDATE_INTERVAL, INTERPOLATION_VARIANCE);
         locationmanager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -147,12 +145,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         startForeground(1337, notification);
 
-        Toast.makeText(this, "Service created",
-                Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
 
         // Retrieve stored locations from DB. Parameter is maxAge, a timestamp in milliseconds.
         // All locations younger than maxAge are retrieved.
-        //List<Loc> locs = databaseHelper.getLocs(System.currentTimeMillis() - REGULAR_UPDATE_INTERVAL * PASSIVE_CACHE_SIZE);
+        //List<Loc> locs = dbHelper.getLocs(System.currentTimeMillis() - REGULAR_UPDATE_INTERVAL * PASSIVE_CACHE_SIZE);
         //CircularFifoQueue<Loc> test = LocationCache.getInstance().getPassiveCache();
     }
 
@@ -163,12 +160,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         stopForeground(true);
         IS_SERVICE_RUNNING = false;
 
-        Toast.makeText(this, "Service terminated",
-                Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Service terminated", Toast.LENGTH_LONG).show();
 
         // Store locs in DB in order to retrieve them when service is recreated soon and stored locs
         // aren't too old already.
-        databaseHelper.dumpLocs(LocationCache.getInstance().getPassiveCache());
+        dbHelper.dumpLocs(LocationCache.getInstance().getPassiveCache());
 
         super.onDestroy();
     }
@@ -194,8 +190,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     public void updateTLAs() {
-        getHelper();
-        this.TLAs = databaseHelper.getAllTLAs();
+        getHelper(this);
+        this.TLAs = dbHelper.getAllTLAs();
     }
 
     public void updateInBoundTLAs() {
@@ -214,7 +210,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         updateInBoundTLAs();
 
         // compare inBoundTLAs with "open" DB entries
-        List<Timeslot> unsealedTimeslots = databaseHelper.getAllUnsealedTimeslots();
+        List<Timeslot> unsealedTimeslots = dbHelper.getAllUnsealedTimeslots();
         List<Timeslot> satisfiedTimeslots = new ArrayList<Timeslot>();
 
         // start timeslots + retrieve timeslots which should get sealed
@@ -226,11 +222,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                     // match, no update required
                 }
             }
-            int status = databaseHelper.startNewTimeslot(getNormalizedTimestamp(), tla.getActivityName(), tla.getLocationName());
+            int status = dbHelper.startNewTimeslot(getNormalizedTimestamp(), tla.getActivityName(), tla.getLocationName());
             if (status == 1) {
-                GeneralHelper.showToast(this, "new timeslot in DB started");
+                GeneralHelper.showToast(this, "New Timeslot started");
             } else {
-                GeneralHelper.showToast(this, "timeslot already exists");
+                //GeneralHelper.showToast(this, "timeslot already exists");
             }
         }
 
@@ -238,11 +234,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         unsealedTimeslots.removeAll(satisfiedTimeslots); // unsealedTimeslots ist jetzt List für unsatisfied Timeslots
         for (Timeslot shouldSeal : unsealedTimeslots) {
             int id = shouldSeal.get_id();
-            int status = databaseHelper.sealThisTimeslot(id, getNormalizedTimestamp());
+            int status = dbHelper.sealThisTimeslot(id, getNormalizedTimestamp());
             if (status == 1) {
-                GeneralHelper.showToast(this, "timeslot successfully sealed in DB");
+                GeneralHelper.showToast(this, "Timeslot sealed");
             } else {
-                GeneralHelper.showToast(this, "error sealing timeslot in DB");
+                GeneralHelper.showToast(this, "Error sealing timeslot in DB");
             }
         }
     }
@@ -330,11 +326,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     // kann man DatabaseHelper hier weglassen, und DatabaseHelper-Klasse direkt ansprechen? getHelper eigtl nur außerhalb von DatabaseHelper-Klasse zu benutzen
-    private DatabaseHelper getHelper() {
-        if (databaseHelper == null) {
-            databaseHelper = OpenHelperManager.getHelper(ctx, DatabaseHelper.class);
+    private DatabaseHelper getHelper(Context context) {
+        if (dbHelper == null) {
+            dbHelper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
         }
-        return databaseHelper;
+        return dbHelper;
     }
 
     private boolean googlePlayServiceConnected() {

@@ -56,38 +56,46 @@ public class MapManageTLAs extends MapAbstract {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO: Do we have to add isAdded() here?
-        //MainActivity main = (MainActivity) getActivity();
-        parentActivity.getDrawerToggle().setDrawerIndicatorEnabled(false);
-        parentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         // needed to indicate that the fragment would
         // like to add items to the Options Menu
         setHasOptionsMenu(true);
 
         // TODO: To animate the drawer when switching fragments: https://github.com/keklikhasan/LDrawer
 
-        // work around for bug "fragment not attached to activity anymore"
-        // Appears when navigation to this fragment the 2nd time.
-        // The call of getResources() can't complete because of the bug.
-        // TODO: Are there other ways to stay attached to activity?
-        if(isAdded()){
-            // getResources() only works when fragment is attached to activity. That is what we check
-            // with isAdded().
-            colorButtonDisabled = getResources().getColor(R.color.grey_25);
-            colorButtonEnabled = getResources().getColor(R.color.greenish);
-        }
+
+
     }
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = super.onCreateViewWithLayout(inflater, container, savedInstanceState, R.layout.fragment_map_edittext);
-        super.getDbHelper(getActivity());
 
         candidateTLAId = getArguments().getInt("TLAId");
+
+        radiusValue = (EditText) v.findViewById(R.id.radiusValue);
+        saveButton = (ImageButton) v.findViewById(R.id.saveButton);
+
+
+
+        return v;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // TODO: Do we have to add isAdded() here?
+        //MainActivity main = (MainActivity) getActivity();
+        parentActivity.getDrawerToggle().setDrawerIndicatorEnabled(false);
+        parentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         candidateTLA = dbHelper.getTLAById(candidateTLAId);
         radius = candidateTLA.getRadius();
 
-        radiusValue = (EditText) v.findViewById(R.id.radiusValue);
         radiusValue.setText(String.valueOf(radius));
         radiusValue.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
@@ -111,14 +119,13 @@ public class MapManageTLAs extends MapAbstract {
             }
         });
 
-        saveButton = (ImageButton) v.findViewById(R.id.saveButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (radius == candidateTLA.getRadius()) {
                     GeneralHelper.showToast(getActivity(), "Input is already saved.");
                     // cancel save process
-                } else if (radius < 50){
+                } else if (radius < 50) {
                     GeneralHelper.showToast(getActivity(), "Input must be >= 50 meters.");
                     // cancel save process
                 } else {
@@ -126,12 +133,21 @@ public class MapManageTLAs extends MapAbstract {
                     // TODO: Check if entered radius is valid (> 50m && not near other TLAs).
                     // TODO: Save new radius into DB.
                 }
-
             }
         });
-        updateButtonColor();
 
-        return v;
+        // work around for bug "fragment not attached to activity anymore"
+        // Appears when navigation to this fragment the 2nd time.
+        // The call of getResources() can't complete because of the bug.
+        // TODO: Are there other ways to stay attached to activity?
+        if(isAdded()){
+            // getResources() only works when fragment is attached to activity. That is what we check
+            // with isAdded().
+            colorButtonDisabled = getResources().getColor(R.color.grey_25);
+            colorButtonEnabled = getResources().getColor(R.color.greenish);
+        }
+
+        updateButtonColor();
     }
 
     @Override

@@ -17,6 +17,7 @@ import de.mohoff.zeiterfassung.R;
 
 public class Overview extends Fragment {
     AdapterOverview adapter;
+    RecyclerView recList;
 
     public Overview() {
         // Required empty public constructor
@@ -30,8 +31,15 @@ public class Overview extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view =inflater.inflate(R.layout.fragment_overview, container, false);
-        RecyclerView recList = (RecyclerView) view.findViewById(R.id.cardList);
+        View view = inflater.inflate(R.layout.fragment_overview, container, false);
+        recList = (RecyclerView) view.findViewById(R.id.cardList);
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
         // Disable ItemAnimator to prevent a visual bug by calling updateFirstCardPeriodically().
         //recList.setItemAnimator(new MyItemAnimator());
@@ -48,8 +56,6 @@ public class Overview extends Fragment {
         recList.setLayoutManager(llm);
 
         updateFirstCardPeriodically();
-
-        return view;
     }
 
     private void updateFirstCardPeriodically() {
@@ -57,13 +63,15 @@ public class Overview extends Fragment {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.notifyItemChanged(adapter.getItemCount()-1);
-                    }
-                });
+                if(getActivity() != null){
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.notifyItemChanged(adapter.getItemCount()-1);
+                        }
+                    });
+                }
             }
-        }, 0, 1000 * 10);
+        }, 0, 1000 * 10); // Update every 10sec.
     }
 }
