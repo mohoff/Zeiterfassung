@@ -20,6 +20,8 @@ public class ManageTLAs extends Fragment {
     private LinearLayoutManager linLayoutManager;
     private AdapterManageTLA adapter;
 
+    // TODO: add kind of tutorial: alertDialog which explains that user has to longclick Zones in order to edit them. With checkbox "Don't show tipp again"
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
