@@ -11,11 +11,14 @@ import android.view.ViewGroup;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import de.mohoff.zeiterfassung.locationservice.TimeslotEventListener;
 import de.mohoff.zeiterfassung.ui.AdapterOverview;
+import de.mohoff.zeiterfassung.ui.MainActivity;
 import de.mohoff.zeiterfassung.ui.MyItemAnimator;
 import de.mohoff.zeiterfassung.R;
 
-public class Overview extends Fragment {
+public class Overview extends Fragment implements TimeslotEventListener{
+    MainActivity parentActivity;
     AdapterOverview adapter;
     RecyclerView recList;
 
@@ -41,6 +44,8 @@ public class Overview extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        parentActivity = (MainActivity) getActivity();
+
         // Disable ItemAnimator to prevent a visual bug by calling updateFirstCardPeriodically().
         //recList.setItemAnimator(new MyItemAnimator());
         recList.setItemAnimator(null);
@@ -58,12 +63,18 @@ public class Overview extends Fragment {
         updateFirstCardPeriodically();
     }
 
+    @Override
+    public void onResume() {
+        parentActivity.setOnTimeslotEventListener(this); // set listener
+        super.onResume();
+    }
+
     private void updateFirstCardPeriodically() {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if(getActivity() != null){
+                if(getActivity() != null && adapter != null){
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -73,5 +84,22 @@ public class Overview extends Fragment {
                 }
             }
         }, 0, 1000 * 10); // Update every 10sec.
+    }
+
+    @Override
+    public void onNewTimeslot(int id) {
+        // Adapter retrieves updated data from DB and updates its model accordingly.
+        adapter.updateData();
+        // The current implementation only expects inserts, no deletions.
+        // Thus the only action is to notify the adapter that an item is added.
+        adapter.notifyItemInserted(adapter.getItemCount()-1);
+        // Give visual feedback that a new item has beed added.
+        recList.scrollToPosition(adapter.getItemCount()-1);
+    }
+
+    @Override
+    public void onTimeslotSealed(int id) {
+        // Only most recent Timeslot can be possibly sealed. For that the item position is known anytime.
+        adapter.notifyItemChanged(adapter.getItemCount()-1);
     }
 }

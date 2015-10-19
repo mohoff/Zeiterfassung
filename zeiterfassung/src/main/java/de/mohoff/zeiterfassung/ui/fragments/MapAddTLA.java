@@ -80,11 +80,6 @@ public class MapAddTLA extends MapAbstract {
         activityName = getArguments().getString("activityName");
         locationName = getArguments().getString("locationName");
 
-        radiusValue = (EditText) v.findViewById(R.id.radiusValue);
-        addressValue = (EditText) v.findViewById(R.id.addressValue);
-        searchButton = (ImageButton) v.findViewById(R.id.searchButton);
-        saveButton = (FloatingActionButton) v.findViewById(R.id.saveButton);
-
         return v;
     }
 
@@ -109,6 +104,7 @@ public class MapAddTLA extends MapAbstract {
             colorButtonEnabled = getResources().getColor(R.color.greenish);
         }
 
+        radiusValue = (EditText) v.findViewById(R.id.radiusValue);
         radiusValue.setText(String.valueOf(radius));
         radiusValue.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
@@ -131,6 +127,8 @@ public class MapAddTLA extends MapAbstract {
             }
         });
 
+
+        searchButton = (ImageButton) v.findViewById(R.id.searchButton);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,7 +137,7 @@ public class MapAddTLA extends MapAbstract {
                 } else {
                     try {
                         // Do the lookup
-                        Address lookupResult = geocoder.getFromLocationName(addressValue.getText().toString(), 1).get(0);
+                        Address lookupResult = geocoder.getFromLocationName(addressValue.getText().toString(), 1).get(0); // get(0) can cause IndexOutOfBoundException
                         lookupLatLng = new LatLng(lookupResult.getLatitude(), lookupResult.getLongitude());
                         // Add marker and circle for the lookup position to the map
                         candidateMarker = map.addMarker(
@@ -152,13 +150,14 @@ public class MapAddTLA extends MapAbstract {
                         centerMapTo(lookupLatLng);
                     } catch (IOException e) {
                         GeneralHelper.showToast(parentActivity, "Lookup failed. Do you have internet connection?");
-                    } catch (IllegalArgumentException e) {
+                    } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
                         GeneralHelper.showToast(parentActivity, "Lookup failed. Please enter a valid address or place.");
                     }
                 }
             }
         });
 
+        saveButton = (android.support.design.widget.FloatingActionButton) v.findViewById(R.id.saveButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -184,6 +183,8 @@ public class MapAddTLA extends MapAbstract {
                 }
             }
         });
+
+        addressValue = (EditText) v.findViewById(R.id.addressValue);
     }
 
     @Override

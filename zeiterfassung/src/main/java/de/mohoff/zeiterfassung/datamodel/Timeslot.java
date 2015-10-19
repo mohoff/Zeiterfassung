@@ -119,27 +119,42 @@ public class Timeslot {
     }
 
     public String getReadableDuration(){
-        long minutesStart = this.starttime/(1000*60);
-        long minutesEnd;
-        long durationInMinutes;
-
         if(this.endtime == 0){
-            minutesEnd = System.currentTimeMillis()/(1000*60);
+            return getReadableDuration(this.starttime, System.currentTimeMillis(), true);
         } else {
-            minutesEnd = this.endtime/(1000*60);
+            return getReadableDuration(this.starttime,  this.endtime, true);
         }
-        durationInMinutes = minutesEnd - minutesStart;
+    }
 
-        // split time into days, hours and minutes
-        long days = durationInMinutes/(60*24);
-        long rest = durationInMinutes%(60*24);
-        long hours = rest/60;
-        rest = rest%60;
-        long minutes = rest;
+    public static String getReadableDuration(long time1, long time2, boolean ignoreSeconds){
+        int secInMillis = 1000,
+            minInMillis = secInMillis * 60,
+            hourInMillis = minInMillis * 60,
+            dayInMillis = hourInMillis * 24,
+            yearInMillis = dayInMillis * 365;
+        int years, days, hours, mins, secs;
+        String output = "";
+
+        long diff = time1 > time2 ? time1-time2 : time2-time1;
+
+        years = (int) (diff / yearInMillis);
+        diff = diff - years * yearInMillis;
+        days = (int) (diff / dayInMillis);
+        diff = diff - days * dayInMillis;
+        hours = (int) (diff / hourInMillis);
+        diff = diff - hours * hourInMillis;
+        mins = (int) (diff / minInMillis);
+        diff = diff - mins * minInMillis;
+        secs = (int) (diff / secInMillis);
 
         // generate output string
-        String output = "";
+        if(years != 0){
+            output += days + " y";
+        }
         if(days != 0){
+            if(!output.equals("")){
+                output += "\n";
+            }
             output += days + " d";
         }
         if(hours != 0){
@@ -148,11 +163,17 @@ public class Timeslot {
             }
             output += hours + " h";
         }
-        if(minutes != 0){
+        if(mins != 0){
             if(!output.equals("")){
                 output += "\n";
             }
-            output += minutes + " min";
+            output += mins + " min";
+        }
+        if(mins != 0 && !ignoreSeconds){
+            if(!output.equals("")){
+                output += "\n";
+            }
+            output += secs + " sec";
         }
 
         return output;

@@ -130,7 +130,7 @@ public class GeneralHelper {
         float unclampedOpacity = 1.0f - (float) ((int)accuracy/50) /10.0f;
 
         // clamp unclampedOpacity to interval [ 0.2 , 1 ]
-        return Math.max(1.0f, Math.min(0.2f, unclampedOpacity));
+        return Math.min(1.0f, Math.max(0.2f, unclampedOpacity));
     }
 
     public static void hideSoftKeyboard(Activity activity) {

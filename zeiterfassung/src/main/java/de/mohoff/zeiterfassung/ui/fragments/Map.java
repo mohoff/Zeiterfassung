@@ -40,6 +40,7 @@ import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
+import de.mohoff.zeiterfassung.datamodel.Timeslot;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
@@ -93,27 +94,49 @@ public class Map extends MapAbstract implements LocationChangeListener {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         super.onMapReady(googleMap);
+        CircularFifoQueue<Loc> cache = LocationCache.getInstance().getPassiveCache();
 
-        if(LocationCache.getInstance().getPassiveCache() != null && LocationCache.getInstance().getPassiveCache().size() > 0){
-            for(Loc loc : LocationCache.getInstance().getPassiveCache()){
-                super.addMarkerToMap(map, markers,
+        if(cache != null && cache.size() > 0){
+            for(int i=0; i<cache.size(); i++){
+                Loc loc = cache.get(i);
+                long lastMarkerTimestamp = (i-1)>= 0 ? cache.get(i - 1).getTimestampInMillis() : 0;
+                super.addMarkerToMap(
+                        map,
+                        markers,
                         GeneralHelper.convertLocToLatLng(loc),
-                        GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()));
+                        GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()),
+                        "Location",
+                        "A:" + loc.getAccuracy() +
+                                "\n O:" + GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()) +
+                                "\n t:" + Timeslot.getReadableDuration(lastMarkerTimestamp, loc.getTimestampInMillis(), false)
+                );
             }
-            currentPolyline = super.addPolylineToMap(map, LocationCache.getInstance().getPassiveCache());
+            currentPolyline = super.addPolylineToMap(map, cache);
         } else {
             GeneralHelper.showToast(parentActivity, "no location data available.");
         }
     }
 
     public void onNewLocation(Loc loc) {
-        LatLng latLng = GeneralHelper.convertLocToLatLng(loc);
-        float opacity = GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy());
-
-        //userLocs.add(loc);
         if(map != null){
             // Update markers
-            addMarkerToMap(map, markers, latLng, opacity);
+            long timestampLastMarker;
+            try {
+                timestampLastMarker = LocationCache.getInstance().getPassiveCache().get(1).getTimestampInMillis();
+            } catch (Exception e){
+                // No other markers exist
+                timestampLastMarker = 0;
+            }
+            super.addMarkerToMap(
+                    map,
+                    markers,
+                    GeneralHelper.convertLocToLatLng(loc),
+                    GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()),
+                    "Location",
+                    "A:" + loc.getAccuracy() +
+                            "\n O:" + GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()) +
+                            "\n t:" + Timeslot.getReadableDuration(timestampLastMarker, loc.getTimestampInMillis(), false)
+            );
             // Ensure that there are only passiveCache.maxSize() markers displayed to prevent memory leak.
             // If passiveQueue is full and at least one drop happened already in it, remove oldest marker.
             if(LocationCache.getInstance().hasFirstPassiveQueueDropHappened()){
@@ -168,7 +191,8 @@ public class Map extends MapAbstract implements LocationChangeListener {
             if(this.locs.size() > 0){
                 this.markersAdded = true;
                 for( Loc loc : this.locs){
-                    addMarkerToMap(map, markers, GeneralHelper.convertLocToLatLng(loc), 1);
+                    // (method signature updated meanwhile...)
+                    //addMarkerToMap(map, markers, GeneralHelper.convertLocToLatLng(loc), 1);
                 }
             } else {
                 //GeneralHelper.showToast(parentActivity, "no location data available.");

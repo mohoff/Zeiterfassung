@@ -36,6 +36,7 @@ import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.locationservice.LocationService;
+import de.mohoff.zeiterfassung.locationservice.TimeslotEventListener;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerAdapter;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItem;
@@ -93,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     // listener for Map fragment
     // When fragment is active, it can update its map on new locations instantly
     private LocationChangeListener newLocationListener;
+
+    private TimeslotEventListener newTimeslotEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -468,9 +471,13 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             // Extract data included in the Intent
             String receivedMessage = intent.getStringExtra("message");
             if(receivedMessage.equals("newTimeslotStarted")){
-                timeslotStartedEvent(Long.valueOf(intent.getStringExtra("timestamp")), intent.getStringExtra("activityName"), intent.getStringExtra("locationName"));
+                if (newTimeslotEventListener != null) {
+                    newTimeslotEventListener.onNewTimeslot(intent.getIntExtra("id", 0)); // Why need to provide default value?
+                }
             } else if(receivedMessage.equals("openTimeslotSealed")){
-                timeslotSealedEvent(Long.valueOf(intent.getStringExtra("timestamp")), intent.getStringExtra("activityName"), intent.getStringExtra("locationName"));
+                if (newTimeslotEventListener != null) {
+                    newTimeslotEventListener.onTimeslotSealed(intent.getIntExtra("id", 0));
+                }
             }
         }
     };
@@ -506,16 +513,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     @Override
     protected void onPause() {
         super.onPause();
-    }
-
-    public void timeslotStartedEvent(long millis, String activityName, String locationName) {
-        String humanReadable = sdf.format(millis);
-        outputTV.append("ENTER: " + humanReadable + ",   " + locationName + " @" + activityName + "\n");
-    }
-
-    public void timeslotSealedEvent(long millis, String activityName, String locationName) {
-        String humanReadable = sdf.format(millis);
-        outputTV.append("QUIT: " + humanReadable + ",   " + locationName + " @" + activityName + "\n");
     }
 
     private DatabaseHelper getDbHelper() {
@@ -565,6 +562,10 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     public void setOnNewLocationListener(LocationChangeListener listen) {
         newLocationListener = listen;
+    }
+
+    public void setOnTimeslotEventListener(TimeslotEventListener listen) {
+        newTimeslotEventListener = listen;
     }
 
     private ArrayList<String> getListItems(){

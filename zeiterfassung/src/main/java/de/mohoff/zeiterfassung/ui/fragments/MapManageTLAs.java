@@ -79,8 +79,6 @@ public class MapManageTLAs extends MapAbstract {
         radiusValue = (EditText) v.findViewById(R.id.radiusValue);
         saveButton = (ImageButton) v.findViewById(R.id.saveButton);
 
-
-
         return v;
     }
 
@@ -139,13 +137,14 @@ public class MapManageTLAs extends MapAbstract {
         // work around for bug "fragment not attached to activity anymore"
         // Appears when navigation to this fragment the 2nd time.
         // The call of getResources() can't complete because of the bug.
-        // TODO: Are there other ways to stay attached to activity?
-        if(isAdded()){
+        // (TODO: Are there other ways to stay attached to activity?)
+        // TODO: Still need to check for isAdded, even in onActivityCreated()?
+        //if(isAdded()){
             // getResources() only works when fragment is attached to activity. That is what we check
             // with isAdded().
             colorButtonDisabled = getResources().getColor(R.color.grey_25);
             colorButtonEnabled = getResources().getColor(R.color.greenish);
-        }
+        //}
 
         updateButtonColor();
     }

@@ -56,7 +56,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     protected Geocoder geocoder;
     // Should be replaced with "greenish_50" in onCreateView().
     // Work around for "fragment not attached to activity" error.
-    int color = Color.BLACK;
+    int polylineColor = Color.BLACK;
 
     protected DatabaseHelper dbHelper = null;
 
@@ -75,7 +75,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         try {
             view = (RelativeLayout) inflater.inflate(layout, container, false);
         } catch (InflateException e) {
-            /* map is already there, just return view as it is */
+            // map is already there, just return view as it is
         }
         //return this.onCreateView(inflater, container, savedInstanceState);
 
@@ -105,14 +105,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        parentActivity = (MainActivity) getActivity();
-
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        if(isAdded()) {
-            color = getResources().getColor(R.color.greenish_50);
-        }
 
         return view;
     }
@@ -127,6 +121,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         parentActivity = (MainActivity) getActivity();
         geocoder = new Geocoder(getActivity());
         dbHelper = getDbHelper(parentActivity);
+
+        polylineColor = getResources().getColor(R.color.greenish_50);
     }
 
     @Override
@@ -139,8 +135,13 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         super.onPause();
     }
 
-    public void onDestroyView() {
-        super.onDestroyView();
+    @Override
+    public void onDestroy() {
+        if (dbHelper != null) {
+            OpenHelperManager.releaseHelper();
+            dbHelper = null;
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -164,14 +165,16 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         progressBar.setVisibility(View.GONE);
     }
 
-    protected void addMarkerToMap(GoogleMap map, List<Marker> markers, LatLng latLng, float opacity){
+    protected void addMarkerToMap(GoogleMap map, List<Marker> markers, LatLng latLng, float opacity, String title, String snippet){
         Marker marker = map.addMarker(new MarkerOptions()
                 .position(latLng)
                 .draggable(false)
                 .alpha(opacity)
                 .icon(BitmapDescriptorFactory.defaultMarker(193))      // BitmapDescriptorFactory.HUE_MAGENTA
-                //.title("acc " + String.valueOf(loc.getAccuracy()) + ", speed " + String.valueOf(loc.getSpeed()) + ", alt " + String.valueOf(loc.getAltitude()))
+                .title(title)
+                .snippet(snippet)
         );
+
         if(markers != null){
             markers.add(marker);
             if(markers.size() > 1){
@@ -195,7 +198,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
 
     protected Polyline addPolylineToMap(GoogleMap map, CircularFifoQueue<Loc> queueLocs){
         PolylineOptions options = new PolylineOptions()  // .geodesic(false)
-                .color(color)
+                .color(polylineColor)
                 .width(15);
 
         for(Loc loc : queueLocs){

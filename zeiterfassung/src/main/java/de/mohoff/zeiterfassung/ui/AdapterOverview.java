@@ -68,7 +68,12 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
         this.data.add(new Timeslot(1416524002267L, 1416558002267L, "activity4", "act4, location1"));
         this.data.add(new Timeslot(1416224002267L, 1416728002267L, "activity5", "act5, location1"));
         */
-        this.data.addAll(dbHelper.getAllTimeslots());
+        data.addAll(dbHelper.getAllTimeslots());
+    }
+
+    public void updateData(){
+        data.clear();
+        data.addAll(dbHelper.getAllTimeslots());
     }
 
     // Create new views (invoked by the layout manager)
@@ -117,8 +122,6 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
             lastPosition = position;
         }
     }
-
-
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override

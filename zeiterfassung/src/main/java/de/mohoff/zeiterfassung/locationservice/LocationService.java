@@ -276,8 +276,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     // broadcast for timeslot events
-    private void sendTimeslotEventViaBroadcast(String message, long timestamp, String activityName, String locationName) {
+    private void sendTimeslotEventViaBroadcast(int _id, String message, long timestamp, String activityName, String locationName) {
         Intent intent = new Intent("locationServiceTimeslotEvents");
+        intent.putExtra("id", _id);
         intent.putExtra("message", message);
         intent.putExtra("timestamp", String.valueOf(timestamp));
         intent.putExtra("activityName", activityName);
