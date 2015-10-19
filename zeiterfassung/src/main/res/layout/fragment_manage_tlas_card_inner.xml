@@ -6,15 +6,12 @@
     android:layout_height="wrap_content"
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
-    android:layout_marginBottom="0dp"
     android:id="@+id/card_view_inner"
     android:layout_gravity="center"
     card_view:cardBackgroundColor="@color/grey_05"
     card_view:cardCornerRadius="2dp"
     card_view:cardElevation="1dp"
-    card_view:cardUseCompatPadding="true"
-    card_view:contentPaddingTop="-3dp"
-    card_view:contentPaddingBottom="-3dp">
+    card_view:cardUseCompatPadding="true">
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,10 +20,12 @@
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
         android:paddingRight="5dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:id="@+id/locationWrapper">
 
         <!-- location name -->
-        <EditText
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/locationName"
@@ -34,6 +33,7 @@
             android:text="allmandring 26d"
             android:textSize="14sp"
             android:singleLine="true"
+            android:layout_centerVertical="true"
             android:layout_marginRight="75dp"
             android:maxLength="100"/>
 

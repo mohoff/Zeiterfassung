@@ -65,8 +65,13 @@ public class Overview extends Fragment implements TimeslotEventListener{
 
     @Override
     public void onResume() {
-        parentActivity.setOnTimeslotEventListener(this); // set listener
         super.onResume();
+
+        parentActivity.setOnTimeslotEventListener(this); // set listener
+
+        // Update adapter model and update UI
+        adapter.updateData();
+        adapter.notifyDataSetChanged();
     }
 
     private void updateFirstCardPeriodically() {

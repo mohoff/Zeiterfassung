@@ -9,7 +9,10 @@ import android.content.ServiceConnection;
 import android.location.Location;
 import android.os.IBinder;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -171,5 +174,20 @@ public class GeneralHelper {
             }
             LocationCache.getInstance().setPassiveCache(tmp);
         }
+    }
+
+    public static View getAlertDialogEditTextContainer(Context context, EditText et, String placeholder){
+        et.setText(placeholder);
+        et.setSingleLine(true);
+
+        FrameLayout container = new FrameLayout(context);
+        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        params.leftMargin = 50;
+        params.rightMargin = 50;
+        et.setLayoutParams(params);
+        container.addView(et);
+        return container;
     }
 }

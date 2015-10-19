@@ -94,7 +94,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    // in deployment: split activity- and location-creation
     public int createNewTLA(double latitude, double longitude, int radius, String activity, String location){
         getTargetLocationAreaREDAO();
 
@@ -108,10 +107,33 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
         }
 
-
-        //result = targetareasREDAO.create(tla);
-
         return result;
+    }
+
+    public int updateTLALocationName(int id, String newLocationName){
+        UpdateBuilder<TargetLocationArea, Integer> updateBuilder = targetareasREDAO.updateBuilder();
+        try {
+            updateBuilder.updateColumnValue("locationName", newLocationName);
+            updateBuilder.where().eq("_id", id);
+            updateBuilder.update();
+            return 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public int updateTLAActivityName(String oldActivityName, String newActivityName){
+        UpdateBuilder<TargetLocationArea, Integer> updateBuilder = targetareasREDAO.updateBuilder();
+        try {
+            updateBuilder.updateColumnValue("activityName", newActivityName);
+            updateBuilder.where().eq("activityName", oldActivityName);
+            updateBuilder.update();
+            return 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     public TargetLocationArea getTLAById(int id){

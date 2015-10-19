@@ -21,8 +21,8 @@
             android:layout_height="wrap_content"
             android:paddingLeft="10dip"
             android:paddingRight="10dip"
-            android:paddingTop="5dip"
-            android:paddingBottom="5dip"
+            android:paddingTop="15dip"
+            android:paddingBottom="12dip"
             android:id="@+id/activityWrapper">
 
             <RelativeLayout
@@ -33,7 +33,7 @@
                 android:id="@+id/activityWrapperLeft">
 
                 <!-- activity name -->
-                <EditText
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/activityName"
@@ -41,6 +41,9 @@
                     android:text="home"
                     android:layout_toRightOf="@+id/activityIcon"
                     android:singleLine="true"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_centerVertical="true"
                     android:maxLength="100"/>
                 <!-- activity icon/color -->
                 <ImageView
@@ -58,7 +61,8 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/deleteActivityButton"
                     android:src="@drawable/ic_delete_black_24dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="7dp"
                     android:layout_alignParentRight="true"/>
             </RelativeLayout>
         </LinearLayout>
