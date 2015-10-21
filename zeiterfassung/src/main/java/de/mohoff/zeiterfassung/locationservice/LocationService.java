@@ -216,13 +216,14 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         // start timeslots + retrieve timeslots which should get sealed
         for (TargetLocationArea tla : inBoundTLAs) {
             for (Timeslot ts : unsealedTimeslots) {
-                if ((ts.getActivity().equals(tla.getActivityName())) && (ts.getLocation().equals(tla.getLocationName()))) {
+                //if ((ts.getActivity().equals(tla.getActivityName())) && (ts.getLocation().equals(tla.getLocationName()))) {
+                if ((ts.getTLA().getActivityName().equals(tla.getActivityName())) && (ts.getTLA().getLocationName().equals(tla.getLocationName()))) {
                     satisfiedTimeslots.add(ts);
                     break;
                     // match, no update required
                 }
             }
-            int status = dbHelper.startNewTimeslot(getNormalizedTimestamp(), tla.getActivityName(), tla.getLocationName());
+            int status = dbHelper.startNewTimeslot(getNormalizedTimestamp(), tla);
             if (status == 1) {
                 GeneralHelper.showToast(this, "New Timeslot started");
             } else {

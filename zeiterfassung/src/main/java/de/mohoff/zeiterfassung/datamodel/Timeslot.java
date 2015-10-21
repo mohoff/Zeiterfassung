@@ -18,26 +18,20 @@ public class Timeslot {
     private long starttime; // in seconds
     @DatabaseField
     private long endtime = 0; // in seconds
-    @DatabaseField(canBeNull = false)
-    private String activity;
-    @DatabaseField(canBeNull = false)
-    private String location;
-
-    private int dayInMillis = 1000 * 60 * 60 * 24;
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    private TargetLocationArea tla;
 
     public Timeslot(){}
 
-    public Timeslot(long starttime, String activity, String location){
+    public Timeslot(long starttime, TargetLocationArea tla){
         this.starttime = starttime;
-        this.activity = activity;
-        this.location = location;
+        this.tla = tla;
     }
 
-    public Timeslot(long starttime, long endtime, String activity, String location){
+    public Timeslot(long starttime, long endtime, TargetLocationArea tla){
         this.starttime = starttime;
         this.endtime = endtime;
-        this.activity = activity;
-        this.location = location;
+        this.tla = tla;
     }
 
     public int get_id() {
@@ -64,27 +58,19 @@ public class Timeslot {
         this.endtime = endtime;
     }
 
-    public String getActivity() {
-        return activity;
+    public TargetLocationArea getTLA(){
+        return tla;
     }
 
-    public void setActivity(String activity) {
-        this.activity = activity;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
+    public void setTLA(TargetLocationArea tla){
+        this.tla = tla;
     }
 
     private String getReadableDate(long time){
         if (isSameDay(System.currentTimeMillis(), time)){
             return "Today";
         }
-        if (isSameDay(System.currentTimeMillis() - dayInMillis, time)){
+        if (isSameDay(System.currentTimeMillis() - 1000 * 60 * 60 * 24, time)){
             return "Yesterday";
         }
         return new SimpleDateFormat("dd.MM.yyyy").format(new Date(time));

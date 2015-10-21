@@ -23,9 +23,11 @@
         <item name="android:colorButtonNormal">@color/greenish</item>
     </style>
 
-    <style name="Button" parent="android:style/Widget.Material.Button">
+    <!--
+    <style name="Button">
         <item name="android:colorButtonNormal">@color/greenish</item>
     </style>
+    -->
 
     <style name="ImageButton" parent="android:style/Widget.Material.ImageButton">
         <item name="android:tint">@color/greenish</item>

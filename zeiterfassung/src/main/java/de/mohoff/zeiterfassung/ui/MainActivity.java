@@ -219,6 +219,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 new IntentFilter("locationServiceLocUpdateEvents"));
 
         sdf = new SimpleDateFormat("dd.MM.yyyy - HH:mm");
+
+        //int result = getDbHelper().deleteAllTLAs();
+        //int bla = 0;
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -366,6 +369,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 nextFragment = new Map();
                 break;
             case 4:
+                nextFragment = new Settings();
+                break;
+            case 54:
                 nextFragment = new About();
                 break;
         }
@@ -579,6 +585,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         list.add("Manage TLAs");
         list.add("Map");
         list.add("---------------"); // list[3] now hardcoded as separator (only hardcoded possible I think)
+        list.add("Settings");
         list.add("About");
         return list;
     }

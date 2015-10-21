@@ -26,7 +26,7 @@ public class DatabaseConfigUtil extends OrmLiteConfigUtil {
         //writeConfigFile("zeiterfassung/src/main/res/raw/ormlite_config.txt", classes);
 
         // worked!
-        writeConfigFile(new File("C://Users/Moritz/GitHub/ZeiterfassungWithMap/zeiterfassung/src/main/res/raw/ormlite_config.txt"), classes);
+        writeConfigFile(new File("/home/moo/git/Zeiterfassung/zeiterfassung/src/main/res/raw/ormlite_config.txt"), classes);
 
 
     }

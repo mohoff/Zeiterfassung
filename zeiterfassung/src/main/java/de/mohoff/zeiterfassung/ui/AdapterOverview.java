@@ -74,6 +74,7 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
     public void updateData(){
         data.clear();
         data.addAll(dbHelper.getAllTimeslots());
+        int bla = 0;
     }
 
     // Create new views (invoked by the layout manager)
@@ -101,8 +102,8 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
 
         holder.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
         holder.icon.setImageResource(R.drawable.ic_action_edit_location);
-        holder.activity.setText(timeslot.getActivity());
-        holder.location.setText(timeslot.getLocation());
+        holder.activity.setText(timeslot.getTLA().getActivityName());
+        holder.location.setText(timeslot.getTLA().getLocationName());
         holder.startTime.setText(timeslot.getReadableStartTime());
         holder.startDate.setText(timeslot.getReadableStartDate());
         holder.endTime.setText(timeslot.getReadableEndTime());

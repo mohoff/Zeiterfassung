@@ -36,7 +36,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME = "database.db";
 
     // any time you make changes to your database objects, you may have to increase the database version
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 5;
 
     // the DAO object we use to access the SimpleData table
     private Dao<Timeslot, Integer> timeslotDAO = null;
@@ -67,14 +67,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return (int) dao2.countOf();*/
     }
 
-    public int startNewTimeslot(long millis, String activityName, String locationName){
+    public int startNewTimeslot(long millis, TargetLocationArea tla){
         getTimeslotREDAO();
 
         // check if timeslots are unsealed and already existing for passed activityName and locationName
         List<Timeslot> existingTimeslotsForActAndLoc = new ArrayList<Timeslot>();
         QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
         try{
-            queryBuilder.where().eq("endtime", 0).and().eq("activity", activityName).and().eq("location", locationName);
+            queryBuilder.where().eq("endtime", 0).and().eq("tla", tla);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
             existingTimeslotsForActAndLoc = timeslotREDAO.query(preparedQuery); // assumed there is only one "open" timeslot allowed for any time t
         } catch (SQLException e){
@@ -83,7 +83,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
         if(existingTimeslotsForActAndLoc.isEmpty()){
             // timeslot not yet created/open
-            Timeslot ts = new Timeslot(millis, activityName, locationName);
+            Timeslot ts = new Timeslot(millis, tla);
             int result = -1;
             result = timeslotREDAO.create(ts);
             //amountOfTimeslots++;
@@ -184,6 +184,30 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
+    public int deleteAllTimeslots(){
+        try {
+            // Dropping and creating table will reset autoincrement for _id.
+            TableUtils.dropTable(connectionSource, Timeslot.class, true);
+            TableUtils.createTable(connectionSource, Timeslot.class);
+            return 1;
+        } catch (SQLException e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public int deleteAllTLAs(){
+        try {
+            // Dropping and creating table will reset autoincrement for _id.
+            TableUtils.dropTable(connectionSource, TargetLocationArea.class, true);
+            TableUtils.createTable(connectionSource, TargetLocationArea.class);
+            return 1;
+        } catch (SQLException e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     public int sealCurrentTimeslot(long millis){ // seals newest TS
         getTimeslotREDAO();
 
@@ -218,17 +242,16 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public void _createSampleTLAs(){
         int status;
-        status = createNewTLA(48.743715, 9.095967, 50, "home", "vaihingen allmandring 26d");
-        status = createNewTLA(48.243962, 9.928635, 75, "home", "burgrieden mittelweg 10");
-        status = createNewTLA(48.742120, 9.101002, 100, "uni", "hdm");
-        status = createNewTLA(48.745847, 9.105381, 50, "sbahn", "station uni");
-        status = createNewTLA(48.74319107, 9.10227019, 75, "bar", "wuba");
-        status = createNewTLA(48.74642511, 9.10120401, 75, "bar", "sansibar");
-        status = createNewTLA(48.74506944, 9.09997154, 75, "bar", "boddschi");
-        status = createNewTLA(48.74311678, 9.09741271, 75, "bar", "unithekle");
-        status = createNewTLA(48.77232266, 9.15882993, 50, "freizeit", "mgfitness");
-        status = createNewTLA(48.73002512, 9.111964, 75, "freizeit", "corso kino");
-        status = createNewTLA(48.665458, 9.037194, 150, "work", "ibm boeblingen");
+        status = createNewTLA(48.743715, 9.095967, 50, "Home", "Vaihingen allmandring 26d");
+        status = createNewTLA(48.243962, 9.928635, 75, "Home", "Burgrieden mittelweg 10");
+        status = createNewTLA(48.742120, 9.101002, 100, "Uni", "HdM");
+        status = createNewTLA(48.745847, 9.105381, 50, "VVS", "Station Uni");
+        status = createNewTLA(48.74319107, 9.10227019, 50, "Bars", "Wuba");
+        status = createNewTLA(48.74642511, 9.10120401, 50, "Bars", "Sansibar");
+        status = createNewTLA(48.74506944, 9.09997154, 50, "Bars", "Boddschi");
+        status = createNewTLA(48.74311678, 9.09741271, 50, "Bars", "Unithekle");
+        status = createNewTLA(48.77232266, 9.15882993, 50, "Freizeit", "mgfitness");
+        status = createNewTLA(48.73002512, 9.111964, 75, "Freizeit", "Corso Kino");
     }
 
 
@@ -416,7 +439,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return activities;
     }
 
-    public List<Timeslot> getTimeslotsBetweenActivity(int starttime, int endtime, String activityName){
+    /*public List<Timeslot> getTimeslotsBetweenActivity(int starttime, int endtime, String activityName){
         getTimeslotREDAO();
         List<Timeslot> timeslots = new ArrayList<Timeslot>();
 
@@ -430,7 +453,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
 
         return timeslots;
-    }
+    }*/
 
     public List<Timeslot> getTimeslotsBetweenLocation(int starttime, int endtime, String locationName){
         getTimeslotREDAO();
@@ -448,7 +471,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return timeslots;
     }
 
-    public List<Timeslot> getTimeslotsBetweenActivityLocation(int starttime, int endtime, String activityName, String locationName){
+    /*public List<Timeslot> getTimeslotsBetweenActivityLocation(int starttime, int endtime, String activityName, String locationName){
         getTimeslotREDAO();
         List<Timeslot> timeslots = new ArrayList<Timeslot>();
 
@@ -462,7 +485,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
 
         return timeslots;
-    }
+    }*/
 
     public int dumpLocs(CircularFifoQueue<Loc> cache){
         getLocREDAO();
