@@ -52,11 +52,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     public static float INTERPOLATION_VARIANCE = 1.0f;
     private static String locationProviderType = LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
 
-    //private static Context ctx;
     private LocationManager locationmanager;
     public static Location mostRecentLocation = null;
-    /////
-    //private LocationCache locCache;
+
     private DatabaseHelper dbHelper = null;
     private boolean inBound = false;
     private int numberOfUpdates = 0;

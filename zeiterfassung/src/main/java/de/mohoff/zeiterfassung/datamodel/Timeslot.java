@@ -18,7 +18,7 @@ public class Timeslot {
     private long starttime; // in seconds
     @DatabaseField
     private long endtime = 0; // in seconds
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @DatabaseField(canBeNull = false, foreign = true, foreignAutoRefresh = true, columnName = "tla_id")
     private TargetLocationArea tla;
 
     public Timeslot(){}

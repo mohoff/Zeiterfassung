@@ -36,7 +36,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME = "database.db";
 
     // any time you make changes to your database objects, you may have to increase the database version
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
 
     // the DAO object we use to access the SimpleData table
     private Dao<Timeslot, Integer> timeslotDAO = null;
@@ -74,7 +74,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         List<Timeslot> existingTimeslotsForActAndLoc = new ArrayList<Timeslot>();
         QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
         try{
-            queryBuilder.where().eq("endtime", 0).and().eq("tla", tla);
+            queryBuilder.where().eq("endtime", 0).and().eq("tla_id", tla);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
             existingTimeslotsForActAndLoc = timeslotREDAO.query(preparedQuery); // assumed there is only one "open" timeslot allowed for any time t
         } catch (SQLException e){
