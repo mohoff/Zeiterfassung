@@ -29,11 +29,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
-
 import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
-import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.locationservice.LocationService;
 import de.mohoff.zeiterfassung.locationservice.TimeslotEventListener;
@@ -41,13 +38,12 @@ import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerAdapter;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItem;
 import de.mohoff.zeiterfassung.ui.fragments.*;
-import de.mohoff.zeiterfassung.ui.fragments.Map;
+import de.mohoff.zeiterfassung.ui.fragments.MapLive;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerListener {
@@ -91,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     //private MainActivity refThis = this;
     private boolean isServiceRunning = false;
 
-    // listener for Map fragment
+    // listener for MapLive fragment
     // When fragment is active, it can update its map on new locations instantly
     private LocationChangeListener newLocationListener;
 
@@ -179,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
 
         /*
-        // TODO: remove "locs" from savedInstanceState when Map-fragment is destroyed?!
+        // TODO: remove "locs" from savedInstanceState when MapLive-fragment is destroyed?!
         if(savedInstanceState != null){
             // restore location marker data after screen rotation
             if (savedInstanceState.containsKey("locs")) {
@@ -366,12 +362,12 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 nextFragment = new ManageTLAs();
                 break;
             case 2:
-                nextFragment = new Map();
+                nextFragment = new MapLive();
                 break;
             case 4:
                 nextFragment = new Settings();
                 break;
-            case 54:
+            case 5:
                 nextFragment = new About();
                 break;
         }
@@ -502,7 +498,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             }
             // GEHT NOCH NICHT, mapFragment ist jedes mal NULL
             //getFragmentManager().executePendingTransactions();
-            //Map mapFragment = (Map)getFragmentManager().findFragmentByTag("MAP");
+            //MapLive mapFragment = (MapLive)getFragmentManager().findFragmentByTag("MAP");
             //if (mapFragment.isVisible()) {
             //    mapFragment.drawLocationUpdate(new Loc(lat, lng, accuracy));
             //}
@@ -578,12 +574,12 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         ArrayList<String> list = new ArrayList<>();
         /*list.add(new NavigationDrawerItem(true, "Overview"));
         list.add(new NavigationDrawerItem(true, "Manage TLAs"));
-        list.add(new NavigationDrawerItem(true, "Map"));
+        list.add(new NavigationDrawerItem(true, "MapLive"));
         list.add(new NavigationDrawerItem(true, "Location Service"));
         list.add(new NavigationDrawerItem(true, "About"));*/
         list.add("Overview");
         list.add("Manage TLAs");
-        list.add("Map");
+        list.add("Live Map");
         list.add("---------------"); // list[3] now hardcoded as separator (only hardcoded possible I think)
         list.add("Settings");
         list.add("About");

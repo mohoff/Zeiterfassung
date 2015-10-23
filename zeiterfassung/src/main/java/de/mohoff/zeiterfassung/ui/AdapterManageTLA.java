@@ -2,10 +2,8 @@ package de.mohoff.zeiterfassung.ui;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,9 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
@@ -30,11 +26,8 @@ import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
-import de.mohoff.zeiterfassung.ui.fragments.About;
 import de.mohoff.zeiterfassung.ui.fragments.AddTLA;
-import de.mohoff.zeiterfassung.ui.fragments.ManageTLAs;
-import de.mohoff.zeiterfassung.ui.fragments.MapManageTLAs;
-import de.mohoff.zeiterfassung.ui.fragments.Overview;
+import de.mohoff.zeiterfassung.ui.fragments.MapEditTLAs;
 
 /**
  * Created by moo on 8/17/15.
@@ -361,7 +354,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                 locHolder.repinButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Fragment nextFragment = new MapManageTLAs();
+                        Fragment nextFragment = new MapEditTLAs();
                         // pass TLAId to map fragment
                         Bundle args = new Bundle();
                         args.putInt("TLAId", tla.get_id());

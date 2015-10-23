@@ -3,9 +3,14 @@ package de.mohoff.zeiterfassung.datamodel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import java.util.ArrayList;
 
 
 @DatabaseTable(tableName = "locdump")
@@ -94,6 +99,16 @@ public class Loc implements Parcelable{  //, daoClass = Loc.class)
         double distance = earthRadius * c * 1000;
 
         return (int) distance; // * 1000 for km?
+    }
+
+    public static CameraUpdate getMapViewport(ArrayList<LatLng> latLngList, int padding){
+        LatLngBounds.Builder boundBilder = LatLngBounds.builder();
+        for(LatLng latLng : latLngList){
+            boundBilder.include(latLng);
+        }
+        LatLngBounds bounds = boundBilder.build();
+
+        return CameraUpdateFactory.newLatLngBounds(bounds, padding);
     }
 
     public double getLatitude() {

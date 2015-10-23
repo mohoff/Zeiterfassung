@@ -1,6 +1,7 @@
 package de.mohoff.zeiterfassung.ui.fragments;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
@@ -44,7 +45,7 @@ import de.mohoff.zeiterfassung.datamodel.Timeslot;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
-public class Map extends MapAbstract implements LocationChangeListener {
+public class MapLive extends MapAbstract implements LocationChangeListener {
     //CircularFifoQueue<Loc> userLocs = new CircularFifoQueue<>();
     List<Marker> markers = new ArrayList<Marker>();
     Polyline currentPolyline;

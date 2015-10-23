@@ -2,6 +2,7 @@ package de.mohoff.zeiterfassung.ui.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Geocoder;
@@ -67,15 +68,17 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
 
     public View onCreateViewWithLayout(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState, int layout) {
+        //view = inflater.inflate(layout, container, false);
         if (view != null) {
             ViewGroup parent = (ViewGroup) view.getParent();
             if (parent != null)
                 parent.removeView(view);
         }
         try {
-            view = (RelativeLayout) inflater.inflate(layout, container, false);
+            view = inflater.inflate(layout, container, false);
         } catch (InflateException e) {
             // map is already there, just return view as it is
+            int bla = 5;
         }
         //return this.onCreateView(inflater, container, savedInstanceState);
 
@@ -155,6 +158,20 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        /* Following snippet is a workaround for an error which leads to an inflate exception because
+           the wrapping fragment can't contain another fragment, MapFragment in this case.
+           We use the FragmentManager to remove the MapFragment manually from the parent view so that
+           the parent view can be inflated properly with a new MapFragment.
+         */
+        Fragment fragment = (getFragmentManager().findFragmentById(R.id.map));
+        FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+        ft.remove(fragment);
+        ft.commit();
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         this.map = googleMap;
         // Disable "Navigation" and "GPS Pointer" buttons whiche are visible by default
@@ -208,24 +225,29 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         return map.addPolyline(options);
     }
 
-    protected void centerMapTo(LatLng cameraCenter){
-        CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(cameraCenter, 15);
+    protected void centerMapTo(LatLng cameraCenter, int zoomLevel){
+        if(zoomLevel <= 0){
+            zoomLevel = 15;
+        }
+        centerMapTo(CameraUpdateFactory.newLatLngZoom(cameraCenter, zoomLevel));
+    }
+
+    protected  void centerMapTo(CameraUpdate cu){
         map.animateCamera(cu);
     }
 
-    protected MarkerOptions createMarkerOptions(LatLng pos, boolean isDraggable, String title, String snippet, BitmapDescriptor bitmapDescriptor){
+    protected MarkerOptions createMarkerOptions(boolean isDraggable, String title, String snippet, BitmapDescriptor bitmapDescriptor){
+        // without position
         return new MarkerOptions()
-                .position(pos)
                 .draggable(isDraggable)
                 .title(title)
                 .snippet(snippet)
                 .icon(bitmapDescriptor);
     }
 
-    protected CircleOptions createCircleOptions(LatLng pos, int radius, int fillColor){
+    protected CircleOptions createCircleOptions(int fillColor){
+        // without position and radius
         return new CircleOptions()
-                .center(pos)
-                .radius(radius)
                 .fillColor(fillColor)
                 .strokeWidth(0)
                 .strokeColor(Color.TRANSPARENT);

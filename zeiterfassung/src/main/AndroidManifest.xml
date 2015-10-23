@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
         <!--<activity
-            android:name=".activities.Map"
+            android:name=".activities.MapLive"
             android:label="@string/title_activity_map" >
         </activity>-->
         <activity
