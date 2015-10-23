@@ -47,6 +47,9 @@ public class LocationCache {
     public CircularFifoQueue<Loc> getPassiveCache(){
         return passiveCache;
     }
+    public CircularFifoQueue<Loc> getActiveCache(){
+        return activeCache;
+    }
 
     public void setPassiveCache(CircularFifoQueue<Loc> cache){
         passiveCache = cache;

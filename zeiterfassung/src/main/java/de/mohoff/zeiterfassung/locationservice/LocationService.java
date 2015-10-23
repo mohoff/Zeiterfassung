@@ -24,6 +24,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,29 +40,27 @@ import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String TAG = LocationService.class.getSimpleName();
-    private final LocalBinder binder = new LocalBinder();
-
-    private GoogleApiClient googleApiClient;
-    private LocationRequest locReq;
 
     private static boolean IS_SERVICE_RUNNING = false; // not used right now
-    private static float boundaryTreshold = 0.8f;
+    public static float INBOUND_TRESHOLD = 0.8f;
     public static int ACTIVE_CACHE_SIZE = 5;
     public static int PASSIVE_CACHE_SIZE = 50;
+    // TODO: What to do when service is started? We really need to wait ~ REGULAR_UPDATE_INTERVAL * ACTIVE_CACHE_SIZE until activeCache is full in order to perform first createNewTimeslot? Can we do better?
     public static int REGULAR_UPDATE_INTERVAL = 60 * 1000; // ms, update interval, 60 * 1000, 150 * 1000, 120 * 1000
     public static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
     public static float INTERPOLATION_VARIANCE = 1.0f;
     private static String locationProviderType = LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
 
-    private LocationManager locationmanager;
-    public static Location mostRecentLocation = null;
-
     private DatabaseHelper dbHelper = null;
-    private boolean inBound = false;
+
+    private final LocalBinder binder = new LocalBinder();
+    private GoogleApiClient googleApiClient;
+    private LocationRequest locReq;
+
+    private List<TargetLocationArea> allTLAs = new ArrayList<TargetLocationArea>();
+    private TargetLocationArea inboundTLA;
+    public static Location mostRecentLocation = null;
     private int numberOfUpdates = 0;
-    private TargetLocationArea nearestTLA = null;
-    private List<TargetLocationArea> TLAs = new ArrayList<TargetLocationArea>();
-    private List<TargetLocationArea> inBoundTLAs = new ArrayList<TargetLocationArea>();
 
     @Override
     public boolean stopService(Intent name) {
@@ -72,7 +72,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         LocationService.mostRecentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locReq, this);
 
-        Toast.makeText(this, "Connected to GoogleApiClient.", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Connected to GoogleApiClient.", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -92,7 +92,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     }
 
-    // ServiceBinder: so activities and other classes can bind to this service
+    // ServiceBinder: Activities and other classes can bind to this service
     public class LocalBinder extends Binder {
         public LocationService getService() {
             return LocationService.this;
@@ -106,16 +106,25 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         googleApiClient.connect();
 
         return binder;
-        //throw new UnsupportedOperationException("Not yet implemented");
     }
-
 
     public void onCreate() {
         super.onCreate();
         getHelper(this);
-        //LocationCache.getInstance().setParameters(ACTIVE_CACHE_SIZE, PASSIVE_CACHE_SIZE, REGULAR_UPDATE_INTERVAL, INTERPOLATION_VARIANCE);
-        locationmanager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+        //locationmanager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        locReq = new LocationRequest();
+        locReq.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY); // PRIORITY_HIGH_ACCURACY
+        locReq.setInterval(LocationService.REGULAR_UPDATE_INTERVAL);
+        locReq.setFastestInterval(LocationService.FASTEST_UPDATE_INTERVAL);
+
+        // Setup statusbar notification to indicate running service
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent intent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
@@ -130,35 +139,17 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                 .setPriority(Notification.PRIORITY_MIN)
                 .build();
 
-        googleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-        locReq = new LocationRequest();
-        locReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); // make static
-        locReq.setInterval(LocationService.REGULAR_UPDATE_INTERVAL); // make static
-        locReq.setFastestInterval(LocationService.FASTEST_UPDATE_INTERVAL); // make static // or better same as setInterval() to have consistent locAlgorithm?
-
         startForeground(1337, notification);
-
-        //Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
-
-        // Retrieve stored locations from DB. Parameter is maxAge, a timestamp in milliseconds.
-        // All locations younger than maxAge are retrieved.
-        //List<Loc> locs = dbHelper.getLocs(System.currentTimeMillis() - REGULAR_UPDATE_INTERVAL * PASSIVE_CACHE_SIZE);
-        //CircularFifoQueue<Loc> test = LocationCache.getInstance().getPassiveCache();
     }
 
     @Override
     public void onDestroy() {
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-        googleApiClient.disconnect(); // does nothing if googleApiClient is already disconnected. So no need to check if already connected or not.
+        googleApiClient.disconnect();
+
+        // Stop statusbar notification
         stopForeground(true);
         IS_SERVICE_RUNNING = false;
-
-        //Toast.makeText(this, "Service terminated", Toast.LENGTH_LONG).show();
 
         // Store locs in DB in order to retrieve them when service is recreated soon and stored locs
         // aren't too old already.
@@ -171,70 +162,53 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         googleApiClient.connect();
+        getHelper(this);
+        allTLAs = dbHelper.getAllTLAs();
 
-        updateTLAs();
         IS_SERVICE_RUNNING = true;
         return Service.START_STICKY;
     }
 
-    // not used anymore
-    public boolean isNetworkEnabled() {
+    public boolean updateInboundTLA() {
+        TargetLocationArea newInboundTLA = null;
 
-        return this.locationmanager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-    }
-
-    public boolean isGPSEnabled() {
-        return this.locationmanager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-    }
-
-    public void updateTLAs() {
-        getHelper(this);
-        this.TLAs = dbHelper.getAllTLAs();
-    }
-
-    public void updateInBoundTLAs() {
-        inBoundTLAs.clear();
-
-        for (TargetLocationArea tla : TLAs) {
-            float prox = LocationCache.getInstance().getCurrentInBoundProxFor(tla);
-            if (prox > boundaryTreshold) {
-                inBoundTLAs.add(tla);
-                // break; if only one TLA can match a location
+        for (TargetLocationArea tla : allTLAs) {
+            float ratio = LocationCache.getInstance().getCurrentInBoundProxFor(tla);
+            // Trigger inbound zone event if ratio of #(inbound locations) to #(outbound locations)
+            // is greater than or equal to INBOUND_TRESHOLD.
+            if (ratio >= INBOUND_TRESHOLD) {
+                newInboundTLA = tla;
             }
         }
+
+        // Determine if a change happened. To do so we check for all cases in which newInboundTLA
+        // and inboundTLA are different (only one of them is null OR both have different IDs in the
+        // DB.)
+        if((newInboundTLA != null && inboundTLA == null) ||
+                (newInboundTLA == null && inboundTLA != null) ||
+                (newInboundTLA != null && inboundTLA != null && newInboundTLA.get_id() != inboundTLA.get_id())) {
+
+            inboundTLA = newInboundTLA;
+            return true;
+        }
+        return false;
     }
 
-    public void updateTLAsAndTimeslots() {
-        updateInBoundTLAs();
+    public void updateTimeslots() {
+        Timeslot openTimeslot = dbHelper.getOpenTimeslot();
 
-        // compare inBoundTLAs with "open" DB entries
-        List<Timeslot> unsealedTimeslots = dbHelper.getAllUnsealedTimeslots();
-        List<Timeslot> satisfiedTimeslots = new ArrayList<Timeslot>();
-
-        // start timeslots + retrieve timeslots which should get sealed
-        for (TargetLocationArea tla : inBoundTLAs) {
-            for (Timeslot ts : unsealedTimeslots) {
-                //if ((ts.getActivity().equals(tla.getActivityName())) && (ts.getLocation().equals(tla.getLocationName()))) {
-                if ((ts.getTLA().getActivityName().equals(tla.getActivityName())) && (ts.getTLA().getLocationName().equals(tla.getLocationName()))) {
-                    satisfiedTimeslots.add(ts);
-                    break;
-                    // match, no update required
-                }
-            }
-            int status = dbHelper.startNewTimeslot(getNormalizedTimestamp(), tla);
-            if (status == 1) {
-                GeneralHelper.showToast(this, "New Timeslot started");
+        // Start new Timeslot
+        if(openTimeslot == null && inboundTLA != null){
+            if (dbHelper.startNewTimeslot(getEventTimestamp(), inboundTLA) == 1) {
+                GeneralHelper.showToast(this, "New Timeslot started.");
             } else {
-                //GeneralHelper.showToast(this, "timeslot already exists");
+                GeneralHelper.showToast(this, "Timeslot already exists.");
             }
         }
 
-        // seal timeslots
-        unsealedTimeslots.removeAll(satisfiedTimeslots); // unsealedTimeslots ist jetzt List für unsatisfied Timeslots
-        for (Timeslot shouldSeal : unsealedTimeslots) {
-            int id = shouldSeal.get_id();
-            int status = dbHelper.sealThisTimeslot(id, getNormalizedTimestamp());
-            if (status == 1) {
+        // Close openTimeslot
+        if(openTimeslot != null && inboundTLA == null){
+            if (dbHelper.closeTimeslotById(openTimeslot.get_id(), getEventTimestamp()) == 1) {
                 GeneralHelper.showToast(this, "Timeslot sealed");
             } else {
                 GeneralHelper.showToast(this, "Error sealing timeslot in DB");
@@ -246,7 +220,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     public void handleLocationUpdate(Location loc) {
         Log.v(TAG, loc.getLatitude() + ", " + loc.getLongitude() + ", " + loc.getAccuracy());
 
-        Loc currentLoc = convertLocationToLoc(loc);
+        Loc currentLoc = Loc.convertLocationToLoc(loc);
         // Put loc in activeCache and passiveCache
         LocationCache.getInstance().addLocationUpdate(currentLoc);
         // Order is important: First update cache, then send broadcast because Broadcast-Receivers
@@ -254,27 +228,40 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         sendLocationUpdateViaBroadcast(loc.getLatitude(), loc.getLongitude(), loc.getAccuracy());
 
         numberOfUpdates++;
-        if ((numberOfUpdates % 2 == 0) && LocationCache.getInstance().isActiveCacheFull()) {
+
+        // Old apprach: Update TLAs and Timeslots every 2nd LocationUpdate.
+        /*if ((numberOfUpdates % 2 == 0) && LocationCache.getInstance().isActiveCacheFull()) {
             updateTLAsAndTimeslots();
+        }*/
+
+        // New approach: Update inboundTLA at every LocationUpdate unless activeCache doesn't contain
+        // 2 entries yet. If it was updated, also update Timeslots.
+        if(LocationCache.getInstance().getActiveCache().size() >= 2 &&
+                updateInboundTLA()){
+            updateTimeslots();
         }
     }
 
-    public static long getNormalizedTimestamp() {
-        return System.currentTimeMillis() - (long) (boundaryTreshold * ACTIVE_CACHE_SIZE * REGULAR_UPDATE_INTERVAL);
+    public static long getEventTimestamp() {
+        // Old approach: Substract static duration from current time and return result.
+        //return System.currentTimeMillis() - (long) (INBOUND_TRESHOLD * ACTIVE_CACHE_SIZE * REGULAR_UPDATE_INTERVAL);
+
+        // New approach: Location updates also will be received outside of REGULAR_UPDATE_INTERVAL.
+        // To take that into account, we lookup the stored Loc at indexOfInterest and return its timestamp.
+        // That should lead to a more accurate timestamp result.
+        CircularFifoQueue<Loc> activeCache = LocationCache.getInstance().getActiveCache();
+        int indexOfInterest = (int)(INBOUND_TRESHOLD * ACTIVE_CACHE_SIZE);
+        for(; indexOfInterest>=0; indexOfInterest--){
+            try {
+                return activeCache.get(indexOfInterest).getTimestampInMillis();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return -1;
     }
 
-    public Loc getInterpolatedPosition() {
-        return LocationCache.getInstance().getInterpolatedPosition();
-    }
-
-    public LatLng getInterpolatedPositionInLatLng() {
-        return new LatLng(
-                LocationCache.getInstance().getInterpolatedPosition().getLatitude(),
-                LocationCache.getInstance().getInterpolatedPosition().getLongitude()
-        );
-    }
-
-    // broadcast for timeslot events
+    // Broadcast for Timeslot events
     private void sendTimeslotEventViaBroadcast(int _id, String message, long timestamp, String activityName, String locationName) {
         Intent intent = new Intent("locationServiceTimeslotEvents");
         intent.putExtra("id", _id);
@@ -285,7 +272,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    // broadcast for locationUpdate events
+    // Broadcast for locationUpdate events
     private void sendLocationUpdateViaBroadcast(double lat, double lng, double accuracy){
         Intent intent = new Intent("locationServiceLocUpdateEvents");
         // message = "newTimeslotStarted"
@@ -295,37 +282,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    public static long getPastTimestampForBoundaryEvents(Loc loc){
-        //return loc.getTimestampInMillis() - (int)((ACTIVE_CACHE_SIZE-ACTIVE_CACHE_SIZE*boundaryTreshold) * LocationUpdater.timeBetweenMeasures);
-        return loc.getTimestampInMillis() - ACTIVE_CACHE_SIZE * REGULAR_UPDATE_INTERVAL;
-    }
-
-    public static Loc convertLocationToLoc(Location loc) {
-        Loc result;
-        long timeToPersist = System.currentTimeMillis();
-        result = new Loc(loc.getLatitude(), loc.getLongitude(), timeToPersist);
-        if (loc.getAccuracy() > 0.0) {
-            result.setAccuracyMultiplier(LocationCache._getAccuracyMultiplier(loc.getAccuracy()));
-        }
-        if (loc.hasAltitude()) {
-            result.setAltitude((int) loc.getAltitude());
-        }
-        if (loc.hasSpeed()) {
-            result.setSpeed((int) loc.getSpeed());
-        }
-        return result;
-    }
-
-    public static Loc convertLatLngToLoc(LatLng latLng) {
-        Loc result = null;
-        if ((latLng.latitude != 0) && (latLng.longitude != 0)) {
-            long currentTimeInMinutes = (System.currentTimeMillis());
-            result = new Loc(latLng.latitude, latLng.longitude, currentTimeInMinutes);
-        }
-        return result;
-    }
-
-    // kann man DatabaseHelper hier weglassen, und DatabaseHelper-Klasse direkt ansprechen? getHelper eigtl nur außerhalb von DatabaseHelper-Klasse zu benutzen
     private DatabaseHelper getHelper(Context context) {
         if (dbHelper == null) {
             dbHelper = OpenHelperManager.getHelper(context, DatabaseHelper.class);

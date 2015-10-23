@@ -232,12 +232,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int sealThisTimeslot(int id, long millis){
+    public int closeTimeslotById(int id, long millis){
         getTimeslotREDAO();
 
-        Timeslot toSeal = timeslotREDAO.queryForId(getAmountOfTimeslots());
-        toSeal.setEndtime(millis);
-        return timeslotREDAO.update(toSeal);
+        Timeslot toClose = timeslotREDAO.queryForId(id);
+        toClose.setEndtime(millis);
+        return timeslotREDAO.update(toClose);
     }
 
     public void _createSampleTLAs(){
@@ -364,20 +364,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return timeslots;
     }
 
-    public List<Timeslot> getAllUnsealedTimeslots(){
+    public Timeslot getOpenTimeslot(){
         getTimeslotREDAO();
-        List<Timeslot> unsealed = new ArrayList<Timeslot>();
 
         QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
         try{
             queryBuilder.where().eq("endtime", 0);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
-            unsealed = timeslotREDAO.query(preparedQuery);
-        } catch (SQLException e){
+            return timeslotREDAO.query(preparedQuery).get(0);
+        } catch (SQLException | IndexOutOfBoundsException e){
             e.printStackTrace();
         }
-
-        return unsealed;
+        return null;
     }
 
     public List<TargetLocationArea> getAllTLAs(){

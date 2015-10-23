@@ -1,6 +1,7 @@
 package de.mohoff.zeiterfassung.ui;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -99,6 +100,11 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Timeslot timeslot = data.get(position);
+
+        if(timeslot.getReadableEndTime().equals("pending") && timeslot.getReadableEndDate().equals("pending")){
+            holder.endTime.setTypeface(null, Typeface.ITALIC);
+            holder.endDate.setTypeface(null, Typeface.ITALIC);
+        }
 
         holder.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
         holder.icon.setImageResource(R.drawable.ic_action_edit_location);

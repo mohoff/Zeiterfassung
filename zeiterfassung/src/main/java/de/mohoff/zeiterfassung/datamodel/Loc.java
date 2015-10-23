@@ -1,5 +1,6 @@
 package de.mohoff.zeiterfassung.datamodel;
 
+import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -109,6 +110,31 @@ public class Loc implements Parcelable{  //, daoClass = Loc.class)
         LatLngBounds bounds = boundBilder.build();
 
         return CameraUpdateFactory.newLatLngBounds(bounds, padding);
+    }
+
+    public static Loc convertLocationToLoc(Location loc) {
+        Loc result;
+        long timeToPersist = System.currentTimeMillis();
+        result = new Loc(loc.getLatitude(), loc.getLongitude(), timeToPersist);
+        if (loc.getAccuracy() > 0.0) {
+            result.setAccuracyMultiplier(LocationCache._getAccuracyMultiplier(loc.getAccuracy()));
+        }
+        if (loc.hasAltitude()) {
+            result.setAltitude((int) loc.getAltitude());
+        }
+        if (loc.hasSpeed()) {
+            result.setSpeed((int) loc.getSpeed());
+        }
+        return result;
+    }
+
+    public static Loc convertLatLngToLoc(LatLng latLng) {
+        Loc result = null;
+        if ((latLng.latitude != 0) && (latLng.longitude != 0)) {
+            long currentTimeInMinutes = (System.currentTimeMillis());
+            result = new Loc(latLng.latitude, latLng.longitude, currentTimeInMinutes);
+        }
+        return result;
     }
 
     public double getLatitude() {

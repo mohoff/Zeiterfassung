@@ -107,7 +107,7 @@
                 android:layout_height="fill_parent"
                 android:orientation="vertical">
                 <TextView
-                    android:id="@+id/startTime"
+                    android:id="@+id/endTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -132,7 +132,7 @@
                     android:paddingBottom="6dp"
                     android:textSize="12sp"/>
                 <TextView
-                    android:id="@+id/endTime"
+                    android:id="@+id/startTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
@@ -150,7 +150,7 @@
                 <View
                     android:layout_height="fill_parent"
                     android:layout_width="2dp"
-                    android:layout_below="@id/startTime"
+                    android:layout_below="@id/endTime"
                     android:layout_above="@id/duration"
                     android:layout_centerHorizontal="true"
                     android:background="@color/greenish_100"/>
@@ -166,7 +166,7 @@
                     android:layout_height="fill_parent"
                     android:layout_width="2dp"
                     android:layout_below="@id/duration"
-                    android:layout_above="@id/endTime"
+                    android:layout_above="@id/startTime"
                     android:layout_centerHorizontal="true"
                     android:background="@color/grey_50"/>
                 <View
@@ -181,7 +181,7 @@
 
     <!-- start date -->
     <TextView
-        android:id="@+id/startDate"
+        android:id="@+id/endDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top"
@@ -196,7 +196,7 @@
         android:background="@color/greenish_50"/>
     <!-- end date -->
     <TextView
-        android:id="@+id/endDate"
+        android:id="@+id/startDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
