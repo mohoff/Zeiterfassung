@@ -64,6 +64,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     @Override
     public boolean stopService(Intent name) {
+        sendServiceEventViaBroadcast("stop");
         return super.stopService(name);
     }
 
@@ -166,6 +167,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         allTLAs = dbHelper.getAllTLAs();
 
         IS_SERVICE_RUNNING = true;
+        sendServiceEventViaBroadcast("start");
         return Service.START_STICKY;
     }
 
@@ -279,6 +281,13 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         intent.putExtra("lat", String.valueOf(lat));
         intent.putExtra("lng", String.valueOf(lng));
         intent.putExtra("accuracy", String.valueOf(accuracy));
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    // Broadcast for locationUpdate events
+    private void sendServiceEventViaBroadcast(String eventtype){
+        Intent intent = new Intent("serviceEventUpdate");
+        intent.putExtra("type", eventtype);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

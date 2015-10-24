@@ -16,6 +16,7 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import java.util.ArrayList;
 
+import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
@@ -26,15 +27,10 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private ArrayList<Timeslot> data = new ArrayList<Timeslot>();
     private int lastPosition = 99999;
     private Context context;
-    private boolean isServiceRunning = false;
+    //private boolean isServiceRunning = false;
 
     private final static int VIEWTYPE_NORMAL = 1;
     private final static int VIEWTYPE_SERVICEINFO = 2;
-
-    public void setIsServiceRunning(boolean isRunning){
-        isServiceRunning = isRunning;
-    }
-
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -142,7 +138,8 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        if (!isServiceRunning && position == getItemCount()-1) {
+
+        if (!((MainActivity)context).serviceStatus.get() && position == getItemCount()-1) {
             return VIEWTYPE_SERVICEINFO;
         } else {
             return VIEWTYPE_NORMAL;
@@ -163,7 +160,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        if(!isServiceRunning){
+        if(!((MainActivity)context).serviceStatus.get()){
             return data.size() + 1;
         } else {
             return data.size();

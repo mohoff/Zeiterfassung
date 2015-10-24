@@ -1,6 +1,7 @@
 package de.mohoff.zeiterfassung;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -189,5 +190,15 @@ public class GeneralHelper {
         et.setLayoutParams(params);
         container.addView(et);
         return container;
+    }
+
+    public static boolean isLocationServiceRunning(Context context){
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if ("LocationService".equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

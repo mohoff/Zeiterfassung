@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import de.mohoff.zeiterfassung.locationservice.ServiceChangeListener;
 import de.mohoff.zeiterfassung.locationservice.TimeslotEventListener;
 import de.mohoff.zeiterfassung.ui.AdapterOverview;
 import de.mohoff.zeiterfassung.ui.MainActivity;
@@ -18,7 +19,7 @@ import de.mohoff.zeiterfassung.ui.MyItemAnimator;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
 
-public class Overview extends Fragment implements TimeslotEventListener, NavigationDrawerListener{
+public class Overview extends Fragment implements TimeslotEventListener, ServiceChangeListener{
     MainActivity parentActivity;
     AdapterOverview adapter;
     RecyclerView recList;
@@ -71,7 +72,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Navigat
 
         // Set listeners
         parentActivity.setOnTimeslotEventListener(this);
-        parentActivity.setNavigationDrawerListener(this);
+        parentActivity.serviceStatus.addListener(this);
 
         // Update adapter model and update UI
         adapter.updateData();
@@ -84,7 +85,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Navigat
 
         // Remove listeners
         parentActivity.removeOnTimeslotEventListener();
-        parentActivity.removeNavigationDrawerListener();
+        parentActivity.serviceStatus.removeListener(this);
     }
 
     private void updateFirstCardPeriodically() {
@@ -112,7 +113,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Navigat
         // Thus the only action is to notify the adapter that an item is added.
         adapter.notifyItemInserted(adapter.getItemCount()-1);
         // Give visual feedback that a new item has beed added.
-        recList.scrollToPosition(adapter.getItemCount()-1);
+        recList.scrollToPosition(adapter.getItemCount() - 1);
     }
 
     @Override
@@ -122,6 +123,11 @@ public class Overview extends Fragment implements TimeslotEventListener, Navigat
     }
 
     @Override
+    public void onServiceStatusEvent(boolean isRunning) {
+        adapter.notifyDataSetChanged();
+    }
+
+    /*@Override
     public void StartButtonClicked() {
         // TODO: when click start->stop often repeatedly, it gets async. To fix.
         adapter.setIsServiceRunning(true);
@@ -137,9 +143,5 @@ public class Overview extends Fragment implements TimeslotEventListener, Navigat
             recList.scrollToPosition(0);
         }
     }
-
-    @Override
-    public void onItemSelected(View view, int position) {
-
-    }
+    */
 }

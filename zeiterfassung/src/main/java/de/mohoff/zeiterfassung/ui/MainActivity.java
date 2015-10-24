@@ -33,6 +33,7 @@ import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.locationservice.LocationService;
+import de.mohoff.zeiterfassung.locationservice.LocationServiceStatus;
 import de.mohoff.zeiterfassung.locationservice.TimeslotEventListener;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerAdapter;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
@@ -85,21 +86,14 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     //private LocationService service;
     private LocationServiceConnection lsc = null;
     //private MainActivity refThis = this;
-    private boolean isServiceRunning = false;
+    //public boolean isServiceRunning = false;
+    public LocationServiceStatus serviceStatus;
 
     // listener for MapLive fragment
     // When fragment is active, it can update its map on new locations instantly
     private LocationChangeListener newLocationListener;
     private TimeslotEventListener newTimeslotEventListener;
 
-    private NavigationDrawerListener navDrawerListener;
-
-    public void setNavigationDrawerListener(NavigationDrawerListener listen) {
-        navDrawerListener = listen;
-    }
-    public void removeNavigationDrawerListener() {
-        navDrawerListener = null;
-    }
     public void setOnNewLocationListener(LocationChangeListener listen) {
         newLocationListener = listen;
     }
@@ -194,6 +188,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             }
         }));
 
+        buttonStartService = (Button) findViewById(R.id.buttonStartService);
+        buttonStopService = (Button) findViewById(R.id.buttonStopService);
 
         /*
         // TODO: remove "locs" from savedInstanceState when MapLive-fragment is destroyed?!
@@ -216,29 +212,23 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         // TODO: Check if it also needs to be called in onCreate() of LocationService.
         GeneralHelper.setupLocationCache(dbHelper);
 
-
         // Show overview at initial app start
         if(savedInstanceState == null){
             selectItem(0);
         }
 
-        buttonStartService = (Button) findViewById(R.id.buttonStartService);
-        buttonStopService = (Button) findViewById(R.id.buttonStopService);
+        serviceStatus = new LocationServiceStatus();
 
-        if(isMyServiceRunning(LocationService.class)){
-            isServiceRunning = true;
-        }
         updateServiceButtons();
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(timeslotReceiver,
+        LocalBroadcastManager.getInstance(this).registerReceiver(timeslotEventReceiver,
                 new IntentFilter("locationServiceTimeslotEvents"));
-        LocalBroadcastManager.getInstance(this).registerReceiver(locUpdateReceiver,
+        LocalBroadcastManager.getInstance(this).registerReceiver(locUpdateEventReceiver,
                 new IntentFilter("locationServiceLocUpdateEvents"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
+                new IntentFilter("serviceEventUpdate"));
 
         sdf = new SimpleDateFormat("dd.MM.yyyy - HH:mm");
-
-        //int result = getDbHelper().deleteAllTLAs();
-        //int bla = 0;
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -255,7 +245,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         boolean bindResult;
         // Calling startService() first prevents it from being killed on unbind()
         if(startService(new Intent(MainActivity.this, LocationService.class)) != null){
-            isServiceRunning = true;
+            serviceStatus.set(true);
+            //isServiceRunning = true;
             updateServiceButtons();
 
             bindResult = bindLocationService();
@@ -275,7 +266,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         }*/
 
         stopService(new Intent(MainActivity.this, LocationService.class));
-        isServiceRunning = false;
+        serviceStatus.set(false);
+        //isServiceRunning = false;
         updateServiceButtons();
     }
 
@@ -319,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     }
 
     private void updateServiceButtons(){
-        if(isServiceRunning){
+        if(serviceStatus.get()){
             // manage start button
             buttonStartService.getBackground().setColorFilter(getResources().getColor(R.color.grey_25), PorterDuff.Mode.MULTIPLY);
             buttonStartService.setEnabled(false);
@@ -333,9 +325,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 public void onClick(View v) {
                     // stop location service
                     StopButtonClicked();
-                    if (navDrawerListener != null) {
-                       navDrawerListener.StopButtonClicked();
-                    }
+                    //if (navDrawerListener != null) {
+                    //  navDrawerListener.StopButtonClicked();
+                    //}
                 }
             });
         } else {
@@ -347,9 +339,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 public void onClick(View v) {
                     // start and connect to location service
                     StartButtonClicked();
-                    if (navDrawerListener != null) {
-                        navDrawerListener.StartButtonClicked();
-                    }
+                    //if (navDrawerListener != null) {
+                    //    navDrawerListener.StartButtonClicked();
+                    //}
                 }
             });
             // manage stop button
@@ -366,14 +358,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     }
 
     private void selectItem(int position) {
-        // update the main content by replacing fragments
+        // Update the main content by replacing fragments
         nextFragment = new Fragment();
         nextFragmentAvailable = true;
-
-        // pass arguments to fragment
-        /*Bundle args = new Bundle();
-        args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
-        fragment.setArguments(args);*/
 
         switch(position) {
             case 0:
@@ -394,11 +381,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         }
 
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            // user selected other fragment from drawer.
+            // User selected other fragment from drawer.
             // new fragment is loaded in onDrawerClosed()
             drawerLayout.closeDrawer(leftDrawer);
         } else {
-            // display inital fragment after app start
+            // Display initial fragment after app start
             replaceFragment(nextFragment, false);
         }
     }
@@ -438,12 +425,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         }
     }
 
-    /*private void replaceFragment(Fragment nextFragment){
-        fragM.beginTransaction()
-                .replace(R.id.content_frame, nextFragment)
-                .commit();
-    }*/
-
     public void replaceFragment(Fragment fragment, boolean addToBackStack){
         String backStateName = fragment.getClass().getName();
         String fragmentTag = backStateName;
@@ -480,15 +461,16 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             dbHelper = null;
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(timeslotReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(locUpdateReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(timeslotEventReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(locUpdateEventReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceEventReceiver);
 
         unbindLocationService();
         super.onDestroy();
     }
 
     // BroadcastReceiver, which receives Events from LocationService, such as "newTimeslotStarted" as message
-    private BroadcastReceiver timeslotReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver timeslotEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
@@ -504,7 +486,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             }
         }
     };
-    private BroadcastReceiver locUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver locUpdateEventReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
@@ -517,14 +499,20 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             if (newLocationListener != null) {
                 newLocationListener.onNewLocation(newLocation);
             }
-            // GEHT NOCH NICHT, mapFragment ist jedes mal NULL
-            //getFragmentManager().executePendingTransactions();
-            //MapLive mapFragment = (MapLive)getFragmentManager().findFragmentByTag("MAP");
-            //if (mapFragment.isVisible()) {
-            //    mapFragment.drawLocationUpdate(new Loc(lat, lng, accuracy));
-            //}
         }
     };
+    private BroadcastReceiver serviceEventReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String receivedMessage = intent.getStringExtra("type");
+            if(receivedMessage.equals("start")){
+                serviceStatus.set(true);
+            } else if(receivedMessage.equals("stop")){
+                serviceStatus.set(false);
+            }
+        }
+    };
+
 
     @Override
     protected void onResume() {
@@ -603,6 +591,10 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         public void onClick(View view, int position);
         public void onLongClick(View view, int position);
     }
+
+
+
+
 
     static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
         private GestureDetector gestureDetector;
