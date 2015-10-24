@@ -53,7 +53,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
         this.context = (MainActivity)context;
     }
 
-    // Activity ViewHolder (outer holder)
+    // Activity ViewHolderItem (outer holder)
     public static class ActViewHolder extends RecyclerView.ViewHolder {
         TextView activityName;
         RecyclerView recyclerView;
@@ -67,7 +67,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    // Location ViewHolder (inner holder)
+    // Location ViewHolderItem (inner holder)
     public static class LocViewHolder extends RecyclerView.ViewHolder {
         public TextView locationName;
         public ImageButton repinButton;
@@ -81,7 +81,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    // AddButton ViewHolder (for outer and inner)
+    // AddButton ViewHolderItem (for outer and inner)
     public static class AddHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         ImageButton addButton;

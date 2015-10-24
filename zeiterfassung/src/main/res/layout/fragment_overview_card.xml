@@ -8,7 +8,8 @@
     card_view:cardElevation="2dp"
     card_view:cardUseCompatPadding="true"
     card_view:cardBackgroundColor="#fff"
-    android:layout_marginTop="5dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
     android:layout_marginLeft="5dp"
     android:layout_marginRight="5dp"
     android:padding="0dp">

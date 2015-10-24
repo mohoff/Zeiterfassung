@@ -90,8 +90,29 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     // listener for MapLive fragment
     // When fragment is active, it can update its map on new locations instantly
     private LocationChangeListener newLocationListener;
-
     private TimeslotEventListener newTimeslotEventListener;
+
+    private NavigationDrawerListener navDrawerListener;
+
+    public void setNavigationDrawerListener(NavigationDrawerListener listen) {
+        navDrawerListener = listen;
+    }
+    public void removeNavigationDrawerListener() {
+        navDrawerListener = null;
+    }
+    public void setOnNewLocationListener(LocationChangeListener listen) {
+        newLocationListener = listen;
+    }
+    public void setOnTimeslotEventListener(TimeslotEventListener listen) {
+        newTimeslotEventListener = listen;
+    }
+    public void removeOnNewLocationListener() {
+        newLocationListener = null;
+    }
+    public void removeOnTimeslotEventListener() {
+        newTimeslotEventListener = null;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -312,9 +333,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 public void onClick(View v) {
                     // stop location service
                     StopButtonClicked();
-                    //if (navDrawerListener != null) {
-                    //   navDrawerListener.StopButtonClicked();
-                    //}
+                    if (navDrawerListener != null) {
+                       navDrawerListener.StopButtonClicked();
+                    }
                 }
             });
         } else {
@@ -326,9 +347,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 public void onClick(View v) {
                     // start and connect to location service
                     StartButtonClicked();
-                    //if (navDrawerListener != null) {
-                    //    navDrawerListener.StartButtonClicked();
-                    //}
+                    if (navDrawerListener != null) {
+                        navDrawerListener.StartButtonClicked();
+                    }
                 }
             });
             // manage stop button
@@ -560,14 +581,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         outState.putParcelableArrayList("locs", locsTmp);
         */
         super.onSaveInstanceState(outState);
-    }
-
-    public void setOnNewLocationListener(LocationChangeListener listen) {
-        newLocationListener = listen;
-    }
-
-    public void setOnTimeslotEventListener(TimeslotEventListener listen) {
-        newTimeslotEventListener = listen;
     }
 
     private ArrayList<String> getListItems(){

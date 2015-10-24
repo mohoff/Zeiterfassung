@@ -19,17 +19,27 @@ import java.util.ArrayList;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
+import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
 
-public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHolder> {
+public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private DatabaseHelper dbHelper = null;
     private ArrayList<Timeslot> data = new ArrayList<Timeslot>();
     private int lastPosition = 99999;
     private Context context;
+    private boolean isServiceRunning = false;
+
+    private final static int VIEWTYPE_NORMAL = 1;
+    private final static int VIEWTYPE_SERVICEINFO = 2;
+
+    public void setIsServiceRunning(boolean isRunning){
+        isServiceRunning = isRunning;
+    }
+
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolderItem extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         public CardView container;
         public ImageView icon;
@@ -39,7 +49,7 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
         public TextView duration;
         public TextView endTime, endDate;
 
-        public ViewHolder(View v){
+        public ViewHolderItem(View v){
             super(v);
             this.container = (CardView) v.findViewById(R.id.card_view);
             this.icon = (ImageView) v.findViewById(R.id.icon);
@@ -50,6 +60,13 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
             this.duration = (TextView) v.findViewById(R.id.duration);
             this.endTime = (TextView) v.findViewById(R.id.endTime);
             this.endDate = (TextView) v.findViewById(R.id.endDate);
+        }
+    }
+
+    public static class ViewHolderServiceInfo extends RecyclerView.ViewHolder {
+        // public ImageButton dismissButton;
+        public ViewHolderServiceInfo(View v){
+            super(v);
         }
     }
 
@@ -80,43 +97,56 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
 
     // Create new views (invoked by the layout manager)
     @Override
-    public AdapterOverview.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).
-        inflate(R.layout.fragment_overview_card, parent, false);
-        return new ViewHolder(itemView);
-
-        /*
-            // create a new view
-            View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.my_text_view, parent, false);
-            // set the view's size, margins, paddings and layout parameters
-            ...
-            ViewHolder vh = new ViewHolder(v);
-            return vh;
-        */
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if(viewType == VIEWTYPE_NORMAL){
+            View itemView = LayoutInflater.from(parent.getContext()).
+                    inflate(R.layout.fragment_overview_card, parent, false);
+            return new ViewHolderItem(itemView);
+        }
+        if(viewType == VIEWTYPE_SERVICEINFO){
+            View itemView = LayoutInflater.from(parent.getContext()).
+                    inflate(R.layout.fragment_overview_card_serviceinfo, parent, false);
+            return new ViewHolderServiceInfo(itemView);
+        }
+        return null;
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Timeslot timeslot = data.get(position);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        //position = isServiceRunning ? position : position-1;
+        if(holder.getItemViewType() == VIEWTYPE_NORMAL) {
+            ViewHolderItem vh = (ViewHolderItem) holder;
+            Timeslot timeslot = data.get(position);
 
-        if(timeslot.getReadableEndTime().equals("pending") && timeslot.getReadableEndDate().equals("pending")){
-            holder.endTime.setTypeface(null, Typeface.ITALIC);
-            holder.endDate.setTypeface(null, Typeface.ITALIC);
+            if(timeslot.getReadableEndTime().equals("pending") && timeslot.getReadableEndDate().equals("pending")){
+                vh.endTime.setTypeface(null, Typeface.ITALIC);
+                vh.endDate.setTypeface(null, Typeface.ITALIC);
+            }
+
+            vh.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
+            vh.icon.setImageResource(R.drawable.ic_action_edit_location);
+            vh.activity.setText(timeslot.getTLA().getActivityName());
+            vh.location.setText(timeslot.getTLA().getLocationName());
+            vh.startTime.setText(timeslot.getReadableStartTime());
+            vh.startDate.setText(timeslot.getReadableStartDate());
+            vh.endTime.setText(timeslot.getReadableEndTime());
+            vh.endDate.setText(timeslot.getReadableEndDate());
+            vh.duration.setText(timeslot.getReadableDuration()); // e.g. "1d 2h 14min"
+
+            //setAnimation(vh.container, position);
+        } else if(holder.getItemViewType() == VIEWTYPE_SERVICEINFO){
+            // set dismiss action for dismissButton
         }
+    }
 
-        holder.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
-        holder.icon.setImageResource(R.drawable.ic_action_edit_location);
-        holder.activity.setText(timeslot.getTLA().getActivityName());
-        holder.location.setText(timeslot.getTLA().getLocationName());
-        holder.startTime.setText(timeslot.getReadableStartTime());
-        holder.startDate.setText(timeslot.getReadableStartDate());
-        holder.endTime.setText(timeslot.getReadableEndTime());
-        holder.endDate.setText(timeslot.getReadableEndDate());
-        holder.duration.setText(timeslot.getReadableDuration()); // e.g. "1d 2h 14min"
-
-        setAnimation(holder.container, position);
+    @Override
+    public int getItemViewType(int position) {
+        if (!isServiceRunning && position == getItemCount()-1) {
+            return VIEWTYPE_SERVICEINFO;
+        } else {
+            return VIEWTYPE_NORMAL;
+        }
     }
 
     private void setAnimation(View viewToAnimate, int position) {
@@ -133,7 +163,11 @@ public class AdapterOverview extends RecyclerView.Adapter<AdapterOverview.ViewHo
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return data.size();
+        if(!isServiceRunning){
+            return data.size() + 1;
+        } else {
+            return data.size();
+        }
     }
 
     private DatabaseHelper getDbHelper(Context context) {

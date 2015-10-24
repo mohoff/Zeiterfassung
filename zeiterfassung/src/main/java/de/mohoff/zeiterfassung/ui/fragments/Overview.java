@@ -16,11 +16,13 @@ import de.mohoff.zeiterfassung.ui.AdapterOverview;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 import de.mohoff.zeiterfassung.ui.MyItemAnimator;
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
 
-public class Overview extends Fragment implements TimeslotEventListener{
+public class Overview extends Fragment implements TimeslotEventListener, NavigationDrawerListener{
     MainActivity parentActivity;
     AdapterOverview adapter;
     RecyclerView recList;
+    LinearLayoutManager llm;
 
     public Overview() {
         // Required empty public constructor
@@ -50,7 +52,7 @@ public class Overview extends Fragment implements TimeslotEventListener{
         //recList.setItemAnimator(new MyItemAnimator());
         recList.setItemAnimator(null);
 
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         llm.setReverseLayout(true);
         llm.setStackFromEnd(true);
@@ -67,11 +69,22 @@ public class Overview extends Fragment implements TimeslotEventListener{
     public void onResume() {
         super.onResume();
 
-        parentActivity.setOnTimeslotEventListener(this); // set listener
+        // Set listeners
+        parentActivity.setOnTimeslotEventListener(this);
+        parentActivity.setNavigationDrawerListener(this);
 
         // Update adapter model and update UI
         adapter.updateData();
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // Remove listeners
+        parentActivity.removeOnTimeslotEventListener();
+        parentActivity.removeNavigationDrawerListener();
     }
 
     private void updateFirstCardPeriodically() {
@@ -106,5 +119,27 @@ public class Overview extends Fragment implements TimeslotEventListener{
     public void onTimeslotSealed(int id) {
         // Only most recent Timeslot can be possibly sealed. For that the item position is known anytime.
         adapter.notifyItemChanged(adapter.getItemCount()-1);
+    }
+
+    @Override
+    public void StartButtonClicked() {
+        // TODO: when click start->stop often repeatedly, it gets async. To fix.
+        adapter.setIsServiceRunning(true);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void StopButtonClicked() {
+        adapter.setIsServiceRunning(false);
+        adapter.notifyDataSetChanged();
+        // TODO: below not working yet.
+        if(llm.findFirstVisibleItemPosition() > (adapter.getItemCount()-3)){
+            recList.scrollToPosition(0);
+        }
+    }
+
+    @Override
+    public void onItemSelected(View view, int position) {
+
     }
 }
