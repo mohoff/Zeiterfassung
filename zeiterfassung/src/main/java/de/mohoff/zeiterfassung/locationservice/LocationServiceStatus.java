@@ -3,7 +3,11 @@ package de.mohoff.zeiterfassung.locationservice;
 import java.util.ArrayList;
 
 /**
- * Created by moo on 10/24/15.
+ * LocationServiceStatus serves as wrapper for a boolean variable which keeps
+ * track of the background service LocationService. Apart from a getter and setter,
+ * this class also provides listener management. The used ServiceChangeListener will
+ * be called when the service status changes. All registered classes can receive
+ * such an event now.
  */
 public class LocationServiceStatus {
     private boolean isServiceRunning;

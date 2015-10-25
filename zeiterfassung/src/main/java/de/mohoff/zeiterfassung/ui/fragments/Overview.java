@@ -2,6 +2,7 @@ package de.mohoff.zeiterfassung.ui.fragments;
 
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -113,6 +114,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         // Thus the only action is to notify the adapter that an item is added.
         adapter.notifyItemInserted(adapter.getItemCount()-1);
         // Give visual feedback that a new item has beed added.
+        // TODO: Does the following this work?
         recList.scrollToPosition(adapter.getItemCount() - 1);
     }
 
@@ -125,6 +127,21 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
     @Override
     public void onServiceStatusEvent(boolean isRunning) {
         adapter.notifyDataSetChanged();
+        if(!isRunning){
+            // Because a reverse layout is used, the most upper card has index n and
+            // the card at the bottom of the list has index 0. Taking screen height
+            // into account, firstVisible is approx. n-4 by default.
+            // The list will be scrolled top when current scroll position is not too far
+            // away from the very top.
+
+            // findFirstVisibleItemPosition() returns first (partly) item position
+            int firstVisible = llm.findFirstVisibleItemPosition();
+            int itemCount = adapter.getItemCount();
+            if(firstVisible > itemCount-10){
+                //recList.scrollToPosition(itemCount-1);
+                recList.smoothScrollToPosition(itemCount-1);
+            }
+        }
     }
 
     /*@Override

@@ -217,7 +217,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             selectItem(0);
         }
 
+        // Initialize LocationServiceStatus and sync its state with the LocationService
         serviceStatus = new LocationServiceStatus();
+        serviceStatus.set(LocationService.IS_SERVICE_RUNNING);
 
         updateServiceButtons();
 
@@ -229,16 +231,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 new IntentFilter("serviceEventUpdate"));
 
         sdf = new SimpleDateFormat("dd.MM.yyyy - HH:mm");
-    }
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void startAndBindToLocationService() {
@@ -259,16 +251,15 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     }
 
     public void unbindAndStopLocationService(){
-        unbindLocationService();
-        /*if(stopService(new Intent(MainActivity.this, LocationService.class))){
-            isServiceRunning = false;
-            updateServiceButtons();
-        }*/
+        // The order of following executed lines is debatable. I value UI
+        // responsiveness over waiting for stopService call. Since stopService
+        // does not provide any feedback about its success, I prefer UI feedback
+        // first.
 
-        stopService(new Intent(MainActivity.this, LocationService.class));
         serviceStatus.set(false);
-        //isServiceRunning = false;
         updateServiceButtons();
+        unbindLocationService();
+        stopService(new Intent(MainActivity.this, LocationService.class));
     }
 
     private boolean bindLocationService(){
@@ -282,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     }
 
     public void unbindLocationService(){
-        // it's ok when service is already unbound
+        // It's ok when service is already unbound
         if(lsc != null){
             unbindService(lsc);
             lsc = null;

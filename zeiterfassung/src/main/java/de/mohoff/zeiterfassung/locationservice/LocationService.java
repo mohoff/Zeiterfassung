@@ -41,7 +41,7 @@ import de.mohoff.zeiterfassung.ui.MainActivity;
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String TAG = LocationService.class.getSimpleName();
 
-    private static boolean IS_SERVICE_RUNNING = false; // not used right now
+    public static boolean IS_SERVICE_RUNNING = false; // not used right now
     public static float INBOUND_TRESHOLD = 0.8f;
     public static int ACTIVE_CACHE_SIZE = 5;
     public static int PASSIVE_CACHE_SIZE = 50;
