@@ -28,6 +28,8 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
@@ -61,6 +63,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private TargetLocationArea inboundTLA;
     public static Location mostRecentLocation = null;
     private int numberOfUpdates = 0;
+
+    private LocationUpdateTimer locUpdateTimerTask = new LocationUpdateTimer();
+    private Timer timer = new Timer();
 
     @Override
     public boolean stopService(Intent name) {
@@ -175,7 +180,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         TargetLocationArea foundInboundTLA = null;
 
         for (TargetLocationArea tla : allTLAs) {
-            float ratio = LocationCache.getInstance().getCurrentInBoundProxFor(tla);
+            float ratio = LocationCache.getInstance().getCurrentInBoundProxFor2(tla);
             // Trigger inbound zone event if ratio of #(inbound locations) to #(outbound locations)
             // is greater than or equal to INBOUND_TRESHOLD.
             if (ratio >= INBOUND_TRESHOLD) {
@@ -192,11 +197,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                                                                     // leave AND enter event (inbound1 --> inbound2)
 
             inboundTLA = foundInboundTLA;
-            // 'True' indicates the calling function that a change was detected
+            // 'True' indicates the calling function that a change was detected.
             // An enter- or a leave-event happened.
             return true;
         }
-        // 'False' indicates the calling function that no change was detected
+        // 'False' indicates the calling function that no change was detected.
         // Neither an enter- nor a leave-event happened.
         return false;
     }
@@ -251,7 +256,18 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                 updateInboundTLA()){
             updateTimeslots();
         }
+
+        timer.cancel();
+        timer.schedule(locUpdateTimerTask, REGULAR_UPDATE_INTERVAL * 3);
     }
+
+    private class LocationUpdateTimer extends TimerTask {
+        public void run(){
+            // set marker on map that connection interruption because no more
+            // location updates are received and timer exceeded.
+        }
+    }
+
 
     public static long getEventTimestamp() {
         // Old approach: Substract static duration from current time and return result.

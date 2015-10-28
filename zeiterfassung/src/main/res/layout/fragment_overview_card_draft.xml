@@ -15,10 +15,10 @@
         android:layout_height="wrap_content"
         card_view:cardCornerRadius="4dp"
         card_view:cardElevation="2dp"
-        card_view:cardUseCompatPadding="true"
+        card_view:cardUseCompatPadding="false"
         card_view:cardBackgroundColor="#fff"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:padding="0dp">
@@ -238,13 +238,13 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="8dp"
                 android:background="@color/greenish"/>
-            <View
+           <!-- <View
                 android:layout_height="14dp"
                 android:layout_width="8dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignLeft="@id/topFillPart"
                 android:layout_marginTop="-14dp"
-                android:background="@drawable/overview_connector_gradient"/>
+                android:background="@drawable/overview_connector_gradient"/>-->
             <View
                 android:layout_height="12dp"
                 android:layout_width="12dp"
@@ -278,7 +278,17 @@
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 
-
+    <View
+        android:layout_height="14dp"
+        android:layout_width="8dp"
+        android:id="@+id/middleConnectorPart"
+        android:clickable="true"
+        android:focusableInTouchMode="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@id/card_view"
+        android:layout_marginRight="11.2dp"
+        android:background="@drawable/overview_connector_gradient"
+        android:visibility="invisible"/>
 
     <!--
     <View

@@ -159,16 +159,21 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         /* Following snippet is a workaround for an error which leads to an inflate exception because
            the wrapping fragment can't contain another fragment, MapFragment in this case.
            We use the FragmentManager to remove the MapFragment manually from the parent view so that
            the parent view can be inflated properly with a new MapFragment.
          */
-        Fragment fragment = (getFragmentManager().findFragmentById(R.id.map));
-        FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
-        ft.remove(fragment);
-        ft.commit();
+        try {
+            Fragment fragment = (getFragmentManager().findFragmentById(R.id.map));
+            FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+            ft.remove(fragment);
+            ft.commit();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
+        super.onDestroyView();
     }
 
     @Override

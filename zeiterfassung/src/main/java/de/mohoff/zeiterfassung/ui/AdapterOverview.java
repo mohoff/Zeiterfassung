@@ -47,7 +47,8 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public TextView duration;
         public TextView endTime, endDate;
 
-        public RelativeLayout topConnectorPart, bottomConnectorPart;
+        //public RelativeLayout topConnectorPart, bottomConnectorPart;
+        //public View middleConnectorPart;
 
         public ViewHolderItem(View v){
             super(v);
@@ -61,8 +62,9 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             this.endTime = (TextView) v.findViewById(R.id.endTime);
             this.endDate = (TextView) v.findViewById(R.id.endDate);
 
-            this.topConnectorPart = (RelativeLayout) v.findViewById(R.id.topConnectorPart);
-            this.bottomConnectorPart = (RelativeLayout) v.findViewById(R.id.bottomConnectorPart);
+            //this.topConnectorPart = (RelativeLayout) v.findViewById(R.id.topConnectorPart);
+            //this.bottomConnectorPart = (RelativeLayout) v.findViewById(R.id.bottomConnectorPart);
+            //this.middleConnectorPart = (View) v.findViewById(R.id.middleConnectorPart);
         }
     }
 
@@ -103,7 +105,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if(viewType == VIEWTYPE_NORMAL){
             View itemView = LayoutInflater.from(parent.getContext()).
-                    inflate(R.layout.fragment_overview_card_draft, parent, false);
+                    inflate(R.layout.fragment_overview_card, parent, false);
             return new ViewHolderItem(itemView);
         }
         if(viewType == VIEWTYPE_SERVICEINFO){
@@ -140,34 +142,26 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             vh.endDate.setText(timeslot.getReadableEndDate());
             vh.duration.setText(timeslot.getReadableDuration()); // e.g. "1d 2h 14min"
 
-            // Show or hide top connector part of that view
+            /*// Show or hide top connector part of that view
             if(listHasItemAtIndex(position+1) && (data.get(position+1).getTLA().get_id() == timeslot.getTLA().get_id())){
                 vh.topConnectorPart.setVisibility(View.VISIBLE);
-                //vh.topConnectorPart.setOnClickListener(getOnMergeClickListener());
-                for(int i=0; i<vh.topConnectorPart.getChildCount(); i++){
-                    vh.topConnectorPart.getChildAt(i).setOnClickListener(getOnMergeClickListener());
-                }
-                //vh.topConnectorPart.setOnClickListener(getOnMergeClickListener());
+                vh.topConnectorPart.setOnClickListener(getOnMergeClickListener());
+                vh.middleConnectorPart.setVisibility(View.VISIBLE);
+                vh.middleConnectorPart.setOnClickListener(getOnMergeClickListener());
             } else {
                 vh.topConnectorPart.setVisibility(View.INVISIBLE);
-                for(int i=0; i<vh.topConnectorPart.getChildCount(); i++) {
-                    vh.topConnectorPart.getChildAt(i).setOnClickListener(null);
-                }
-                //vh.topConnectorPart.setOnClickListener(null);
+                vh.topConnectorPart.setOnClickListener(null);
+                vh.middleConnectorPart.setVisibility(View.INVISIBLE);
+                vh.middleConnectorPart.setOnClickListener(null);
             }
             // Show or hide bottom connector part of that view
             if(listHasItemAtIndex(position - 1) && (data.get(position- 1).getTLA().get_id() == timeslot.getTLA().get_id())){
                 vh.bottomConnectorPart.setVisibility(View.VISIBLE);
-                for(int i=0; i<vh.bottomConnectorPart.getChildCount(); i++){
-                    vh.bottomConnectorPart.getChildAt(i).setOnClickListener(getOnMergeClickListener());
-                }
-                //vh.bottomConnectorPart.getChildAt(i).setOnClickListener(getOnMergeClickListener());
+                vh.bottomConnectorPart.setOnClickListener(getOnMergeClickListener());
             } else {
                 vh.bottomConnectorPart.setVisibility(View.INVISIBLE);
-                for(int i=0; i<vh.bottomConnectorPart.getChildCount(); i++) {
-                    vh.bottomConnectorPart.getChildAt(i).setOnClickListener(null);
-                }
-            }
+                vh.bottomConnectorPart.setOnClickListener(null);
+            }*/
 
         } else if(holder.getItemViewType() == VIEWTYPE_SERVICEINFO){
             // set dismiss action for dismissButton

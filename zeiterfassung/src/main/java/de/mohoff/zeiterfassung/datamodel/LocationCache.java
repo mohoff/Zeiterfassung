@@ -90,6 +90,21 @@ public class LocationCache {
         return positives/all;
     }
 
+    public float getCurrentInBoundProxFor2(TargetLocationArea tla){
+        float positives = 0;
+        float all = activeCache.size();
+
+        for(int i=0; i< activeCache.size(); i++){
+            Loc loc = (Loc) activeCache.get(i);
+            //int distanceDebug = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude()));
+            int distanceTLABorderToUser = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude())) - tla.getRadius();
+            if(distanceTLABorderToUser <= 0){
+                positives++;
+            }
+        }
+        return positives/all;
+    }
+
 
 
 
