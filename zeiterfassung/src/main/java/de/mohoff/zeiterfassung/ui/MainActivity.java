@@ -430,7 +430,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             if(addToBackStack) {
                 ft.addToBackStack(backStateName);
             }
-            ft.commit();
+            //ft.commit();
+            ft.commitAllowingStateLoss();
         }
     }
 

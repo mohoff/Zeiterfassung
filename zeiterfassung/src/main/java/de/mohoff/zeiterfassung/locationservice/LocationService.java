@@ -172,34 +172,50 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     public boolean updateInboundTLA() {
-        TargetLocationArea newInboundTLA = null;
+        TargetLocationArea foundInboundTLA = null;
 
         for (TargetLocationArea tla : allTLAs) {
             float ratio = LocationCache.getInstance().getCurrentInBoundProxFor(tla);
             // Trigger inbound zone event if ratio of #(inbound locations) to #(outbound locations)
             // is greater than or equal to INBOUND_TRESHOLD.
             if (ratio >= INBOUND_TRESHOLD) {
-                newInboundTLA = tla;
+                foundInboundTLA = tla;
             }
         }
 
-        // Determine if a change happened. To do so we check for all cases in which newInboundTLA
+        // Determine if a change happened. To do so we check for all cases in which foundInboundTLA
         // and inboundTLA are different (only one of them is null OR both have different IDs in the
         // DB.)
-        if((newInboundTLA != null && inboundTLA == null) ||
-                (newInboundTLA == null && inboundTLA != null) ||
-                (newInboundTLA != null && inboundTLA != null && newInboundTLA.get_id() != inboundTLA.get_id())) {
+        if((foundInboundTLA != null && inboundTLA == null) ||       // enter event (no inbound --> inbound)
+                (foundInboundTLA == null && inboundTLA != null) ||  // leave event (inbound --> no inbound)
+                (foundInboundTLA != null && (foundInboundTLA.get_id() != inboundTLA.get_id()))) {
+                                                                    // leave AND enter event (inbound1 --> inbound2)
 
-            inboundTLA = newInboundTLA;
+            inboundTLA = foundInboundTLA;
+            // 'True' indicates the calling function that a change was detected
+            // An enter- or a leave-event happened.
             return true;
         }
+        // 'False' indicates the calling function that no change was detected
+        // Neither an enter- nor a leave-event happened.
         return false;
     }
 
     public void updateTimeslots() {
         Timeslot openTimeslot = dbHelper.getOpenTimeslot();
 
+        // Close openTimeslot
+        // TODO: Check if it makes sense to add in if-statement: && isInbound(interpolatedPosition)
+        if(openTimeslot != null && inboundTLA == null){
+            if (dbHelper.closeTimeslotById(openTimeslot.get_id(), getEventTimestamp()) == 1) {
+                GeneralHelper.showToast(this, "Timeslot sealed");
+            } else {
+                GeneralHelper.showToast(this, "Error sealing timeslot in DB");
+            }
+        }
+
         // Start new Timeslot
+        // TODO: Check if it makes sense to add in if-statement: && isOutbound(interpolatedPosition)
         if(openTimeslot == null && inboundTLA != null){
             if (dbHelper.startNewTimeslot(getEventTimestamp(), inboundTLA) == 1) {
                 GeneralHelper.showToast(this, "New Timeslot started.");
@@ -208,14 +224,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             }
         }
 
-        // Close openTimeslot
-        if(openTimeslot != null && inboundTLA == null){
-            if (dbHelper.closeTimeslotById(openTimeslot.get_id(), getEventTimestamp()) == 1) {
-                GeneralHelper.showToast(this, "Timeslot sealed");
-            } else {
-                GeneralHelper.showToast(this, "Error sealing timeslot in DB");
-            }
-        }
+
     }
 
 
@@ -238,7 +247,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         // New approach: Update inboundTLA at every LocationUpdate unless activeCache doesn't contain
         // 2 entries yet. If it was updated, also update Timeslots.
-        if(LocationCache.getInstance().getActiveCache().size() >= 2 &&
+        if((LocationCache.getInstance().getActiveCache().size() >= 2) &&
                 updateInboundTLA()){
             updateTimeslots();
         }
@@ -253,7 +262,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         // That should lead to a more accurate timestamp result.
         CircularFifoQueue<Loc> activeCache = LocationCache.getInstance().getActiveCache();
         int indexOfInterest = (int)(INBOUND_TRESHOLD * ACTIVE_CACHE_SIZE);
-        for(; indexOfInterest>=0; indexOfInterest--){
+        for(; indexOfInterest >= 0; indexOfInterest--){
             try {
                 return activeCache.get(indexOfInterest).getTimestampInMillis();
             } catch (Exception e){

@@ -372,7 +372,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             queryBuilder.where().eq("endtime", 0);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
             return timeslotREDAO.query(preparedQuery).get(0);
-        } catch (SQLException | IndexOutOfBoundsException e){
+        } catch (Exception e){
+            // (SQLException | IndexOutOfBoundsException e)
             e.printStackTrace();
         }
         return null;

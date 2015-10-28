@@ -160,13 +160,13 @@ public class GeneralHelper {
     public static void setupLocationCache(DatabaseHelper dbHelper){
         // Check if LocationCache is currently initialized.
         // If not, set parameters for LocationCache and eventually populate it with locs from DB dump.
-        if(LocationCache.getInstance().getPassiveCache() == null ||
+        /*if(LocationCache.getInstance().getPassiveCache() == null ||
                 LocationCache.getInstance().getPassiveCache().isEmpty()){
             LocationCache.getInstance().setParameters(LocationService.ACTIVE_CACHE_SIZE,
                     LocationService.PASSIVE_CACHE_SIZE,
                     LocationService.REGULAR_UPDATE_INTERVAL,
                     LocationService.INTERPOLATION_VARIANCE
-            );
+            );*/
             List<Loc> locs = dbHelper.getLocs(System.currentTimeMillis() - LocationService.REGULAR_UPDATE_INTERVAL * LocationService.PASSIVE_CACHE_SIZE);
             // Bring List into CircularFifoQueue
             CircularFifoQueue<Loc> tmp = new CircularFifoQueue<>(LocationService.PASSIVE_CACHE_SIZE);
@@ -174,7 +174,7 @@ public class GeneralHelper {
                 tmp.add(entry);
             }
             LocationCache.getInstance().setPassiveCache(tmp);
-        }
+
     }
 
     public static View getAlertDialogEditTextContainer(Context context, EditText et, String placeholder){

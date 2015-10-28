@@ -188,8 +188,8 @@ public class Timeslot {
             durationInMinutes = minutes2 - minutes1;
         }
 
-        long days = durationInMinutes/(60*24);
-        long rest = durationInMinutes%(60*24);
+        long days = durationInMinutes / (60*24);
+        long rest = durationInMinutes % (60*24);
         long hours = rest/60;
         rest = rest%60;
         long minutes = rest;

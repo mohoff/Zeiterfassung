@@ -117,7 +117,7 @@ public class Loc implements Parcelable{  //, daoClass = Loc.class)
         long timeToPersist = System.currentTimeMillis();
         result = new Loc(loc.getLatitude(), loc.getLongitude(), timeToPersist);
         if (loc.getAccuracy() > 0.0) {
-            result.setAccuracyMultiplier(LocationCache._getAccuracyMultiplier(loc.getAccuracy()));
+            result.setAccuracyMultiplier(LocationCache.getNormedAccuracyMultiplier(loc.getAccuracy()));
         }
         if (loc.hasAltitude()) {
             result.setAltitude((int) loc.getAltitude());
