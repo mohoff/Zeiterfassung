@@ -32,6 +32,15 @@ public class Loc implements Parcelable{  //, daoClass = Loc.class)
     private int altitude;
     @DatabaseField
     private int speed;
+    private boolean isRealUpdate;
+
+    public boolean isRealUpdate() {
+        return isRealUpdate;
+    }
+
+    public void setIsRealUpdate(boolean isTrue){
+        isRealUpdate = isTrue;
+    }
 
     public Loc(){}
 
@@ -116,8 +125,9 @@ public class Loc implements Parcelable{  //, daoClass = Loc.class)
         Loc result;
         long timeToPersist = System.currentTimeMillis();
         result = new Loc(loc.getLatitude(), loc.getLongitude(), timeToPersist);
-        if (loc.getAccuracy() > 0.0) {
-            result.setAccuracyMultiplier(LocationCache.getNormedAccuracyMultiplier(loc.getAccuracy()));
+        if (loc.hasAccuracy() && (loc.getAccuracy() > 0.0)) {
+            result.setAccuracy(loc.getAccuracy());
+            //result.setAccuracyMultiplier(LocationCache.getNormedAccuracyMultiplier(loc.getAccuracy()));
         }
         if (loc.hasAltitude()) {
             result.setAltitude((int) loc.getAltitude());
@@ -225,4 +235,15 @@ public class Loc implements Parcelable{  //, daoClass = Loc.class)
             return new Loc[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Loc loc = (Loc) o;
+
+        if (Double.compare(loc.latitude, latitude) != 0) return false;
+        return Double.compare(loc.longitude, longitude) == 0;
+    }
 }

@@ -100,7 +100,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener {
         if(cache != null && cache.size() > 0){
             for(int i=0; i<cache.size(); i++){
                 Loc loc = cache.get(i);
-                long lastMarkerTimestamp = (i-1)>= 0 ? cache.get(i - 1).getTimestampInMillis() : 0;
+                long lastMarkerTimestamp = (i-1)>= 0 ? cache.get(i-1).getTimestampInMillis() : 0;
                 super.addMarkerToMap(
                         map,
                         markers,
@@ -109,7 +109,8 @@ public class MapLive extends MapAbstract implements LocationChangeListener {
                         "Location",
                         "A:" + loc.getAccuracy() +
                                 "\n O:" + GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()) +
-                                "\n t:" + Timeslot.getReadableDuration(lastMarkerTimestamp, loc.getTimestampInMillis(), false)
+                                "\n t:" + Timeslot.getReadableDuration(lastMarkerTimestamp, loc.getTimestampInMillis(), false),
+                        loc.isRealUpdate()
                 );
             }
             currentPolyline = super.addPolylineToMap(map, cache);
@@ -136,7 +137,8 @@ public class MapLive extends MapAbstract implements LocationChangeListener {
                     "Location",
                     "A:" + loc.getAccuracy() +
                             "\n O:" + GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()) +
-                            "\n t:" + Timeslot.getReadableDuration(timestampLastMarker, loc.getTimestampInMillis(), false)
+                            "\n t:" + Timeslot.getReadableDuration(timestampLastMarker, loc.getTimestampInMillis(), false),
+                    loc.isRealUpdate()
             );
             // Ensure that there are only passiveCache.maxSize() markers displayed to prevent memory leak.
             // If passiveQueue is full and at least one drop happened already in it, remove oldest marker.

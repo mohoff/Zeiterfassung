@@ -75,6 +75,7 @@ public class LocationCache {
         return positives/(float) activeInterpolatedCache.size();
     }
 
+    // Uses activeInterpolatedCache
     public float getCurrentInBoundProxFor(TargetLocationArea tla){
         float positives = 0;
         float all = activeCache.size();
@@ -90,6 +91,7 @@ public class LocationCache {
         return positives/all;
     }
 
+    // Uses activeCache
     public float getCurrentInBoundProxFor2(TargetLocationArea tla){
         float positives = 0;
         float all = activeCache.size();
@@ -108,13 +110,26 @@ public class LocationCache {
 
 
 
-    public void addLocationUpdate(Loc myLoc){
-        activeCache.add(myLoc);
+    public void addLocationUpdate(Loc newLoc){
+        // Handle activeCache.
+        if(newLoc.getAccuracy() < LocationService.ACCURACY_TRESHOLD){
+            activeCache.add(newLoc);
+
+            // !!! Interpolated positions are not used right now !!!
+            // Compute interpolated position and update activeInterpolatedCache.
+            computeInterpolatedPosition();
+        }
+
+        // Handle passiveCache.
+        // Add newLoc to passiveCache if newLoc is a real update or there was a real update added
+        // in the last call of this function.
+        if(newLoc.isRealUpdate() || passiveCache.get(0).isRealUpdate()){
+            passiveCache.add(newLoc);
+        }
         if(isPassiveCacheFull()){
             firstPassiveCacheDropHappened = true;
         }
-        passiveCache.add(myLoc);
-        computeInterpolatedPosition();
+
 
     }
 

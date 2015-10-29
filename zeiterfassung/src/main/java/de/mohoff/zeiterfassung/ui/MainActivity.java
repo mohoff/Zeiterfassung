@@ -485,7 +485,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             double lat = Double.valueOf(intent.getStringExtra("lat"));
             double lng = Double.valueOf(intent.getStringExtra("lng"));
             double accuracy = Double.valueOf(intent.getStringExtra("accuracy"));
+            boolean isRealUpdate = intent.getBooleanExtra("isRealUpdate", true);
             Loc newLocation = new Loc(lat, lng, accuracy);
+            newLocation.setIsRealUpdate(isRealUpdate);
             //locs.add(newLocation);
 
             if (newLocationListener != null) {

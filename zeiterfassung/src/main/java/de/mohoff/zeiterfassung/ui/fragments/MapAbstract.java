@@ -187,15 +187,21 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         progressBar.setVisibility(View.GONE);
     }
 
-    protected void addMarkerToMap(GoogleMap map, List<Marker> markers, LatLng latLng, float opacity, String title, String snippet){
-        Marker marker = map.addMarker(new MarkerOptions()
+    protected void addMarkerToMap(GoogleMap map, List<Marker> markers, LatLng latLng, float opacity, String title, String snippet, boolean isRealUpdate){
+        MarkerOptions markerOptions = new MarkerOptions()
                 .position(latLng)
                 .draggable(false)
                 .alpha(opacity)
                 .icon(BitmapDescriptorFactory.defaultMarker(193))      // BitmapDescriptorFactory.HUE_MAGENTA
                 .title(title)
                 .snippet(snippet)
-        );
+        ;
+
+        if(!isRealUpdate){
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+        }
+
+        Marker marker = map.addMarker(markerOptions);
 
         if(markers != null){
             markers.add(marker);

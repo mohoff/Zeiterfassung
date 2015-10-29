@@ -43,8 +43,15 @@ import de.mohoff.zeiterfassung.ui.MainActivity;
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String TAG = LocationService.class.getSimpleName();
 
-    public static boolean IS_SERVICE_RUNNING = false; // not used right now
+    public static boolean IS_SERVICE_RUNNING = false;
+    // Indicates if location update interval exceeded (REGULAR_UPDATE_INTERVAL + 10s) since the last real update
+    public static boolean NO_CONNECTION = false;
+    // Ignore location updates for activeCache which have accuracy > 300m
+    public static double ACCURACY_TRESHOLD = 300.0;
+
+    // Determines the ratio of inbound locations in activeCache to trigger an enter-event.
     public static float INBOUND_TRESHOLD = 0.8f;
+    public static float OUTBOUND_TRESHOLD = 1 - INBOUND_TRESHOLD;
     public static int ACTIVE_CACHE_SIZE = 5;
     public static int PASSIVE_CACHE_SIZE = 50;
     // TODO: What to do when service is started? We really need to wait ~ REGULAR_UPDATE_INTERVAL * ACTIVE_CACHE_SIZE until activeCache is full in order to perform first createNewTimeslot? Can we do better?
@@ -90,7 +97,10 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     @Override
     public void onLocationChanged(Location location) {
         LocationService.mostRecentLocation = location;
-        handleLocationUpdate(location);
+        Loc loc = Loc.convertLocationToLoc(location);
+        loc.setIsRealUpdate(true);
+
+        handleLocationUpdate(loc);
     }
 
     @Override
@@ -181,10 +191,20 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         for (TargetLocationArea tla : allTLAs) {
             float ratio = LocationCache.getInstance().getCurrentInBoundProxFor2(tla);
-            // Trigger inbound zone event if ratio of #(inbound locations) to #(outbound locations)
-            // is greater than or equal to INBOUND_TRESHOLD.
-            if (ratio >= INBOUND_TRESHOLD) {
+            // Only need to check for 'new inbound' and 'still inbound' here to assign foundInboundTLA.
+            // 'new outbound' and 'still outbound' are handled automatically when foundInboundTLA is null.
+            if(
+                    // New enter event for the TLA we are iterating over: There are at
+                    // least (INBOUND_TRESHOLD*activeCache.size()) locations inbound.
+                    (ratio >= INBOUND_TRESHOLD) ||
+                    // Still inbound of the TLA we are iterating over: There is already an inboundTLA
+                    // AND its ratio isn't that low too trigger a leave-event AND inboundTLA is the
+                    // same as the TLA we are just iterating over.
+                    (inboundTLA != null && ratio > OUTBOUND_TRESHOLD && inboundTLA.get_id() == tla.get_id())){
+
                 foundInboundTLA = tla;
+                // No need to iterate any further since we found an inbound TLA and only one is possible.
+                break;
             }
         }
 
@@ -233,38 +253,34 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
 
-    public void handleLocationUpdate(Location loc) {
-        Log.v(TAG, loc.getLatitude() + ", " + loc.getLongitude() + ", " + loc.getAccuracy());
-
-        Loc currentLoc = Loc.convertLocationToLoc(loc);
-        // Put loc in activeCache and passiveCache
-        LocationCache.getInstance().addLocationUpdate(currentLoc);
-        // Order is important: First update cache, then send broadcast because Broadcast-Receivers
-        // might access LocationCache.
-        sendLocationUpdateViaBroadcast(loc.getLatitude(), loc.getLongitude(), loc.getAccuracy());
-
+    public void handleLocationUpdate(Loc loc){
+        NO_CONNECTION = !loc.isRealUpdate();
         numberOfUpdates++;
 
-        // Old apprach: Update TLAs and Timeslots every 2nd LocationUpdate.
-        /*if ((numberOfUpdates % 2 == 0) && LocationCache.getInstance().isActiveCacheFull()) {
-            updateTLAsAndTimeslots();
-        }*/
+        // Put loc in activeCache and passiveCache
+        LocationCache.getInstance().addLocationUpdate(loc);
+        // Order is important: First update cache, then send broadcast because Broadcast-Receivers
+        // might access LocationCache.
+        sendLocationUpdateViaBroadcast(loc.getLatitude(), loc.getLongitude(), loc.getAccuracy(), loc.isRealUpdate());
 
-        // New approach: Update inboundTLA at every LocationUpdate unless activeCache doesn't contain
+        // Update inboundTLA at every LocationUpdate unless activeCache doesn't contain
         // 2 entries yet. If it was updated, also update Timeslots.
         if((LocationCache.getInstance().getActiveCache().size() >= 2) &&
                 updateInboundTLA()){
             updateTimeslots();
         }
 
-        timer.cancel();
-        timer.schedule(locUpdateTimerTask, REGULAR_UPDATE_INTERVAL * 3);
+        locUpdateTimerTask.cancel();
+        locUpdateTimerTask = new LocationUpdateTimer();
+        // Execute locUpdateTimerTask after <2nd parameter> and repeat every <3rd parameter>
+        timer.schedule(locUpdateTimerTask, REGULAR_UPDATE_INTERVAL + 1000 * 10, REGULAR_UPDATE_INTERVAL);
     }
 
     private class LocationUpdateTimer extends TimerTask {
         public void run(){
-            // set marker on map that connection interruption because no more
-            // location updates are received and timer exceeded.
+            Loc loc = LocationCache.getInstance().getActiveCache().get(0);
+            loc.setIsRealUpdate(false);
+            handleLocationUpdate(loc);
         }
     }
 
@@ -300,12 +316,13 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     // Broadcast for locationUpdate events
-    private void sendLocationUpdateViaBroadcast(double lat, double lng, double accuracy){
+    private void sendLocationUpdateViaBroadcast(double lat, double lng, double accuracy, boolean isRealUpdate){
         Intent intent = new Intent("locationServiceLocUpdateEvents");
         // message = "newTimeslotStarted"
         intent.putExtra("lat", String.valueOf(lat));
         intent.putExtra("lng", String.valueOf(lng));
         intent.putExtra("accuracy", String.valueOf(accuracy));
+        intent.putExtra("isRealUpdate", isRealUpdate);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
