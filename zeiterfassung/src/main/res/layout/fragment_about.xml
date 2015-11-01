@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:tag="ABOUT"
-    tools:context="de.mohoff.zeiterfassung.ui.fragments.About">
+    tools:context="de.mohoff.zeiterfassung.ui.components.about.About">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView android:layout_width="match_parent" android:layout_height="match_parent"

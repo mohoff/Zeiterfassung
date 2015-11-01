@@ -3,11 +3,9 @@ package de.mohoff.zeiterfassung.datamodel;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 
 @DatabaseTable(tableName = "timeslots")//, daoClass = Timeslot.class)
@@ -16,19 +14,22 @@ public class Timeslot {
     private int _id;
     @DatabaseField(canBeNull = false, unique = true)
     private long starttime; // in seconds
+    // TODO: Set ..IsVague flags to 'true' when the corresponding start- or endtime is set within 5-10mins after LocationService got started. Display IsVague visually in "Overview" fragment saying measurement might be inaccurate / wrong.
+    private boolean starttimeIsVague = false;
     @DatabaseField
     private long endtime = 0; // in seconds
+    private boolean endtimeIsVague = false;
     @DatabaseField(canBeNull = false, foreign = true, foreignAutoRefresh = true, columnName = "tla_id")
-    private TargetLocationArea tla;
+    private Zone tla;
 
     public Timeslot(){}
 
-    public Timeslot(long starttime, TargetLocationArea tla){
+    public Timeslot(long starttime, Zone tla){
         this.starttime = starttime;
         this.tla = tla;
     }
 
-    public Timeslot(long starttime, long endtime, TargetLocationArea tla){
+    public Timeslot(long starttime, long endtime, Zone tla){
         this.starttime = starttime;
         this.endtime = endtime;
         this.tla = tla;
@@ -58,11 +59,11 @@ public class Timeslot {
         this.endtime = endtime;
     }
 
-    public TargetLocationArea getTLA(){
+    public Zone getTLA(){
         return tla;
     }
 
-    public void setTLA(TargetLocationArea tla){
+    public void setTLA(Zone tla){
         this.tla = tla;
     }
 

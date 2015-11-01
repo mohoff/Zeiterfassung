@@ -27,7 +27,7 @@ foreignAutoRefresh=true
 # --table-end--
 #################################
 # --table-start--
-dataClass=de.mohoff.zeiterfassung.datamodel.TargetLocationArea
+dataClass=de.mohoff.zeiterfassung.datamodel.Zone
 tableName=targetareas
 # --table-fields-start--
 # --field-start--

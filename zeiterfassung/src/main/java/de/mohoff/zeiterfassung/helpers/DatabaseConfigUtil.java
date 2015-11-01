@@ -1,9 +1,9 @@
-package de.mohoff.zeiterfassung.database;
+package de.mohoff.zeiterfassung.helpers;
 
 import com.j256.ormlite.android.apptools.OrmLiteConfigUtil;
 
 import de.mohoff.zeiterfassung.datamodel.Loc;
-import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
+import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
 
 import java.io.File;
@@ -17,7 +17,7 @@ public class DatabaseConfigUtil extends OrmLiteConfigUtil {
 
     private static final Class<?>[] classes = new Class[] {
             Timeslot.class,
-            TargetLocationArea.class,
+            Zone.class,
             Loc.class
     };
     public static void main(String[] args) throws SQLException, IOException {

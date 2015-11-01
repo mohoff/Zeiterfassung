@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:tag="MAP"
-    tools:context="de.mohoff.zeiterfassung.ui.fragments.MapLive">
+    tools:context="de.mohoff.zeiterfassung.ui.components.maplive.MapLive">
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/map"

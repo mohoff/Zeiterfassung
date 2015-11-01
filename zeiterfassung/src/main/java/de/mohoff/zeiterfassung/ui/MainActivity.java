@@ -1,6 +1,5 @@
 package de.mohoff.zeiterfassung.ui;
 
-import android.app.ActivityManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -29,33 +28,29 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
-import de.mohoff.zeiterfassung.GeneralHelper;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.locationservice.LocationService;
 import de.mohoff.zeiterfassung.locationservice.LocationServiceStatus;
 import de.mohoff.zeiterfassung.locationservice.TimeslotEventListener;
+import de.mohoff.zeiterfassung.ui.components.about.About;
+import de.mohoff.zeiterfassung.ui.components.overview.Overview;
+import de.mohoff.zeiterfassung.ui.components.settings.Settings;
+import de.mohoff.zeiterfassung.ui.components.statistics.Statistics;
+import de.mohoff.zeiterfassung.ui.components.zones.ManageZones;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerAdapter;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
 import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItem;
-import de.mohoff.zeiterfassung.ui.fragments.*;
-import de.mohoff.zeiterfassung.ui.fragments.MapLive;
+import de.mohoff.zeiterfassung.ui.components.maplive.MapLive;
 import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.database.DatabaseHelper;
+import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerListener {
-    /*// In order to avoid "fragment not attached to activity" errors, some colors are preassigned.
-    // Now fragments can access below color variables anytime.
-    public int colorGreenish = getResources().getColor(R.color.greenish);
-    public int colorGreenish50 = getResources().getColor(R.color.greenish_50);*/
-    // Set relative to update interval time so max markers on map =~ 2h for example
-    // NOT the same as queueSize in LocationCache.class
-    private static int LOC_QUEUE_SIZE = 50;
-    SimpleDateFormat sdf;
     public static FragmentManager fragM;
     FragmentTransaction fragT;
     private Fragment nextFragment;
@@ -73,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     //private ArrayList<Loc> locsTmp = new ArrayList<>();
 
     private DrawerLayout drawerLayout;
+    private NavigationDrawerAdapter drawerAdapter;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
     private NavigationListItem[] items = new NavigationListItem[8];
@@ -170,8 +166,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         recyclerView = (RecyclerView) findViewById(R.id.drawerList);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        NavigationDrawerAdapter adapter = new NavigationDrawerAdapter(this, getListItems());
-        recyclerView.setAdapter(adapter);
+        drawerAdapter = new NavigationDrawerAdapter(this, getListItems());
+        recyclerView.setAdapter(drawerAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, recyclerView, new ClickListener() {
             @Override
@@ -213,9 +209,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         GeneralHelper.setupLocationCache(dbHelper);
 
         // Show overview at initial app start
-        if(savedInstanceState == null){
-            selectItem(0);
-        }
+        //if(savedInstanceState == null){
+            selectItem(NavigationDrawerAdapter.CURRENTLY_SELECTED);
+        //}
 
         // Initialize LocationServiceStatus and sync its state with the LocationService
         serviceStatus = new LocationServiceStatus();
@@ -229,8 +225,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 new IntentFilter("locationServiceLocUpdateEvents"));
         LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
                 new IntentFilter("serviceEventUpdate"));
-
-        sdf = new SimpleDateFormat("dd.MM.yyyy - HH:mm");
     }
 
     public void startAndBindToLocationService() {
@@ -358,15 +352,18 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 nextFragment = new Overview();
                 break;
             case 1:
-                nextFragment = new ManageTLAs();
+                nextFragment = new ManageZones();
                 break;
             case 2:
                 nextFragment = new MapLive();
                 break;
             case 4:
-                nextFragment = new Settings();
+                nextFragment = new Statistics();
                 break;
             case 5:
+                nextFragment = new Settings();
+                break;
+            case 6:
                 nextFragment = new About();
                 break;
         }
@@ -544,8 +541,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         }
 
         switch(item.getItemId()) {
-            case R.id.action_settings:
-                return true;
+            /*case R.id.action_settings:
+                return true;*/
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -576,6 +573,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         list.add("Manage TLAs");
         list.add("Live Map");
         list.add("---------------"); // list[3] now hardcoded as separator (only hardcoded possible I think)
+        list.add("Statistics");
         list.add("Settings");
         list.add("About");
         return list;

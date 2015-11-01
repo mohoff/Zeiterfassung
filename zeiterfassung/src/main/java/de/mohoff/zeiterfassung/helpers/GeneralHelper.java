@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung;
+package de.mohoff.zeiterfassung.helpers;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -7,7 +7,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.location.Location;
 import android.os.IBinder;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +16,12 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.mohoff.zeiterfassung.database.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.locationservice.LocationService;
@@ -158,23 +154,11 @@ public class GeneralHelper {
     }
 
     public static void setupLocationCache(DatabaseHelper dbHelper){
-        // Check if LocationCache is currently initialized.
-        // If not, set parameters for LocationCache and eventually populate it with locs from DB dump.
-        /*if(LocationCache.getInstance().getPassiveCache() == null ||
-                LocationCache.getInstance().getPassiveCache().isEmpty()){
-            LocationCache.getInstance().setParameters(LocationService.ACTIVE_CACHE_SIZE,
-                    LocationService.PASSIVE_CACHE_SIZE,
-                    LocationService.REGULAR_UPDATE_INTERVAL,
-                    LocationService.INTERPOLATION_VARIANCE
-            );*/
-            List<Loc> locs = dbHelper.getLocs(System.currentTimeMillis() - LocationService.REGULAR_UPDATE_INTERVAL * LocationService.PASSIVE_CACHE_SIZE);
-            // Bring List into CircularFifoQueue
-            CircularFifoQueue<Loc> tmp = new CircularFifoQueue<>(LocationService.PASSIVE_CACHE_SIZE);
-            for(Loc entry : locs){
-                tmp.add(entry);
-            }
-            LocationCache.getInstance().setPassiveCache(tmp);
-
+        List<Loc> locs = dbHelper.getLocs(System.currentTimeMillis() - LocationService.REGULAR_UPDATE_INTERVAL * LocationService.PASSIVE_CACHE_SIZE);
+        // Bring List into CircularFifoQueue
+        CircularFifoQueue<Loc> tmp = new CircularFifoQueue<>(LocationService.PASSIVE_CACHE_SIZE);
+        tmp.addAll(locs);
+        LocationCache.getInstance().setPassiveCache(tmp);
     }
 
     public static View getAlertDialogEditTextContainer(Context context, EditText et, String placeholder){

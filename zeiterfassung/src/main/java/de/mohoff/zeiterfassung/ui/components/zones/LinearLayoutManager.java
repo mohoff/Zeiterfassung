@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung.ui;
+package de.mohoff.zeiterfassung.ui.components.zones;
 
 import android.content.Context;
 import android.graphics.Rect;

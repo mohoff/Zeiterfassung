@@ -1,8 +1,7 @@
-package de.mohoff.zeiterfassung.ui.fragments;
+package de.mohoff.zeiterfassung.ui.components.overview;
 
 import android.os.Bundle;
 import android.app.Fragment;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,11 +13,8 @@ import java.util.TimerTask;
 
 import de.mohoff.zeiterfassung.locationservice.ServiceChangeListener;
 import de.mohoff.zeiterfassung.locationservice.TimeslotEventListener;
-import de.mohoff.zeiterfassung.ui.AdapterOverview;
 import de.mohoff.zeiterfassung.ui.MainActivity;
-import de.mohoff.zeiterfassung.ui.MyItemAnimator;
 import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
 
 public class Overview extends Fragment implements TimeslotEventListener, ServiceChangeListener{
     MainActivity parentActivity;

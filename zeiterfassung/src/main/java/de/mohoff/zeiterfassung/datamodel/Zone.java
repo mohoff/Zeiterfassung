@@ -5,8 +5,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "targetareas")//, daoClass = TargetLocationArea.class)
-public class TargetLocationArea {
+@DatabaseTable(tableName = "targetareas")//, daoClass = Zone.class)
+public class Zone {
     //private LatLng center; // not usable coz we want to store position in db, so we fallback to 2 floats/doubles
 
     @DatabaseField(generatedId = true) // autoincrement primary key
@@ -23,9 +23,9 @@ public class TargetLocationArea {
     private String locationName;
     private Color colorScheme;
 
-    public TargetLocationArea(){}
+    public Zone(){}
 
-    public TargetLocationArea(float latitude, float longitude, int radius, String activityName, String locationName, Color colorScheme) {
+    public Zone(float latitude, float longitude, int radius, String activityName, String locationName, Color colorScheme) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.radius = radius;
@@ -34,7 +34,7 @@ public class TargetLocationArea {
         this.colorScheme = colorScheme;
     }
 
-    public TargetLocationArea(float latitude, float longitude, int radius, String activityName, String locationName) {
+    public Zone(float latitude, float longitude, int radius, String activityName, String locationName) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.radius = radius;

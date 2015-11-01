@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung.ui.fragments;
+package de.mohoff.zeiterfassung.ui.components;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -6,16 +6,12 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Color;
 import android.location.Geocoder;
-import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -24,7 +20,6 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -35,12 +30,11 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import de.mohoff.zeiterfassung.GeneralHelper;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.database.DatabaseHelper;
+import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
@@ -165,10 +159,11 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
            the parent view can be inflated properly with a new MapFragment.
          */
         try {
-            Fragment fragment = (getFragmentManager().findFragmentById(R.id.map));
+            MapFragment fragment = (MapFragment)(getFragmentManager().findFragmentById(R.id.map));
             FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
             ft.remove(fragment);
-            ft.commit();
+            //ft.commit();
+            ft.commitAllowingStateLoss();
         } catch(Exception e){
             e.printStackTrace();
         }

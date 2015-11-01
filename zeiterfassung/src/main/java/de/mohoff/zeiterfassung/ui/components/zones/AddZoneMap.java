@@ -1,36 +1,25 @@
-package de.mohoff.zeiterfassung.ui.fragments;
+package de.mohoff.zeiterfassung.ui.components.zones;
 
 import android.app.Fragment;
-import android.graphics.Color;
-import android.location.Address;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-import de.mohoff.zeiterfassung.GeneralHelper;
-import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.datamodel.Zone;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
-import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
 
 /**
  * Created by moo on 10/9/15.
  */
-public class MapAddTLA extends MapManageTLAAbstract {
+public class AddZoneMap extends ManageZonesMapAbstract {
     String activityName, locationName;
 
     @Override
@@ -63,8 +52,8 @@ public class MapAddTLA extends MapManageTLAAbstract {
                         GeneralHelper.showToast(getActivity(), "TLA successfully added.");
                         // Clear back stack because add-operation succeeded.
                         GeneralHelper.clearBackStack(getActivity());
-                        // Go back to ManageTLAs fragment with clean back stack
-                        Fragment nextFragment = new ManageTLAs();
+                        // Go back to ManageZones fragment with clean back stack
+                        Fragment nextFragment = new ManageZones();
                         parentActivity.replaceFragment(nextFragment, false);
                     }
                 }
@@ -82,7 +71,7 @@ public class MapAddTLA extends MapManageTLAAbstract {
 
         ArrayList<LatLng> latLngList = new ArrayList<>();
 
-        for(TargetLocationArea tla : dbHelper.getAllTLAs()){
+        for(Zone tla : dbHelper.getAllTLAs()){
             LatLng latLng = new LatLng(tla.getLatitude(), tla.getLongitude());
             latLngList.add(latLng);
             Marker marker = map.addMarker(

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:tag="OVERVIEW"
-    tools:context="de.mohoff.zeiterfassung.ui.fragments.Overview">
+    tools:context="de.mohoff.zeiterfassung.ui.components.overview.Overview">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/cardList"

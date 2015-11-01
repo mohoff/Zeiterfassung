@@ -1,7 +1,5 @@
-package de.mohoff.zeiterfassung.ui.fragments;
+package de.mohoff.zeiterfassung.ui.components.zones;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.graphics.Color;
 import android.location.Address;
 import android.os.Bundle;
@@ -27,13 +25,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import de.mohoff.zeiterfassung.GeneralHelper;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 
 /**
  * Created by moo on 10/9/15.
  */
-public abstract class MapManageTLAAbstract extends MapAbstract {
+public abstract class ManageZonesMapAbstract extends MapAbstract {
     ArrayList<Marker> fixMarkers = new ArrayList<Marker>();
     ArrayList<Circle> fixCircles = new ArrayList<Circle>();
     LatLng lookupLatLng;
@@ -64,7 +63,7 @@ public abstract class MapManageTLAAbstract extends MapAbstract {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateViewWithLayout(inflater, container, savedInstanceState, R.layout.fragment_map_manage_tla);
+        return super.onCreateViewWithLayout(inflater, container, savedInstanceState, R.layout.fragment_manage_zones_map);
     }
 
     @Override

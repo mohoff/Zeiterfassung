@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung.ui;
+package de.mohoff.zeiterfassung.ui.components.zones;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -22,31 +22,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.mohoff.zeiterfassung.GeneralHelper;
+import de.mohoff.zeiterfassung.datamodel.Zone;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.database.DatabaseHelper;
-import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
-import de.mohoff.zeiterfassung.ui.fragments.AddTLA;
-import de.mohoff.zeiterfassung.ui.fragments.MapEditTLAs;
+import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
+import de.mohoff.zeiterfassung.ui.MainActivity;
 
 /**
  * Created by moo on 8/17/15.
  */
 // --- Outer adapter ---
-public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHolder>{ //RecyclerView.Adapter<AdapterManageTLA.TLAViewHolder>{
+public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{ //RecyclerView.Adapter<ManageZonesAdapter.TLAViewHolder>{
     private MainActivity context;
     private DatabaseHelper dbHelper = null;
     //private LayoutInflater li;
-    List<TargetLocationArea> tlas;
+    List<Zone> tlas;
     List<String> activityNames = new ArrayList<String>();
-    private AdapterManageTLA outerAdapter = this;
+    private ManageZonesAdapter outerAdapter = this;
 
     private Map<String, AdapterManageTLAInner> locationAdapterMap = new HashMap<>();
     private final static int VIEWTYPE_NORMAL = 1;
     private final static int VIEWTYPE_ADD = 2;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public AdapterManageTLA(Activity context) {
+    public ManageZonesAdapter(Activity context) {
         getDbHelper();
         this.tlas = dbHelper.getAllTLAs();
         this.activityNames = dbHelper.getDistinctActivityNames();
@@ -101,11 +100,11 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
         // show normal Activity
         if(viewType == VIEWTYPE_NORMAL) {
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.fragment_manage_tlas_card_outer, parent, false);
+                    .inflate(R.layout.fragment_manage_zones_card_outer, parent, false);
 
             ActViewHolder outerHolder = new ActViewHolder(v);
             outerHolder.recyclerView.setHasFixedSize(false);
-            de.mohoff.zeiterfassung.ui.LinearLayoutManager innerLinLayoutManager = new de.mohoff.zeiterfassung.ui.LinearLayoutManager(context);
+            de.mohoff.zeiterfassung.ui.components.zones.LinearLayoutManager innerLinLayoutManager = new de.mohoff.zeiterfassung.ui.components.zones.LinearLayoutManager(context);
             innerLinLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             outerHolder.recyclerView.setLayoutManager(innerLinLayoutManager);
 
@@ -114,7 +113,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
         // show "add" option as card listed last
         if(viewType == VIEWTYPE_ADD) {
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.fragment_manage_tlas_card_outer_add, parent, false);
+                    .inflate(R.layout.fragment_manage_zones_card_outer_add, parent, false);
             return new AddHolder(v);
         }
         return null;
@@ -216,8 +215,8 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                 @Override
                 public void onClick(View v) {
                     // TODO: also provide this action in top menubar with "+"-icon
-                    // TODO: Combine following code with onClickListener for Location-addButton. Latter with arguments, so Activity can be preset in AddTLA-View.
-                    Fragment nextFragment = new AddTLA();
+                    // TODO: Combine following code with onClickListener for Location-addButton. Latter with arguments, so Activity can be preset in AddZone-View.
+                    Fragment nextFragment = new AddZone();
                     context.replaceFragment(nextFragment, true);
                 }
             });
@@ -242,7 +241,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     // Updates the the complete list (outer and inner adapter). To be called when there has happened
     // a DB-change in order to reflect that on UI.
-    private void updateList(AdapterManageTLA outerAdapter, AdapterManageTLAInner innerAdapter){
+    private void updateList(ManageZonesAdapter outerAdapter, AdapterManageTLAInner innerAdapter){
         // To update the outer adapter, we first have to retrieve all TLAs from the DB.
         this.tlas = dbHelper.getAllTLAs();
         this.activityNames = dbHelper.getDistinctActivityNames();
@@ -260,9 +259,9 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     // Helper function to reduce all TLAs to a set which elements all correspond to one Activity.
-    private List<TargetLocationArea> getRelevantTLAsByActivity(List<TargetLocationArea> list, String activity){
-        ArrayList<TargetLocationArea> relevantTLAs = new ArrayList<>();
-        for (TargetLocationArea entry : list) {
+    private List<Zone> getRelevantTLAsByActivity(List<Zone> list, String activity){
+        ArrayList<Zone> relevantTLAs = new ArrayList<>();
+        for (Zone entry : list) {
             if (entry.getActivityName().equals(activity)) {
                 relevantTLAs.add(entry);
             }
@@ -273,11 +272,11 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
     // --- Inner adapter ---
     private class AdapterManageTLAInner extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         MainActivity context;
-        List<TargetLocationArea> relevantTLAs;
+        List<Zone> relevantTLAs;
         AdapterManageTLAInner innerAdapter = this;
-        AdapterManageTLA outerAdapter;
+        ManageZonesAdapter outerAdapter;
 
-        public AdapterManageTLAInner(AdapterManageTLA outerAdapter, MainActivity context, List<TargetLocationArea> relevantTLAs) {
+        public AdapterManageTLAInner(ManageZonesAdapter outerAdapter, MainActivity context, List<Zone> relevantTLAs) {
             this.outerAdapter = outerAdapter;
             this.context = context;
             this.relevantTLAs = relevantTLAs;
@@ -287,13 +286,13 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             // Show normal Location
             if(viewType == VIEWTYPE_NORMAL) {
-                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_manage_tlas_card_inner, parent, false);
+                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_manage_zones_card_inner, parent, false);
                 return new LocViewHolder(v);
             }
             // Show "add" option as card listed last
             if(viewType == VIEWTYPE_ADD) {
                 View v = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.fragment_manage_tlas_card_inner_add, parent, false);
+                        .inflate(R.layout.fragment_manage_zones_card_inner_add, parent, false);
                 return new AddHolder(v);
             }
             return null;
@@ -305,7 +304,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                 final LocViewHolder locHolder = (LocViewHolder) holder;
 
                 // Get TLA at position to setup textView and clickListeners below
-                final TargetLocationArea tla = relevantTLAs.get(position);
+                final Zone tla = relevantTLAs.get(position);
 
                 locHolder.locationName.setText(tla.getLocationName());
                 locHolder.locationName.setOnLongClickListener(new View.OnLongClickListener() {
@@ -354,7 +353,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                 locHolder.repinButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Fragment nextFragment = new MapEditTLAs();
+                        Fragment nextFragment = new EditZonesMap();
                         // pass TLAId to map fragment
                         Bundle args = new Bundle();
                         args.putInt("TLAId", tla.get_id());
@@ -400,7 +399,7 @@ public class AdapterManageTLA extends RecyclerView.Adapter<RecyclerView.ViewHold
                 addButtonHolder.cardView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Fragment nextFragment = new AddTLA();
+                        Fragment nextFragment = new AddZone();
                         Bundle args = new Bundle();
                         args.putString("activityName", relevantTLAs.get(0).getActivityName());
                         nextFragment.setArguments(args);

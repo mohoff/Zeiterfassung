@@ -1,10 +1,6 @@
-package de.mohoff.zeiterfassung.ui.fragments;
+package de.mohoff.zeiterfassung.ui.components.zones;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v7.widget.CardView;
@@ -20,12 +16,12 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import java.util.List;
 
-import de.mohoff.zeiterfassung.GeneralHelper;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.database.DatabaseHelper;
+import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
-public class AddTLA extends Fragment {
+public class AddZone extends Fragment {
     private MainActivity parentActivity;
     private DatabaseHelper dbHelper = null;
     private ArrayAdapter adapter;
@@ -37,7 +33,7 @@ public class AddTLA extends Fragment {
     private String inputActivityName = "";
     private String inputLocationName = "";
 
-    public AddTLA() {
+    public AddZone() {
         // Required empty public constructor
     }
 
@@ -53,7 +49,7 @@ public class AddTLA extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_add_tla, container, false);
+        View view = inflater.inflate(R.layout.fragment_add_zone, container, false);
 
         autoCompleteTextView = (AutoCompleteTextView) view.findViewById(R.id.inputActivity);
         editText = (EditText) view.findViewById(R.id.inputLocation);
@@ -117,7 +113,7 @@ public class AddTLA extends Fragment {
                 if (inputActivityName == "" || inputLocationName == "") {
                     GeneralHelper.showToast(parentActivity, "Please enter both names first.");
                 } else {
-                    Fragment nextFragment = new MapAddTLA();
+                    Fragment nextFragment = new AddZoneMap();
                     // pass TLAId to map fragment
                     Bundle args = new Bundle();
                     args.putString("activityName", inputActivityName);

@@ -1,25 +1,20 @@
-package de.mohoff.zeiterfassung.ui.fragments;
+package de.mohoff.zeiterfassung.ui.components.settings;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.provider.ContactsContract;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
-import de.mohoff.zeiterfassung.GeneralHelper;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.database.DatabaseHelper;
-import de.mohoff.zeiterfassung.ui.MainActivity;
+import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 
 public class Settings extends Fragment {
     Context context;

@@ -1,45 +1,23 @@
-package de.mohoff.zeiterfassung.ui.fragments;
+package de.mohoff.zeiterfassung.ui.components.zones;
 
-import android.app.Fragment;
-import android.content.Context;
-import android.graphics.Color;
-import android.location.Address;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.InflateException;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import de.mohoff.zeiterfassung.GeneralHelper;
-import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
-import de.mohoff.zeiterfassung.ui.MainActivity;
+import de.mohoff.zeiterfassung.datamodel.Zone;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 
 /**
  * Created by moo on 8/16/15.
  */
-public class MapEditTLAs extends MapManageTLAAbstract {
+public class EditZonesMap extends ManageZonesMapAbstract {
     int candidateTLAId;
-    TargetLocationArea editTLA;
+    Zone editTLA;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -81,7 +59,7 @@ public class MapEditTLAs extends MapManageTLAAbstract {
     @Override
     public void drawExistingTLAs(){
         super.drawExistingTLAs();
-        for(TargetLocationArea tla : dbHelper.getAllTLAs()) {
+        for(Zone tla : dbHelper.getAllTLAs()) {
             Marker marker;
             Circle circle;
             LatLng latLng = new LatLng(tla.getLatitude(), tla.getLongitude());

@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung.ui;
+package de.mohoff.zeiterfassung.ui.components.overview;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,17 +12,16 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import java.util.ArrayList;
 
-import de.mohoff.zeiterfassung.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.database.DatabaseHelper;
+import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
+import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private DatabaseHelper dbHelper = null;

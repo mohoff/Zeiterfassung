@@ -10,18 +10,16 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -31,12 +29,12 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import de.mohoff.zeiterfassung.GeneralHelper;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.database.DatabaseHelper;
+import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
-import de.mohoff.zeiterfassung.datamodel.TargetLocationArea;
+import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
@@ -66,13 +64,16 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private GoogleApiClient googleApiClient;
     private LocationRequest locReq;
 
-    private List<TargetLocationArea> allTLAs = new ArrayList<TargetLocationArea>();
-    private TargetLocationArea inboundTLA;
+    private List<Zone> allTLAs = new ArrayList<Zone>();
+    private Zone inboundTLA;
     public static Location mostRecentLocation = null;
     private int numberOfUpdates = 0;
+    private int travelledDistance = 0;
 
     private LocationUpdateTimer locUpdateTimerTask = new LocationUpdateTimer();
     private Timer timer = new Timer();
+
+    private ServiceRunningTime serviceRunningTime = new ServiceRunningTime(REGULAR_UPDATE_INTERVAL * ACTIVE_CACHE_SIZE * 2);
 
     @Override
     public boolean stopService(Intent name) {
@@ -84,8 +85,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     public void onConnected(Bundle bundle) {
         LocationService.mostRecentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locReq, this);
-
-        //Toast.makeText(this, "Connected to GoogleApiClient.", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -183,13 +182,17 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         IS_SERVICE_RUNNING = true;
         sendServiceEventViaBroadcast("start");
+
+        // Start counting service tracking uptime
+        serviceRunningTime.start();
+
         return Service.START_STICKY;
     }
 
     public boolean updateInboundTLA() {
-        TargetLocationArea foundInboundTLA = null;
+        Zone foundInboundTLA = null;
 
-        for (TargetLocationArea tla : allTLAs) {
+        for (Zone tla : allTLAs) {
             float ratio = LocationCache.getInstance().getCurrentInBoundProxFor2(tla);
             // Only need to check for 'new inbound' and 'still inbound' here to assign foundInboundTLA.
             // 'new outbound' and 'still outbound' are handled automatically when foundInboundTLA is null.
@@ -232,6 +235,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         // Close openTimeslot
         // TODO: Check if it makes sense to add in if-statement: && isInbound(interpolatedPosition)
         if(openTimeslot != null && inboundTLA == null){
+            // TODO: Check for serviceRunningTime.isServiceRunningLongterm() and apply 'endtimeIsVague = true' flag.
             if (dbHelper.closeTimeslotById(openTimeslot.get_id(), getEventTimestamp()) == 1) {
                 GeneralHelper.showToast(this, "Timeslot sealed");
             } else {
@@ -242,6 +246,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         // Start new Timeslot
         // TODO: Check if it makes sense to add in if-statement: && isOutbound(interpolatedPosition)
         if(openTimeslot == null && inboundTLA != null){
+            // TODO: Check for serviceRunningTime.isServiceRunningLongterm() and apply 'starttimeIsVague = true' flag.
             if (dbHelper.startNewTimeslot(getEventTimestamp(), inboundTLA) == 1) {
                 GeneralHelper.showToast(this, "New Timeslot started.");
             } else {
@@ -257,11 +262,15 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         NO_CONNECTION = !loc.isRealUpdate();
         numberOfUpdates++;
 
+        updateTravelDistance(loc);
+
         // Put loc in activeCache and passiveCache
         LocationCache.getInstance().addLocationUpdate(loc);
         // Order is important: First update cache, then send broadcast because Broadcast-Receivers
         // might access LocationCache.
         sendLocationUpdateViaBroadcast(loc.getLatitude(), loc.getLongitude(), loc.getAccuracy(), loc.isRealUpdate());
+
+
 
         // Update inboundTLA at every LocationUpdate unless activeCache doesn't contain
         // 2 entries yet. If it was updated, also update Timeslots.
@@ -276,11 +285,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         timer.schedule(locUpdateTimerTask, REGULAR_UPDATE_INTERVAL + 1000 * 10, REGULAR_UPDATE_INTERVAL);
     }
 
-    private class LocationUpdateTimer extends TimerTask {
-        public void run(){
-            Loc loc = LocationCache.getInstance().getActiveCache().get(0);
-            loc.setIsRealUpdate(false);
-            handleLocationUpdate(loc);
+    public void updateTravelDistance(Loc loc){
+        if(inboundTLA == null && loc.getAccuracy() <= 100){
+            travelledDistance += loc.distanceTo(LocationCache.getInstance().getMostRecentLoc());
         }
     }
 
@@ -296,7 +303,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         int indexOfInterest = (int)(INBOUND_TRESHOLD * ACTIVE_CACHE_SIZE);
         for(; indexOfInterest >= 0; indexOfInterest--){
             try {
-                return activeCache.get(indexOfInterest).getTimestampInMillis();
+                return activeCache.get(activeCache.size()-indexOfInterest).getTimestampInMillis();
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -333,41 +340,42 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    private class LocationUpdateTimer extends TimerTask {
+        public void run(){
+            Loc loc = LocationCache.getInstance().getMostRecentLoc();
+            if(loc != null){
+                loc.setIsRealUpdate(false);
+                handleLocationUpdate(loc);
+            }
+        }
+    }
+
+    private class ServiceRunningTime extends CountDownTimer {
+        private boolean isServiceRunningLongterm = false;
+
+        public ServiceRunningTime(long millisInFuture) {
+            // 2nd parameter sets interval for onTick().
+            super(millisInFuture, millisInFuture);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {}
+
+        @Override
+        public void onFinish() {
+            isServiceRunningLongterm = true;
+        }
+
+        public boolean isServiceRunningLongterm() {
+            return isServiceRunningLongterm;
+        }
+    }
+
     private DatabaseHelper getHelper(Context context) {
         if (dbHelper == null) {
             dbHelper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
         }
         return dbHelper;
-    }
-
-    private boolean googlePlayServiceConnected() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-
-        if (resultCode == ConnectionResult.SUCCESS) {
-            return true;
-        } else {
-            Toast toast = Toast.makeText(LocationService.this, resultCode, Toast.LENGTH_LONG);
-            toast.show();
-            return false;
-
-            // Get the error dialog from Google Play services
-            /*Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(
-                    resultCode,
-                    this,
-                    CONNECTION_FAILURE_RESOLUTION_REQUEST);
-
-            // If Google Play services can provide an error dialog
-            if (errorDialog != null) {
-                ErrorDialogFragment errorFragment =
-                        new ErrorDialogFragment();
-                // Set the dialog in the DialogFragment
-                errorFragment.setDialog(errorDialog);
-                // Show the error dialog in the DialogFragment
-                errorFragment.show(getSupportFragmentManager(),
-                        "Location Updates");
-            }*/
-
-        }
     }
 }
 

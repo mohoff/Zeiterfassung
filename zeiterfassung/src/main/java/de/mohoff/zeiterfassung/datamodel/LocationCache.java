@@ -59,10 +59,12 @@ public class LocationCache {
     }
 
     public void setPassiveCache(CircularFifoQueue<Loc> cache){
-        passiveCache = cache;
+        if(passiveCache.isEmpty()){
+            passiveCache = cache;
+        }
     }
 
-    public float validateInBoundsForTLA(TargetLocationArea tla){
+    public float validateInBoundsForTLA(Zone tla){
         float positives = 0;
 
         for(int i=0; i< activeInterpolatedCache.size(); i++){
@@ -76,7 +78,7 @@ public class LocationCache {
     }
 
     // Uses activeInterpolatedCache
-    public float getCurrentInBoundProxFor(TargetLocationArea tla){
+    public float getCurrentInBoundProxFor(Zone tla){
         float positives = 0;
         float all = activeCache.size();
 
@@ -92,7 +94,7 @@ public class LocationCache {
     }
 
     // Uses activeCache
-    public float getCurrentInBoundProxFor2(TargetLocationArea tla){
+    public float getCurrentInBoundProxFor2(Zone tla){
         float positives = 0;
         float all = activeCache.size();
 
@@ -129,8 +131,6 @@ public class LocationCache {
         if(isPassiveCacheFull()){
             firstPassiveCacheDropHappened = true;
         }
-
-
     }
 
     public boolean isActiveCacheFull(){
@@ -145,6 +145,15 @@ public class LocationCache {
 
     public boolean hasFirstPassiveQueueDropHappened(){
         return firstPassiveCacheDropHappened;
+    }
+
+    public Loc getMostRecentLoc(){
+        if(activeCache.size() > 0){
+            return activeCache.get(activeCache.size()-1);
+        } else {
+            return null;
+        }
+
     }
 
     public Loc getInterpolatedPosition() {
