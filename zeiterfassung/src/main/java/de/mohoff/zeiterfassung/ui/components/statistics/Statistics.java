@@ -28,6 +28,7 @@ public class Statistics extends Fragment {
 
     List<Stat> stats;
 
+    // TODO: add listeners for timeslotStarted, ZoneAdded/Deleted, so we can call notifyDataSetChanged() somewhere in here.
 
     public Statistics() {
     }

@@ -166,6 +166,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         stopForeground(true);
         IS_SERVICE_RUNNING = false;
 
+        // TODO: store distanceTravelled and backgroundServiceUptime in DB.
+
         // Store locs in DB in order to retrieve them when service is recreated soon and stored locs
         // aren't too old already.
         dbHelper.dumpLocs(LocationCache.getInstance().getPassiveCache());
