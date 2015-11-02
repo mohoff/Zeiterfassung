@@ -20,6 +20,7 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.Loc;
+import de.mohoff.zeiterfassung.datamodel.Stat;
 import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
 
@@ -36,7 +37,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME = "database.db";
 
     // any time you make changes to your database objects, you may have to increase the database version
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 8;
 
     // the DAO object we use to access the SimpleData table
     private Dao<Timeslot, Integer> timeslotDAO = null;
@@ -45,6 +46,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private RuntimeExceptionDao<Zone, Integer> targetareasREDAO = null;
     private Dao<Loc, Integer> locDAO = null;
     private RuntimeExceptionDao<Loc, Integer> locREDAO = null;
+    private Dao<Stat, Integer> statDAO = null;
+    private RuntimeExceptionDao<Stat, Integer> statREDAO = null;
 
 
     public DatabaseHelper(Context context) {
@@ -208,6 +211,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
+    public int deleteAllStats(){
+        try {
+            // Dropping and creating table will reset autoincrement for _id.
+            TableUtils.dropTable(connectionSource, Stat.class, true);
+            TableUtils.createTable(connectionSource, Stat.class);
+            return 1;
+        } catch (SQLException e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     public int sealCurrentTimeslot(long millis){ // seals newest TS
         getTimeslotREDAO();
 
@@ -266,6 +281,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, Timeslot.class);
             TableUtils.createTable(connectionSource, Zone.class);
             TableUtils.createTable(connectionSource, Loc.class);
+            TableUtils.createTable(connectionSource, Stat.class);
         } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
             throw new RuntimeException(e);
@@ -282,6 +298,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.dropTable(connectionSource, Timeslot.class, true);
             TableUtils.dropTable(connectionSource, Zone.class, true);
             TableUtils.dropTable(connectionSource, Loc.class, true);
+            TableUtils.dropTable(connectionSource, Stat.class, true);
             // after we drop the old databases, we create the new ones
             onCreate(db, connectionSource);
         } catch (SQLException e) {
@@ -311,6 +328,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
         return locDAO;
     }
+    public Dao<Stat, Integer> getStatDAO() throws SQLException {
+        if (statDAO == null) {
+            statDAO = getDao(Stat.class);
+        }
+        return statDAO;
+    }
     /**
      * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our SimpleData class. It will
      * create it or just give the cached value. RuntimeExceptionDao only through RuntimeExceptions.
@@ -333,6 +356,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
         return locREDAO;
     }
+    public RuntimeExceptionDao<Stat, Integer> getStatREDAO() {
+        if (statREDAO == null) {
+            statREDAO = getRuntimeExceptionDao(Stat.class);
+        }
+        return statREDAO;
+    }
     /**
      * Close the database connections and clear any cached DAOs.
      */
@@ -345,6 +374,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         targetareasREDAO = null;
         locDAO = null;
         locREDAO = null;
+        statDAO = null;
+        statREDAO = null;
     }
 
 
@@ -402,6 +433,38 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             e.printStackTrace();
         }
         return timeslots;
+    }
+
+    public List<Stat> getAllStats(){
+        getStatREDAO();
+        List<Stat> stats = new ArrayList<>();
+
+        try {
+            stats = statREDAO.queryForAll();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return stats;
+    }
+
+    public int initStatistics(){
+        ArrayList<Stat> stats = new ArrayList<>();
+        stats.add(new Stat("serviceUptime", "Background service uptime"));
+        stats.add(new Stat("distanceTravelled", "Distance travelled"));
+        stats.add(new Stat("numberOfTimeslots", "Zone movements tracked"));
+        stats.add(new Stat("numberOfZones", "Active Zones"));
+
+        // Insert 'stats' in DB
+        for(Stat stat : stats){
+            try {
+                getStatDAO();
+                statDAO.create(stat);
+            } catch(SQLException e){
+                e.printStackTrace();
+                return -1;
+            }
+        }
+        return 1;
     }
 
     public Cursor getCursorForTLAs(){

@@ -78,6 +78,8 @@ public class Loc implements Parcelable{  //, daoClass = Loc.class)
     }
 
     static public int distanceTo(Loc loc1, Loc loc2){
+        if(loc1 == null || loc2 == null) return 0;
+
         int earthRadius = 6371; // km
 
         double loc1LatInRadians = Math.toRadians(loc1.getLatitude());
@@ -95,6 +97,8 @@ public class Loc implements Parcelable{  //, daoClass = Loc.class)
     }
 
     public int distanceTo(Loc targetLoc){
+        if(targetLoc == null) return 0;
+
         int earthRadius = 6371; // km
 
         double loc1LatInRadians = Math.toRadians(this.getLatitude());

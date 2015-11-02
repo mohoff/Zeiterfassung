@@ -445,6 +445,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     @Override
     protected void onDestroy() {
+        // TODO: add releaseHelper (following lines) also to all other fragments which use dbHelper
         if (dbHelper != null) {
             OpenHelperManager.releaseHelper();
             dbHelper = null;

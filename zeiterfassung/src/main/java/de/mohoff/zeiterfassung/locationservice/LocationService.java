@@ -287,7 +287,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     public void updateTravelDistance(Loc loc){
         if(inboundTLA == null && loc.getAccuracy() <= 100){
-            travelledDistance += loc.distanceTo(LocationCache.getInstance().getMostRecentLoc());
+            Loc mostRecentLoc = LocationCache.getInstance().getMostRecentLoc();
+            // 0.9 is correction value
+            travelledDistance += loc.distanceTo(mostRecentLoc) * 0.9;
         }
     }
 

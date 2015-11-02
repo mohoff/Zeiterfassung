@@ -1,5 +1,5 @@
 #
-# generated on 2015/10/22 02:35:17
+# generated on 2015/11/02 01:01:40
 #
 # --table-start--
 dataClass=de.mohoff.zeiterfassung.datamodel.Timeslot
@@ -20,6 +20,7 @@ fieldName=endtime
 # --field-start--
 fieldName=tla
 columnName=tla_id
+canBeNull=false
 foreign=true
 foreignAutoRefresh=true
 # --field-end--
@@ -28,7 +29,7 @@ foreignAutoRefresh=true
 #################################
 # --table-start--
 dataClass=de.mohoff.zeiterfassung.datamodel.Zone
-tableName=targetareas
+tableName=zones
 # --table-fields-start--
 # --field-start--
 fieldName=_id
@@ -88,6 +89,31 @@ fieldName=altitude
 # --field-end--
 # --field-start--
 fieldName=speed
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=de.mohoff.zeiterfassung.datamodel.Stat
+tableName=stat
+# --table-fields-start--
+# --field-start--
+fieldName=_id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=identifier
+canBeNull=false
+unique=true
+# --field-end--
+# --field-start--
+fieldName=displayString
+canBeNull=false
+# --field-end--
+# --field-start--
+fieldName=value
+defaultValue=n.a.
+canBeNull=false
 # --field-end--
 # --table-fields-end--
 # --table-end--

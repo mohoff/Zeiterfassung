@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "targetareas")//, daoClass = Zone.class)
+@DatabaseTable(tableName = "zones")//, daoClass = Zone.class)
 public class Zone {
     //private LatLng center; // not usable coz we want to store position in db, so we fallback to 2 floats/doubles
 
