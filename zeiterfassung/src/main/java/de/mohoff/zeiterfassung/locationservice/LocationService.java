@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import de.mohoff.zeiterfassung.datamodel.Stat;
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
@@ -74,6 +75,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private Timer timer = new Timer();
 
     private ServiceRunningTime serviceRunningTime = new ServiceRunningTime(REGULAR_UPDATE_INTERVAL * ACTIVE_CACHE_SIZE * 2);
+
+    private List<Stat> stats;
 
     @Override
     public boolean stopService(Intent name) {
@@ -155,6 +158,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                 .build();
 
         startForeground(1337, notification);
+
+        stats = dbHelper.getAllStats();
     }
 
     @Override
@@ -166,7 +171,15 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         stopForeground(true);
         IS_SERVICE_RUNNING = false;
 
-        // TODO: store distanceTravelled and backgroundServiceUptime in DB.
+        // Update 'travelled distance' in DB.
+        for(Stat stat : stats){
+            if(stat.getIdentifier().equals("distanceTravelled")){
+                int updatedDistance = Integer.valueOf(stat.getValue()) + travelledDistance;
+                dbHelper.updateStatDistanceTravelled(travelledDistance);
+            }
+        }
+
+        // TODO: store backgroundServiceUptime in DB.
 
         // Store locs in DB in order to retrieve them when service is recreated soon and stored locs
         // aren't too old already.
@@ -255,8 +268,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                 GeneralHelper.showToast(this, "Timeslot already exists.");
             }
         }
-
-
     }
 
 
@@ -272,8 +283,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         // might access LocationCache.
         sendLocationUpdateViaBroadcast(loc.getLatitude(), loc.getLongitude(), loc.getAccuracy(), loc.isRealUpdate());
 
-
-
         // Update inboundTLA at every LocationUpdate unless activeCache doesn't contain
         // 2 entries yet. If it was updated, also update Timeslots.
         if((LocationCache.getInstance().getActiveCache().size() >= 2) &&
@@ -288,10 +297,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     public void updateTravelDistance(Loc loc){
+        // TODO: Maybe add condition '&& numberOfUpdates % 2 == 0' in order to reduce update frequency
         if(inboundTLA == null && loc.getAccuracy() <= 100){
             Loc mostRecentLoc = LocationCache.getInstance().getMostRecentLoc();
-            // 0.9 is correction value
-            travelledDistance += loc.distanceTo(mostRecentLoc) * 0.9;
+            // 0.95 is correction value
+            travelledDistance += loc.distanceTo(mostRecentLoc) * 0.95;
         }
     }
 

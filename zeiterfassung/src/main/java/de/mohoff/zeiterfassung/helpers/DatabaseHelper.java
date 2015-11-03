@@ -467,6 +467,36 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return 1;
     }
 
+    private void checkForStat(String identifier){
+        Stat result = null;
+        try{
+            result = statDAO.queryForEq("identifier", identifier).get(0);
+        } catch (SQLException | IndexOutOfBoundsException | NullPointerException e){
+            e.printStackTrace();
+        }
+
+        if(result == null){
+            initStatistics();
+        }
+    }
+
+
+    public int updateStatDistanceTravelled(int newValue){
+        checkForStat("distanceTravelled");
+
+        // Update column field 'value'
+        UpdateBuilder<Stat, Integer> updateBuilder = statREDAO.updateBuilder();
+        try {
+            updateBuilder.updateColumnValue("value", newValue);
+            updateBuilder.where().eq("identifier", "distanceTravelled");
+            updateBuilder.update();
+            return 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     public Cursor getCursorForTLAs(){
         Cursor c = null;
         QueryBuilder<Zone, Integer> queryBuilder = targetareasREDAO.queryBuilder();

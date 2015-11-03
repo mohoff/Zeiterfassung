@@ -109,6 +109,8 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         // The current implementation only expects inserts, no deletions.
         // Thus the only action is to notify the adapter that an item is added.
         adapter.notifyItemInserted(adapter.getItemCount()-1);
+        // Update the 2nd list element. Its endtime and enddate might have TYPEFACE.ITALIC still.
+        adapter.notifyItemChanged(adapter.getItemCount()-2);
         // Give visual feedback that a new item has beed added.
         // TODO: Does the following this work?
         recList.scrollToPosition(adapter.getItemCount() - 1);
