@@ -3,6 +3,10 @@ package de.mohoff.zeiterfassung.datamodel;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.sql.Time;
+
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
+
 /**
  * Created by moo on 11/1/15.
  */
@@ -40,8 +44,33 @@ public class Stat {
     }
 
     public String getValue() {
+        // Try to convert 'value' to an integer. If convertible situational return a custom string
+        // format. If it's not convertible just return 'value'.
+
+        int intValue = -1;
+        try {
+            intValue = Integer.getInteger(value);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        if(intValue != -1 && identifier.equals("distanceTravelled")){
+            return getReadableDistance(Integer.getInteger(value));
+        } else if(intValue != -1 && identifier.equals("serviceUptime")){
+            return Timeslot.getReadableDuration(300000,400000, false);
+        }
         return value;
     }
 
+    public static String getReadableDistance(int distanceInMeter){
+        // Transforms the integer 12345 to String "12 km 345 m"
 
+        String output = "";
+        if(distanceInMeter >= 1000){
+            output += distanceInMeter/1000 + " km ";
+            distanceInMeter = distanceInMeter - (distanceInMeter/1000)*1000;
+        }
+        output += (distanceInMeter - distanceInMeter%10) + " m";
+        return output;
+    }
 }

@@ -55,19 +55,23 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     public int getAmountOfTimeslots(){
-        // approach 1, so we can give better return values
-        int result = -1;
         try {
             getTimeslotDAO();
-            result = (int)timeslotDAO.countOf();
+            return (int)timeslotDAO.countOf();
         } catch(SQLException e){
             e.printStackTrace();
+            return -1;
         }
-        return result;
+    }
 
-        // approach 2
-        /*RuntimeExceptionDao<Timeslot, Integer> dao2 = getTimeslotREDAO();
-        return (int) dao2.countOf();*/
+    public int getAmountOfZones(){
+        try {
+            getTargetLocationAreaDAO();
+            return (int)targetareasDAO.countOf();
+        } catch(SQLException e){
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     public int startNewTimeslot(long millis, Zone tla){
@@ -470,6 +474,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private void checkForStat(String identifier){
         Stat result = null;
         try{
+            getStatDAO();
             result = statDAO.queryForEq("identifier", identifier).get(0);
         } catch (SQLException | IndexOutOfBoundsException | NullPointerException e){
             e.printStackTrace();
@@ -480,18 +485,48 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
+    public int updateStat(String identifier, int newValue){
+        checkForStat(identifier);
+        getStatREDAO();
 
-    public int updateStatDistanceTravelled(int newValue){
-        checkForStat("distanceTravelled");
-
-        // Update column field 'value'
         UpdateBuilder<Stat, Integer> updateBuilder = statREDAO.updateBuilder();
         try {
             updateBuilder.updateColumnValue("value", newValue);
-            updateBuilder.where().eq("identifier", "distanceTravelled");
+            updateBuilder.where().eq("identifier", identifier);
             updateBuilder.update();
             return 1;
         } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    // updateStat for Stats that can be retrieved automatically with DatabaseHelper methods and
+    // thus don't need a 'newValue' parameter.
+    public int updateStat(String identifier){
+        checkForStat(identifier);
+        getStatREDAO();
+
+        UpdateBuilder<Stat, Integer> updateBuilder = statREDAO.updateBuilder();
+        int newValue;
+
+        if(identifier.equals("numberOfTimeslots")){
+            newValue = getAmountOfTimeslots();
+        } else
+        if(identifier.equals("numberOfZones")){
+            newValue = getAmountOfZones();
+        } else {
+            // Do not update if identifier doesn't match any of the listed values
+            return -1;
+        }
+
+        // Execute prepared update operation
+        try {
+            updateBuilder.updateColumnValue("value", newValue);
+            updateBuilder.where().eq("identifier", identifier);
+            updateBuilder.update();
+            return 1;
+        } catch (SQLException e){
             e.printStackTrace();
             return -1;
         }

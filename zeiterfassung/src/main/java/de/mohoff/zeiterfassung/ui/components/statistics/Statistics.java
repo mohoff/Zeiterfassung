@@ -62,6 +62,9 @@ public class Statistics extends Fragment {
         recList.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
 
         dbHelper.initStatistics();
+        dbHelper.updateStat("numberOfTimeslots");
+        dbHelper.updateStat("numberOfZones");
+
         stats = dbHelper.getAllStats();
         adapter = new AdapterStatistics(stats);
 
@@ -72,7 +75,7 @@ public class Statistics extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        adapter.notifyDataSetChanged();
+        //adapter.notifyDataSetChanged();
     }
 
     private DatabaseHelper getDbHelper() {

@@ -113,6 +113,8 @@ public class Timeslot {
         }
     }
 
+    // TODO: add method getReadableDuration(...) that takes timeinterval as argument
+
     public static String getReadableDuration(long time1, long time2, boolean ignoreSeconds){
         int secInMillis = 1000,
             minInMillis = secInMillis * 60,

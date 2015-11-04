@@ -69,7 +69,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private Zone inboundTLA;
     public static Location mostRecentLocation = null;
     private int numberOfUpdates = 0;
-    private int travelledDistance = 0;
+    private int distanceTravelled = 0;
 
     private LocationUpdateTimer locUpdateTimerTask = new LocationUpdateTimer();
     private Timer timer = new Timer();
@@ -77,11 +77,21 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private ServiceRunningTime serviceRunningTime = new ServiceRunningTime(REGULAR_UPDATE_INTERVAL * ACTIVE_CACHE_SIZE * 2);
 
     private List<Stat> stats;
+    private long timestampServiceStarted = 0;
 
     @Override
     public boolean stopService(Intent name) {
+        getHelper(this);
+
+        updateNumericStat("serviceUptime", getServiceSessionUptime());
+        timestampServiceStarted = 0;
+
         sendServiceEventViaBroadcast("stop");
         return super.stopService(name);
+    }
+
+    private int getServiceSessionUptime(){
+        return (int)((System.currentTimeMillis() - timestampServiceStarted)/1000);
     }
 
     @Override
@@ -162,6 +172,24 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         stats = dbHelper.getAllStats();
     }
 
+    private void updateNumericStat(String identifier, int deltaToAdd){
+        // Update 'travelled distance' in DB.
+        for(Stat stat : stats){
+            if(stat.getIdentifier().equals(identifier)){
+                int oldValue = 0;
+                try {
+                    oldValue = Integer.valueOf(stat.getValue());
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                int newValue = oldValue + deltaToAdd;
+                dbHelper.updateStat(identifier, newValue);
+            }
+        }
+    }
+
+
     @Override
     public void onDestroy() {
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
@@ -171,19 +199,17 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         stopForeground(true);
         IS_SERVICE_RUNNING = false;
 
-        // Update 'travelled distance' in DB.
-        for(Stat stat : stats){
-            if(stat.getIdentifier().equals("distanceTravelled")){
-                int updatedDistance = Integer.valueOf(stat.getValue()) + travelledDistance;
-                dbHelper.updateStatDistanceTravelled(travelledDistance);
-            }
-        }
-
-        // TODO: store backgroundServiceUptime in DB.
-
         // Store locs in DB in order to retrieve them when service is recreated soon and stored locs
         // aren't too old already.
         dbHelper.dumpLocs(LocationCache.getInstance().getPassiveCache());
+
+        // Update relevant statistics
+        updateNumericStat("distanceTravelled", distanceTravelled);
+        if(timestampServiceStarted != 0){
+            updateNumericStat("serviceUptime", getServiceSessionUptime());
+            // No need to zero timestampServiceStarted since service instance is destroyed soon.
+            //timestampServiceStarted = 0;
+        }
 
         super.onDestroy();
     }
@@ -200,6 +226,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         // Start counting service tracking uptime
         serviceRunningTime.start();
+        timestampServiceStarted = System.currentTimeMillis();
 
         return Service.START_STICKY;
     }
@@ -301,7 +328,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         if(inboundTLA == null && loc.getAccuracy() <= 100){
             Loc mostRecentLoc = LocationCache.getInstance().getMostRecentLoc();
             // 0.95 is correction value
-            travelledDistance += loc.distanceTo(mostRecentLoc) * 0.95;
+            distanceTravelled += loc.distanceTo(mostRecentLoc) * 0.95;
         }
     }
 
