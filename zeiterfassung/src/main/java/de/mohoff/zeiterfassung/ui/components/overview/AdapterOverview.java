@@ -96,7 +96,6 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void updateData(){
         data.clear();
         data.addAll(dbHelper.getAllTimeslots());
-        int bla = 0;
     }
 
     // Create new views (invoked by the layout manager)
@@ -126,6 +125,9 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if(timeslot.getReadableEndTime().equals("pending") && timeslot.getReadableEndDate().equals("pending")){
                 vh.endTime.setTypeface(null, Typeface.ITALIC);
                 vh.endDate.setTypeface(null, Typeface.ITALIC);
+            } else {
+                vh.endTime.setTypeface(null, Typeface.NORMAL);
+                vh.endDate.setTypeface(null, Typeface.NORMAL);
             }
 
             vh.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));

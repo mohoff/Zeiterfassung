@@ -112,8 +112,8 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         // Update the 2nd list element. Its endtime and enddate might have TYPEFACE.ITALIC still.
         adapter.notifyItemChanged(adapter.getItemCount()-2);
         // Give visual feedback that a new item has beed added.
-        // TODO: Does the following this work?
-        recList.scrollToPosition(adapter.getItemCount() - 1);
+        // TODO: Does the following work?
+        recList.scrollToPosition(adapter.getItemCount()-1);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
             // The list will be scrolled top when current scroll position is not too far
             // away from the very top.
 
-            // findFirstVisibleItemPosition() returns first (partly) item position
+            // findFirstVisibleItemPosition() returns first (partly) visible item position
             int firstVisible = llm.findFirstVisibleItemPosition();
             int itemCount = adapter.getItemCount();
             if(firstVisible > itemCount-10){
@@ -141,22 +141,4 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
             }
         }
     }
-
-    /*@Override
-    public void StartButtonClicked() {
-        // TODO: when click start->stop often repeatedly, it gets async. To fix.
-        adapter.setIsServiceRunning(true);
-        adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void StopButtonClicked() {
-        adapter.setIsServiceRunning(false);
-        adapter.notifyDataSetChanged();
-        // TODO: below not working yet.
-        if(llm.findFirstVisibleItemPosition() > (adapter.getItemCount()-3)){
-            recList.scrollToPosition(0);
-        }
-    }
-    */
 }

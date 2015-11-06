@@ -148,12 +148,14 @@ public class LocationCache {
     }
 
     public Loc getMostRecentLoc(){
-        if(activeCache.size() > 0){
-            return activeCache.get(activeCache.size()-1);
-        } else {
-            return null;
+        for(int i=activeCache.size()-1; i>=0; i--){
+            try {
+                return activeCache.get(i);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
         }
-
+        return null;
     }
 
     public Loc getInterpolatedPosition() {

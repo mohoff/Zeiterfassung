@@ -30,7 +30,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import de.mohoff.zeiterfassung.datamodel.Stat;
-import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
@@ -77,7 +76,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private ServiceRunningTime serviceRunningTime = new ServiceRunningTime(REGULAR_UPDATE_INTERVAL * ACTIVE_CACHE_SIZE * 2);
 
     private List<Stat> stats;
-    private long timestampServiceStarted = 0;
+    public static long timestampServiceStarted = 0;
 
     @Override
     public boolean stopService(Intent name) {
@@ -90,7 +89,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         return super.stopService(name);
     }
 
-    private int getServiceSessionUptime(){
+    // Returns service session uptime in seconds
+    public static int getServiceSessionUptime(){
+        if(timestampServiceStarted == 0) return 0;
         return (int)((System.currentTimeMillis() - timestampServiceStarted)/1000);
     }
 
@@ -178,13 +179,12 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             if(stat.getIdentifier().equals(identifier)){
                 int oldValue = 0;
                 try {
-                    oldValue = Integer.valueOf(stat.getValue());
+                    oldValue = Integer.parseInt(stat.getValue());
+                    int newValue = oldValue + deltaToAdd;
+                    dbHelper.updateStat(identifier, newValue);
                 } catch (Exception e){
                     e.printStackTrace();
                 }
-
-                int newValue = oldValue + deltaToAdd;
-                dbHelper.updateStat(identifier, newValue);
             }
         }
     }
@@ -197,7 +197,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         // Stop statusbar notification
         stopForeground(true);
-        IS_SERVICE_RUNNING = false;
 
         // Store locs in DB in order to retrieve them when service is recreated soon and stored locs
         // aren't too old already.
@@ -211,6 +210,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             //timestampServiceStarted = 0;
         }
 
+        IS_SERVICE_RUNNING = false;
         super.onDestroy();
     }
 
@@ -279,9 +279,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         if(openTimeslot != null && inboundTLA == null){
             // TODO: Check for serviceRunningTime.isServiceRunningLongterm() and apply 'endtimeIsVague = true' flag.
             if (dbHelper.closeTimeslotById(openTimeslot.get_id(), getEventTimestamp()) == 1) {
-                GeneralHelper.showToast(this, "Timeslot sealed");
-            } else {
-                GeneralHelper.showToast(this, "Error sealing timeslot in DB");
+                sendTimeslotEventViaBroadcast("closed");
             }
         }
 
@@ -290,9 +288,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         if(openTimeslot == null && inboundTLA != null){
             // TODO: Check for serviceRunningTime.isServiceRunningLongterm() and apply 'starttimeIsVague = true' flag.
             if (dbHelper.startNewTimeslot(getEventTimestamp(), inboundTLA) == 1) {
-                GeneralHelper.showToast(this, "New Timeslot started.");
-            } else {
-                GeneralHelper.showToast(this, "Timeslot already exists.");
+                sendTimeslotEventViaBroadcast("opened");
             }
         }
     }
@@ -325,7 +321,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     public void updateTravelDistance(Loc loc){
         // TODO: Maybe add condition '&& numberOfUpdates % 2 == 0' in order to reduce update frequency
-        if(inboundTLA == null && loc.getAccuracy() <= 100){
+        if(inboundTLA == null && loc != null && loc.getAccuracy() <= 100){
             Loc mostRecentLoc = LocationCache.getInstance().getMostRecentLoc();
             // 0.95 is correction value
             distanceTravelled += loc.distanceTo(mostRecentLoc) * 0.95;
@@ -353,13 +349,14 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     // Broadcast for Timeslot events
-    private void sendTimeslotEventViaBroadcast(int _id, String message, long timestamp, String activityName, String locationName) {
+    private void sendTimeslotEventViaBroadcast(String eventType) {
         Intent intent = new Intent("locationServiceTimeslotEvents");
-        intent.putExtra("id", _id);
+        intent.putExtra("type", eventType);
+        /*intent.putExtra("id", _id);
         intent.putExtra("message", message);
         intent.putExtra("timestamp", String.valueOf(timestamp));
         intent.putExtra("activityName", activityName);
-        intent.putExtra("locationName", locationName);
+        intent.putExtra("locationName", locationName);*/
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

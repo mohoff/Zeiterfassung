@@ -43,25 +43,49 @@ public class Stat {
         return displayString;
     }
 
-    public String getValue() {
-        // Try to convert 'value' to an integer. If convertible situational return a custom string
-        // format. If it's not convertible just return 'value'.
+    public String getValue(){
+        return value;
+    }
 
-        int intValue = -1;
+    // Return the integer representation of 'value' it it's parsable.
+    public int getIntValue(){
         try {
-            intValue = Integer.getInteger(value);
+            return Integer.parseInt(value);
         } catch (Exception e){
             e.printStackTrace();
         }
+        return -1;
+    }
 
+    // Extension for serviceUptime: Add a certain duration on top of 'value' and return human
+    // readable string.
+    public String getDisplayValueWithExtraTime(int extraTimeInSeconds){
+        int intValue = getIntValue();
+        if(intValue != -1 && identifier.equals("serviceUptime")){
+            // Multiply intValue by 1000 because the method works with millis, not seconds.
+            return Timeslot.getReadableDuration((intValue+extraTimeInSeconds) * 1000, false, false);
+        }
+        return null;
+    }
+
+    // Apply specific string formats to 'value' to generate an output format that is human readable.
+    public String getDisplayValue() {
+        // Try to convert 'value' to an integer. If convertible situational return a custom string
+        // format. If it's not convertible just return 'value'.
+
+        int intValue = getIntValue();
         if(intValue != -1 && identifier.equals("distanceTravelled")){
-            return getReadableDistance(Integer.getInteger(value));
-        } else if(intValue != -1 && identifier.equals("serviceUptime")){
-            return Timeslot.getReadableDuration(300000,400000, false);
+            return getReadableDistance(intValue);
+        }
+        if(intValue != -1 && identifier.equals("serviceUptime")){
+            // Multiply intValue by 1000 because the method works with millis, not seconds.
+            return Timeslot.getReadableDuration(intValue * 1000, false, false);
         }
         return value;
     }
 
+    // Generate an output format for distances that is human readable.
+    // This method separates a distance into a kilometer and a meter part in the output string.
     public static String getReadableDistance(int distanceInMeter){
         // Transforms the integer 12345 to String "12 km 345 m"
 

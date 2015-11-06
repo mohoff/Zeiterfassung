@@ -107,24 +107,20 @@ public class Timeslot {
 
     public String getReadableDuration(){
         if(this.endtime == 0){
-            return getReadableDuration(this.starttime, System.currentTimeMillis(), true);
+            return getReadableDuration(this.starttime, System.currentTimeMillis(), true, true);
         } else {
-            return getReadableDuration(this.starttime,  this.endtime, true);
+            return getReadableDuration(this.starttime,  this.endtime, true, true);
         }
     }
 
-    // TODO: add method getReadableDuration(...) that takes timeinterval as argument
-
-    public static String getReadableDuration(long time1, long time2, boolean ignoreSeconds){
+    public static String getReadableDuration(long diff, boolean ignoreSeconds, boolean multiLine){
         int secInMillis = 1000,
-            minInMillis = secInMillis * 60,
-            hourInMillis = minInMillis * 60,
-            dayInMillis = hourInMillis * 24,
-            yearInMillis = dayInMillis * 365;
+                minInMillis = secInMillis * 60,
+                hourInMillis = minInMillis * 60,
+                dayInMillis = hourInMillis * 24,
+                yearInMillis = dayInMillis * 365;
         int years, days, hours, mins, secs;
         String output = "";
-
-        long diff = time1 > time2 ? time1-time2 : time2-time1;
 
         years = (int) (diff / yearInMillis);
         diff = diff - years * yearInMillis;
@@ -138,34 +134,41 @@ public class Timeslot {
 
         // generate output string
         if(years != 0){
-            output += days + " y";
+            output = addToDurationOutput(output, years, "y", multiLine);
         }
         if(days != 0){
-            if(!output.equals("")){
+            output = addToDurationOutput(output, days, "d", multiLine);
+            /*if(!output.equals("")){
                 output += "\n";
             }
-            output += days + " d";
+            output += days + " d";*/
         }
         if(hours != 0){
-            if(!output.equals("")){
-                output += "\n";
-            }
-            output += hours + " h";
+            output = addToDurationOutput(output, hours, "h", multiLine);
         }
         if(mins != 0){
-            if(!output.equals("")){
-                output += "\n";
-            }
-            output += mins + " min";
+            output = addToDurationOutput(output, mins, "min", multiLine);
         }
-        if(mins != 0 && !ignoreSeconds){
-            if(!output.equals("")){
-                output += "\n";
-            }
-            output += secs + " sec";
+        if(secs != 0 && !ignoreSeconds){
+            output = addToDurationOutput(output, secs, "sec", multiLine);
         }
 
         return output;
+    }
+
+    private static String addToDurationOutput(String result, int value, String unit, boolean multiLine){
+        if(multiLine && !result.equals("")){
+            result += "\n";
+        } else if(!multiLine && !result.equals("")){
+            result += " ";
+        }
+        result += String.valueOf(value) + " " + unit;
+        return result;
+    }
+
+    public static String getReadableDuration(long time1, long time2, boolean ignoreSeconds, boolean multiLine){
+        long diff = time1 > time2 ? time1-time2 : time2-time1;
+        return getReadableDuration(diff, ignoreSeconds, multiLine);
     }
 
     public static boolean isSameDay(long timestamp1, long timestamp2){

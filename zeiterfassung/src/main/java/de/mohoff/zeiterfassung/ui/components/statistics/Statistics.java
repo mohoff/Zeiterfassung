@@ -66,7 +66,7 @@ public class Statistics extends Fragment {
         dbHelper.updateStat("numberOfZones");
 
         stats = dbHelper.getAllStats();
-        adapter = new AdapterStatistics(stats);
+        adapter = new AdapterStatistics(parentActivity, stats);
 
         recList.setAdapter(adapter);
         recList.setLayoutManager(layoutManager);

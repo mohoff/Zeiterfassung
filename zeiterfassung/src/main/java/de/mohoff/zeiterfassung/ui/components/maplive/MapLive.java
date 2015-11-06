@@ -88,7 +88,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener {
                         "Location",
                         "A:" + loc.getAccuracy() +
                                 "\n O:" + GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()) +
-                                "\n t:" + Timeslot.getReadableDuration(lastMarkerTimestamp, loc.getTimestampInMillis(), false),
+                                "\n t:" + Timeslot.getReadableDuration(lastMarkerTimestamp, loc.getTimestampInMillis(), false, false),
                         loc.isRealUpdate()
                 );
             }
@@ -116,7 +116,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener {
                     "Location",
                     "A:" + loc.getAccuracy() +
                             "\n O:" + GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()) +
-                            "\n t:" + Timeslot.getReadableDuration(timestampLastMarker, loc.getTimestampInMillis(), false),
+                            "\n t:" + Timeslot.getReadableDuration(timestampLastMarker, loc.getTimestampInMillis(), false, false),
                     loc.isRealUpdate()
             );
             // Ensure that there are only passiveCache.maxSize() markers displayed to prevent memory leak.

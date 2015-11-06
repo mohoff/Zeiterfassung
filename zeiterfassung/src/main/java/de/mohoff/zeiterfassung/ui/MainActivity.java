@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     //private LocationService service;
     private LocationServiceConnection lsc = null;
-    //private MainActivity refThis = this;
+    private MainActivity that = this;
     //public boolean isServiceRunning = false;
     public LocationServiceStatus serviceStatus;
 
@@ -464,15 +464,17 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         @Override
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
-            String receivedMessage = intent.getStringExtra("message");
-            if(receivedMessage.equals("newTimeslotStarted")){
-                if (newTimeslotEventListener != null) {
-                    newTimeslotEventListener.onNewTimeslot(intent.getIntExtra("id", 0)); // Why need to provide default value?
-                }
-            } else if(receivedMessage.equals("openTimeslotSealed")){
-                if (newTimeslotEventListener != null) {
-                    newTimeslotEventListener.onTimeslotSealed(intent.getIntExtra("id", 0));
-                }
+            String receivedMessage = intent.getStringExtra("type");
+            if(receivedMessage.equals("opened")){
+                GeneralHelper.showToast(that, "Timeslot opened.");
+                //if (newTimeslotEventListener != null) {
+                //    newTimeslotEventListener.onNewTimeslot(intent.getIntExtra("id", 0)); // Why need to provide default value?
+                //}
+            } else if(receivedMessage.equals("closed")){
+                GeneralHelper.showToast(that, "Timeslot opened.");
+                //if (newTimeslotEventListener != null) {
+                //   newTimeslotEventListener.onTimeslotSealed(intent.getIntExtra("id", 0));
+                //}
             }
         }
     };
@@ -571,7 +573,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         list.add(new NavigationDrawerItem(true, "Location Service"));
         list.add(new NavigationDrawerItem(true, "About"));*/
         list.add("Overview");
-        list.add("Manage TLAs");
+        list.add("Zones");
         list.add("Live Map");
         list.add("---------------"); // list[3] now hardcoded as separator (only hardcoded possible I think)
         list.add("Statistics");
