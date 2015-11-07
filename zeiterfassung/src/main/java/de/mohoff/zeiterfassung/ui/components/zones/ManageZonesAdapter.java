@@ -32,22 +32,22 @@ import de.mohoff.zeiterfassung.ui.MainActivity;
  * Created by moo on 8/17/15.
  */
 // --- Outer adapter ---
-public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{ //RecyclerView.Adapter<ManageZonesAdapter.TLAViewHolder>{
+public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private MainActivity context;
     private DatabaseHelper dbHelper = null;
     //private LayoutInflater li;
-    List<Zone> tlas;
+    List<Zone> zones;
     List<String> activityNames = new ArrayList<String>();
     private ManageZonesAdapter outerAdapter = this;
 
-    private Map<String, AdapterManageTLAInner> locationAdapterMap = new HashMap<>();
+    private Map<String, AdapterManageZoneInner> locationAdapterMap = new HashMap<>();
     private final static int VIEWTYPE_NORMAL = 1;
     private final static int VIEWTYPE_ADD = 2;
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public ManageZonesAdapter(Activity context) {
         getDbHelper();
-        this.tlas = dbHelper.getAllTLAs();
+        this.zones = dbHelper.getAllZones();
         this.activityNames = dbHelper.getDistinctActivityNames();
         this.context = (MainActivity)context;
     }
@@ -131,7 +131,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             // Create an adapter if none exists, and put in the map
             if (!locationAdapterMap.containsKey(activity)) {
-                locationAdapterMap.put(activity, new AdapterManageTLAInner(this, context, getRelevantTLAsByActivity(tlas, activity)));
+                locationAdapterMap.put(activity, new AdapterManageZoneInner(this, context, getRelevantZonesByActivity(zones, activity)));
             }
 
             actHolder.recyclerView.setAdapter(locationAdapterMap.get(activity));
@@ -149,7 +149,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                         GeneralHelper.showToast(context, "Name has not changed.");
                                     } else {
                                         // Execute update on DB
-                                        int result = dbHelper.updateTLAActivityName(activity, et.getText().toString());
+                                        int result = dbHelper.updateZoneActivityName(activity, et.getText().toString());
                                         if (result == 1) {
                                             updateList(outerAdapter, locationAdapterMap.get(activity)); // (outerAdapter, innerAdapter)
                                             GeneralHelper.showToast(context, "Updated successfully.");
@@ -185,7 +185,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 @Override
                                 public void onClick(DialogInterface dialog, int i) {
                                     // Delete action
-                                    if (dbHelper.deleteTLAsByActivity(activity) == 1) {
+                                    if (dbHelper.deleteZonesByActivity(activity) == 1) {
                                         GeneralHelper.showToast(context, "Activity deleted.");
                                         actHolder.recyclerView.setAdapter(null);
                                         updateList(outerAdapter, null); // outerAdapter == this
@@ -241,45 +241,45 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     // Updates the the complete list (outer and inner adapter). To be called when there has happened
     // a DB-change in order to reflect that on UI.
-    private void updateList(ManageZonesAdapter outerAdapter, AdapterManageTLAInner innerAdapter){
-        // To update the outer adapter, we first have to retrieve all TLAs from the DB.
-        this.tlas = dbHelper.getAllTLAs();
+    private void updateList(ManageZonesAdapter outerAdapter, AdapterManageZoneInner innerAdapter){
+        // To update the outer adapter, we first have to retrieve all Zones from the DB.
+        this.zones = dbHelper.getAllZones();
         this.activityNames = dbHelper.getDistinctActivityNames();
         outerAdapter.notifyDataSetChanged();
 
-        // To update the inner adapter, we first have to compose the relevant TLA list from scratch.
+        // To update the inner adapter, we first have to compose the relevant Zone list from scratch.
         // When a whole Activity is deleted, innerAdapter is null so we need to check here. In this
         // case, the inner recyclerView will be garbage collected. SetAdapter(null) is called inside
         // alertDialog.
         if (innerAdapter != null) {
-            String activity = innerAdapter.relevantTLAs.get(0).getActivityName();
-            innerAdapter.relevantTLAs = getRelevantTLAsByActivity(this.tlas, activity);
+            String activity = innerAdapter.relevantZones.get(0).getActivityName();
+            innerAdapter.relevantZones = getRelevantZonesByActivity(this.zones, activity);
             innerAdapter.notifyDataSetChanged();
         }
     }
 
-    // Helper function to reduce all TLAs to a set which elements all correspond to one Activity.
-    private List<Zone> getRelevantTLAsByActivity(List<Zone> list, String activity){
-        ArrayList<Zone> relevantTLAs = new ArrayList<>();
+    // Helper function to reduce all Zones to a set which elements all correspond to one Activity.
+    private List<Zone> getRelevantZonesByActivity(List<Zone> list, String activity){
+        ArrayList<Zone> relevantZones = new ArrayList<>();
         for (Zone entry : list) {
             if (entry.getActivityName().equals(activity)) {
-                relevantTLAs.add(entry);
+                relevantZones.add(entry);
             }
         }
-        return relevantTLAs;
+        return relevantZones;
     }
 
     // --- Inner adapter ---
-    private class AdapterManageTLAInner extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private class AdapterManageZoneInner extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         MainActivity context;
-        List<Zone> relevantTLAs;
-        AdapterManageTLAInner innerAdapter = this;
+        List<Zone> relevantZones;
+        AdapterManageZoneInner innerAdapter = this;
         ManageZonesAdapter outerAdapter;
 
-        public AdapterManageTLAInner(ManageZonesAdapter outerAdapter, MainActivity context, List<Zone> relevantTLAs) {
+        public AdapterManageZoneInner(ManageZonesAdapter outerAdapter, MainActivity context, List<Zone> relevantZones) {
             this.outerAdapter = outerAdapter;
             this.context = context;
-            this.relevantTLAs = relevantTLAs;
+            this.relevantZones = relevantZones;
         }
 
         @Override
@@ -303,10 +303,10 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             if(holder.getItemViewType() == VIEWTYPE_NORMAL) {
                 final LocViewHolder locHolder = (LocViewHolder) holder;
 
-                // Get TLA at position to setup textView and clickListeners below
-                final Zone tla = relevantTLAs.get(position);
+                // Get Zone at position to setup textView and clickListeners below
+                final Zone zone = relevantZones.get(position);
 
-                locHolder.locationName.setText(tla.getLocationName());
+                locHolder.locationName.setText(zone.getLocationName());
                 locHolder.locationName.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
@@ -319,10 +319,10 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                             GeneralHelper.showToast(context, "Name has not changed.");
                                         } else {
                                             // Execute update on DB
-                                            int result = dbHelper.updateTLALocationName(relevantTLAs.get(position).get_id(), et.getText().toString());
+                                            int result = dbHelper.updateZoneLocationName(relevantZones.get(position).get_id(), et.getText().toString());
                                             if(result == 1){
                                                 // Directly update the adapter's model, so we can avoid a new DB query
-                                                relevantTLAs.get(position).setLocationName(et.getText().toString());
+                                                relevantZones.get(position).setLocationName(et.getText().toString());
                                                 innerAdapter.notifyDataSetChanged();
                                                 GeneralHelper.showToast(context, "Updated successfully.");
                                                 dialog.dismiss();
@@ -354,9 +354,9 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     @Override
                     public void onClick(View v) {
                         Fragment nextFragment = new EditZonesMap();
-                        // pass TLAId to map fragment
+                        // pass ZoneId to map fragment
                         Bundle args = new Bundle();
-                        args.putInt("TLAId", tla.get_id());
+                        args.putInt("ZoneId", zone.get_id());
                         nextFragment.setArguments(args);
 
                         context.replaceFragment(nextFragment, true);
@@ -371,7 +371,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
                                         // Delete action
-                                        if (dbHelper.deleteTLAById(tla.get_id()) == 1) {
+                                        if (dbHelper.deleteZoneById(zone.get_id()) == 1) {
                                             GeneralHelper.showToast(context, "Location deleted.");
                                             updateList(outerAdapter, innerAdapter); // innerAdapter == this
                                         } else {
@@ -388,7 +388,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                     }
                                 })
                                 .setTitle("Delete Location")
-                                .setMessage("Are you sure that you want to delete Location \"" + tla.getLocationName() + "\"?")
+                                .setMessage("Are you sure that you want to delete Location \"" + zone.getLocationName() + "\"?")
                                 .create();
                                 // TODO: add app icon to the alertDialog.
                         alertDialog.show();
@@ -401,7 +401,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     public void onClick(View v) {
                         Fragment nextFragment = new AddZone();
                         Bundle args = new Bundle();
-                        args.putString("activityName", relevantTLAs.get(0).getActivityName());
+                        args.putString("activityName", relevantZones.get(0).getActivityName());
                         nextFragment.setArguments(args);
                         context.replaceFragment(nextFragment, true);
                         // TODO: Also provide this action in top menubar with "+"-icon. Or by placing the round red bottom right button (see material design)
@@ -412,7 +412,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         @Override
         public int getItemCount() {
-            return relevantTLAs.size() + 1;
+            return relevantZones.size() + 1;
         }
 
         @Override

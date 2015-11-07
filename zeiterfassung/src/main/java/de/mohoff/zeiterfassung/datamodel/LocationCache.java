@@ -64,13 +64,13 @@ public class LocationCache {
         }
     }
 
-    public float validateInBoundsForTLA(Zone tla){
+    public float validateInBoundsForZone(Zone zone){
         float positives = 0;
 
         for(int i=0; i< activeInterpolatedCache.size(); i++){
             Loc loc = (Loc) activeInterpolatedCache.get(i);
-            int distanceToTLABorder = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude())) - tla.getRadius();
-            if(distanceToTLABorder < 0){
+            int distanceToZoneBorder = loc.distanceTo(new Loc(zone.getLatitude(), zone.getLongitude())) - zone.getRadius();
+            if(distanceToZoneBorder < 0){
                 positives++;
             }
         }
@@ -78,15 +78,15 @@ public class LocationCache {
     }
 
     // Uses activeInterpolatedCache
-    public float getCurrentInBoundProxFor(Zone tla){
+    public float getCurrentInBoundProxFor(Zone zone){
         float positives = 0;
         float all = activeCache.size();
 
         for(int i=0; i< activeInterpolatedCache.size(); i++){
             Loc loc = (Loc) activeInterpolatedCache.get(i);
             //int distanceDebug = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude()));
-            int distanceTLABorderToUser = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude())) - tla.getRadius();
-            if(distanceTLABorderToUser <= 0){
+            int distanceZoneBorderToUser = loc.distanceTo(new Loc(zone.getLatitude(), zone.getLongitude())) - zone.getRadius();
+            if(distanceZoneBorderToUser <= 0){
                 positives++;
             }
         }
@@ -94,15 +94,15 @@ public class LocationCache {
     }
 
     // Uses activeCache
-    public float getCurrentInBoundProxFor2(Zone tla){
+    public float getCurrentInBoundProxFor2(Zone zone){
         float positives = 0;
         float all = activeCache.size();
 
         for(int i=0; i< activeCache.size(); i++){
             Loc loc = (Loc) activeCache.get(i);
             //int distanceDebug = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude()));
-            int distanceTLABorderToUser = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude())) - tla.getRadius();
-            if(distanceTLABorderToUser <= 0){
+            int distanceZoneBorderToUser = loc.distanceTo(new Loc(zone.getLatitude(), zone.getLongitude())) - zone.getRadius();
+            if(distanceZoneBorderToUser <= 0){
                 positives++;
             }
         }

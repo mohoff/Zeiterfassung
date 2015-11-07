@@ -1,5 +1,5 @@
 #
-# generated on 2015/11/02 01:01:40
+# generated on 2015/11/07 01:54:01
 #
 # --table-start--
 dataClass=de.mohoff.zeiterfassung.datamodel.Timeslot
@@ -18,8 +18,8 @@ unique=true
 fieldName=endtime
 # --field-end--
 # --field-start--
-fieldName=tla
-columnName=tla_id
+fieldName=zone
+columnName=zone_id
 canBeNull=false
 foreign=true
 foreignAutoRefresh=true

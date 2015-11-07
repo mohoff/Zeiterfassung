@@ -114,7 +114,7 @@ public class AddZone extends Fragment {
                     GeneralHelper.showToast(parentActivity, "Please enter both names first.");
                 } else {
                     Fragment nextFragment = new AddZoneMap();
-                    // pass TLAId to map fragment
+                    // pass ZoneId to map fragment
                     Bundle args = new Bundle();
                     args.putString("activityName", inputActivityName);
                     args.putString("locationName", inputLocationName);

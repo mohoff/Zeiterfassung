@@ -135,8 +135,8 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             // set setClipToOutline(false). This sadly is v21+.
             vh.container.setClipToOutline(false);
             vh.icon.setImageResource(R.drawable.ic_action_edit_location);
-            vh.activity.setText(timeslot.getTLA().getActivityName());
-            vh.location.setText(timeslot.getTLA().getLocationName());
+            vh.activity.setText(timeslot.getZone().getActivityName());
+            vh.location.setText(timeslot.getZone().getLocationName());
             vh.startTime.setText(timeslot.getReadableStartTime());
             vh.startDate.setText(timeslot.getReadableStartDate());
             vh.endTime.setText(timeslot.getReadableEndTime());
@@ -144,7 +144,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             vh.duration.setText(timeslot.getReadableDuration()); // e.g. "1d 2h 14min"
 
             /*// Show or hide top connector part of that view
-            if(listHasItemAtIndex(position+1) && (data.get(position+1).getTLA().get_id() == timeslot.getTLA().get_id())){
+            if(listHasItemAtIndex(position+1) && (data.get(position+1).getZone().get_id() == timeslot.getZone().get_id())){
                 vh.topConnectorPart.setVisibility(View.VISIBLE);
                 vh.topConnectorPart.setOnClickListener(getOnMergeClickListener());
                 vh.middleConnectorPart.setVisibility(View.VISIBLE);
@@ -156,7 +156,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 vh.middleConnectorPart.setOnClickListener(null);
             }
             // Show or hide bottom connector part of that view
-            if(listHasItemAtIndex(position - 1) && (data.get(position- 1).getTLA().get_id() == timeslot.getTLA().get_id())){
+            if(listHasItemAtIndex(position - 1) && (data.get(position- 1).getZone().get_id() == timeslot.getZone().get_id())){
                 vh.bottomConnectorPart.setVisibility(View.VISIBLE);
                 vh.bottomConnectorPart.setOnClickListener(getOnMergeClickListener());
             } else {
@@ -179,7 +179,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             public void onClick(DialogInterface dialog, int i) {
 
                                 // Execute update and delete on DB
-                                /*int result = dbHelper.updateTLALocationName(relevantTLAs.get(position).get_id(), et.getText().toString());
+                                /*int result = dbHelper.updateZoneLocationName(relevantTLAs.get(position).get_id(), et.getText().toString());
                                 if(result == 1){
                                     // Directly update the adapter's model, so we can avoid a new DB query
                                     relevantTLAs.get(position).setLocationName(et.getText().toString());

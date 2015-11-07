@@ -64,8 +64,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private GoogleApiClient googleApiClient;
     private LocationRequest locReq;
 
-    private List<Zone> allTLAs = new ArrayList<Zone>();
-    private Zone inboundTLA;
+    private List<Zone> allZones = new ArrayList<Zone>();
+    private Zone inboundZone;
     public static Location mostRecentLocation = null;
     private int numberOfUpdates = 0;
     private int distanceTravelled = 0;
@@ -131,7 +131,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     @Override
     public IBinder onBind(Intent intent) {
         getHelper(this);
-        dbHelper._createSampleTLAs();
+        dbHelper._createSampleZones();
         googleApiClient.connect();
 
         return binder;
@@ -219,7 +219,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     public int onStartCommand(Intent intent, int flags, int startId) {
         googleApiClient.connect();
         getHelper(this);
-        allTLAs = dbHelper.getAllTLAs();
+        allZones = dbHelper.getAllZones();
 
         IS_SERVICE_RUNNING = true;
         sendServiceEventViaBroadcast("start");
@@ -231,37 +231,37 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         return Service.START_STICKY;
     }
 
-    public boolean updateInboundTLA() {
-        Zone foundInboundTLA = null;
+    public boolean updateInboundZone() {
+        Zone foundInboundZone = null;
 
-        for (Zone tla : allTLAs) {
-            float ratio = LocationCache.getInstance().getCurrentInBoundProxFor2(tla);
-            // Only need to check for 'new inbound' and 'still inbound' here to assign foundInboundTLA.
-            // 'new outbound' and 'still outbound' are handled automatically when foundInboundTLA is null.
+        for (Zone zone : allZones) {
+            float ratio = LocationCache.getInstance().getCurrentInBoundProxFor2(zone);
+            // Only need to check for 'new inbound' and 'still inbound' here to assign foundInboundZone.
+            // 'new outbound' and 'still outbound' are handled automatically when foundInboundZone is null.
             if(
-                    // New enter event for the TLA we are iterating over: There are at
+                    // New enter event for the Zone we are iterating over: There are at
                     // least (INBOUND_TRESHOLD*activeCache.size()) locations inbound.
                     (ratio >= INBOUND_TRESHOLD) ||
-                    // Still inbound of the TLA we are iterating over: There is already an inboundTLA
-                    // AND its ratio isn't that low too trigger a leave-event AND inboundTLA is the
-                    // same as the TLA we are just iterating over.
-                    (inboundTLA != null && ratio > OUTBOUND_TRESHOLD && inboundTLA.get_id() == tla.get_id())){
+                    // Still inbound of the Zone we are iterating over: There is already an inboundZone
+                    // AND its ratio isn't that low too trigger a leave-event AND inboundZone is the
+                    // same as the Zone we are just iterating over.
+                    (inboundZone != null && ratio > OUTBOUND_TRESHOLD && inboundZone.get_id() == zone.get_id())){
 
-                foundInboundTLA = tla;
-                // No need to iterate any further since we found an inbound TLA and only one is possible.
+                foundInboundZone = zone;
+                // No need to iterate any further since we found an inbound Zone and only one is possible.
                 break;
             }
         }
 
-        // Determine if a change happened. To do so we check for all cases in which foundInboundTLA
-        // and inboundTLA are different (only one of them is null OR both have different IDs in the
+        // Determine if a change happened. To do so we check for all cases in which foundInboundZone
+        // and inboundZone are different (only one of them is null OR both have different IDs in the
         // DB.)
-        if((foundInboundTLA != null && inboundTLA == null) ||       // enter event (no inbound --> inbound)
-                (foundInboundTLA == null && inboundTLA != null) ||  // leave event (inbound --> no inbound)
-                (foundInboundTLA != null && (foundInboundTLA.get_id() != inboundTLA.get_id()))) {
+        if((foundInboundZone != null && inboundZone == null) ||       // enter event (no inbound --> inbound)
+                (foundInboundZone == null && inboundZone != null) ||  // leave event (inbound --> no inbound)
+                (foundInboundZone != null && (foundInboundZone.get_id() != inboundZone.get_id()))) {
                                                                     // leave AND enter event (inbound1 --> inbound2)
 
-            inboundTLA = foundInboundTLA;
+            inboundZone = foundInboundZone;
             // 'True' indicates the calling function that a change was detected.
             // An enter- or a leave-event happened.
             return true;
@@ -276,7 +276,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         // Close openTimeslot
         // TODO: Check if it makes sense to add in if-statement: && isInbound(interpolatedPosition)
-        if(openTimeslot != null && inboundTLA == null){
+        if(openTimeslot != null && inboundZone == null){
             // TODO: Check for serviceRunningTime.isServiceRunningLongterm() and apply 'endtimeIsVague = true' flag.
             if (dbHelper.closeTimeslotById(openTimeslot.get_id(), getEventTimestamp()) == 1) {
                 sendTimeslotEventViaBroadcast("closed");
@@ -285,9 +285,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         // Start new Timeslot
         // TODO: Check if it makes sense to add in if-statement: && isOutbound(interpolatedPosition)
-        if(openTimeslot == null && inboundTLA != null){
+        if(openTimeslot == null && inboundZone != null){
             // TODO: Check for serviceRunningTime.isServiceRunningLongterm() and apply 'starttimeIsVague = true' flag.
-            if (dbHelper.startNewTimeslot(getEventTimestamp(), inboundTLA) == 1) {
+            if (dbHelper.startNewTimeslot(getEventTimestamp(), inboundZone) == 1) {
                 sendTimeslotEventViaBroadcast("opened");
             }
         }
@@ -306,10 +306,10 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         // might access LocationCache.
         sendLocationUpdateViaBroadcast(loc.getLatitude(), loc.getLongitude(), loc.getAccuracy(), loc.isRealUpdate());
 
-        // Update inboundTLA at every LocationUpdate unless activeCache doesn't contain
+        // Update inboundZone at every LocationUpdate unless activeCache doesn't contain
         // 2 entries yet. If it was updated, also update Timeslots.
         if((LocationCache.getInstance().getActiveCache().size() >= 2) &&
-                updateInboundTLA()){
+                updateInboundZone()){
             updateTimeslots();
         }
 
@@ -321,10 +321,15 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     public void updateTravelDistance(Loc loc){
         // TODO: Maybe add condition '&& numberOfUpdates % 2 == 0' in order to reduce update frequency
-        if(inboundTLA == null && loc != null && loc.getAccuracy() <= 100){
+        if(inboundZone == null && loc != null && loc.getAccuracy() <= 100){
             Loc mostRecentLoc = LocationCache.getInstance().getMostRecentLoc();
-            // 0.95 is correction value
-            distanceTravelled += loc.distanceTo(mostRecentLoc) * 0.95;
+            int distanceInMeters = loc.distanceTo(mostRecentLoc);
+            // Only add distance to distanceTravelled when greater than some value in order to prevent
+            // fluctuations which occur due to the inaccurate nature of our location service.
+            if(distanceInMeters > 20){
+                // TODO: Maybe add correction factor of 0.9 or similar.
+                distanceTravelled += loc.distanceTo(mostRecentLoc);
+            }
         }
     }
 

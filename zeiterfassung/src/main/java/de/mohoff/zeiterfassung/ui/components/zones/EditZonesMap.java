@@ -16,12 +16,12 @@ import de.mohoff.zeiterfassung.helpers.GeneralHelper;
  * Created by moo on 8/16/15.
  */
 public class EditZonesMap extends ManageZonesMapAbstract {
-    int candidateTLAId;
-    Zone editTLA;
+    int candidateZoneId;
+    Zone editZone;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        candidateTLAId = getArguments().getInt("TLAId");
+        candidateZoneId = getArguments().getInt("ZoneId");
 
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -30,8 +30,8 @@ public class EditZonesMap extends ManageZonesMapAbstract {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        editTLA = dbHelper.getTLAById(candidateTLAId);
-        radius = editTLA.getRadius();
+        editZone = dbHelper.getZoneById(candidateZoneId);
+        radius = editZone.getRadius();
         radiusValue.setText(String.valueOf(radius));
 
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -43,11 +43,11 @@ public class EditZonesMap extends ManageZonesMapAbstract {
                 } else if (candidateMarker == null) {
                     GeneralHelper.showToast(getActivity(), "Please pin an area on the map first.");
                 } else {
-                    if (radius == editTLA.getRadius()) {
+                    if (radius == editZone.getRadius()) {
                         GeneralHelper.showToast(getActivity(), "Input is already saved.");
                         // cancel save process
                     } else {
-                        // TODO: Check if entered radius is valid (> 50m && not near other TLAs).
+                        // TODO: Check if entered radius is valid (> 50m && not near other Zones).
                         // TODO: execute save action on DB
                         GeneralHelper.showToast(getActivity(), "Successfully saved.");
                     }
@@ -57,19 +57,19 @@ public class EditZonesMap extends ManageZonesMapAbstract {
     }
 
     @Override
-    public void drawExistingTLAs(){
-        super.drawExistingTLAs();
-        for(Zone tla : dbHelper.getAllTLAs()) {
+    public void drawExistingZones(){
+        super.drawExistingZones();
+        for(Zone zone : dbHelper.getAllZones()) {
             Marker marker;
             Circle circle;
-            LatLng latLng = new LatLng(tla.getLatitude(), tla.getLongitude());
+            LatLng latLng = new LatLng(zone.getLatitude(), zone.getLongitude());
 
-            if (candidateTLAId == tla.get_id()) {
+            if (candidateZoneId == zone.get_id()) {
                 marker = map.addMarker(
                         optionsCandidateMarker.position(latLng)
                 );
                 circle = map.addCircle(
-                        optionsCandidateCircle.center(latLng).radius(tla.getRadius())
+                        optionsCandidateCircle.center(latLng).radius(zone.getRadius())
                 );
                 candidateMarker = marker;
                 candidateCircle = circle;
@@ -79,7 +79,7 @@ public class EditZonesMap extends ManageZonesMapAbstract {
                         optionsFixMarker.position(latLng)
                 );
                 circle = map.addCircle(
-                        optionsFixCircle.center(latLng).radius(tla.getRadius())
+                        optionsFixCircle.center(latLng).radius(zone.getRadius())
                 );
                 fixMarkers.add(marker);
                 fixCircles.add(circle);
@@ -92,7 +92,7 @@ public class EditZonesMap extends ManageZonesMapAbstract {
         // TODO: rework this
 
         // Provide color feedback. Disable button if radius hasn't changed.
-        if (radius == editTLA.getRadius()) {
+        if (radius == editZone.getRadius()) {
             saveButton.setColorFilter(colorButtonDisabled);
             //saveButton.setClickable(false);
         } else {

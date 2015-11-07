@@ -213,7 +213,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
             }
         } else {
-            // No list "markers" is passed, so we are in "Add new TLA/Zone".
+            // No list "markers" is passed, so we are in "Add new Zone".
             // Just move camera towards desired position without resetting the zoom level every time.
             map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         }

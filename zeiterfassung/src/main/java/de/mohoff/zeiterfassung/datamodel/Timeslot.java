@@ -19,20 +19,20 @@ public class Timeslot {
     @DatabaseField
     private long endtime = 0; // in seconds
     private boolean endtimeIsVague = false;
-    @DatabaseField(canBeNull = false, foreign = true, foreignAutoRefresh = true, columnName = "tla_id")
-    private Zone tla;
+    @DatabaseField(canBeNull = false, foreign = true, foreignAutoRefresh = true, columnName = "zone_id")
+    private Zone zone;
 
     public Timeslot(){}
 
-    public Timeslot(long starttime, Zone tla){
+    public Timeslot(long starttime, Zone zone){
         this.starttime = starttime;
-        this.tla = tla;
+        this.zone = zone;
     }
 
-    public Timeslot(long starttime, long endtime, Zone tla){
+    public Timeslot(long starttime, long endtime, Zone zone){
         this.starttime = starttime;
         this.endtime = endtime;
-        this.tla = tla;
+        this.zone = zone;
     }
 
     public int get_id() {
@@ -59,12 +59,12 @@ public class Timeslot {
         this.endtime = endtime;
     }
 
-    public Zone getTLA(){
-        return tla;
+    public Zone getZone(){
+        return zone;
     }
 
-    public void setTLA(Zone tla){
-        this.tla = tla;
+    public void setZone(Zone zone){
+        this.zone = zone;
     }
 
     private String getReadableDate(long time){

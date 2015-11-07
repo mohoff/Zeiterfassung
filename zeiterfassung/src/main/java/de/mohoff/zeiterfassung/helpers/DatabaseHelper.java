@@ -37,7 +37,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME = "database.db";
 
     // any time you make changes to your database objects, you may have to increase the database version
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
 
     // the DAO object we use to access the SimpleData table
     private Dao<Timeslot, Integer> timeslotDAO = null;
@@ -74,14 +74,14 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int startNewTimeslot(long millis, Zone tla){
+    public int startNewTimeslot(long millis, Zone zone){
         getTimeslotREDAO();
 
         // check if timeslots are unsealed and already existing for passed activityName and locationName
         List<Timeslot> existingTimeslotsForActAndLoc = new ArrayList<Timeslot>();
         QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
         try{
-            queryBuilder.where().eq("endtime", 0).and().eq("tla_id", tla);
+            queryBuilder.where().eq("endtime", 0).and().eq("zone_id", zone);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
             existingTimeslotsForActAndLoc = timeslotREDAO.query(preparedQuery); // assumed there is only one "open" timeslot allowed for any time t
         } catch (SQLException e){
@@ -90,7 +90,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
         if(existingTimeslotsForActAndLoc.isEmpty()){
             // timeslot not yet created/open
-            Timeslot ts = new Timeslot(millis, tla);
+            Timeslot ts = new Timeslot(millis, zone);
             int result = -1;
             result = timeslotREDAO.create(ts);
             //amountOfTimeslots++;
@@ -101,15 +101,15 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int createNewTLA(double latitude, double longitude, int radius, String activity, String location){
+    public int createNewZone(double latitude, double longitude, int radius, String activity, String location){
         getTargetLocationAreaREDAO();
 
-        Zone tla = new Zone((float)latitude, (float)longitude, radius, activity, location);
+        Zone zone = new Zone((float)latitude, (float)longitude, radius, activity, location);
         int result = -1;
 
         try {
             getTargetLocationAreaDAO();
-            result = targetareasDAO.create(tla);
+            result = targetareasDAO.create(zone);
         } catch(SQLException e){
 
         }
@@ -117,7 +117,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return result;
     }
 
-    public int updateTLALocationName(int id, String newLocationName){
+    public int updateZoneLocationName(int id, String newLocationName){
         UpdateBuilder<Zone, Integer> updateBuilder = targetareasREDAO.updateBuilder();
         try {
             updateBuilder.updateColumnValue("locationName", newLocationName);
@@ -130,7 +130,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int updateTLAActivityName(String oldActivityName, String newActivityName){
+    public int updateZoneActivityName(String oldActivityName, String newActivityName){
         UpdateBuilder<Zone, Integer> updateBuilder = targetareasREDAO.updateBuilder();
         try {
             updateBuilder.updateColumnValue("activityName", newActivityName);
@@ -143,7 +143,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public Zone getTLAById(int id){
+    public Zone getZoneById(int id){
         QueryBuilder<Zone, Integer> queryBuilder = targetareasREDAO.queryBuilder();
         try{
             queryBuilder.where().eq("_id", id);
@@ -155,7 +155,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int deleteTLA(String activity, String location){
+    public int deleteZone(String activity, String location){
         DeleteBuilder<Zone, Integer> deleteBuilder = targetareasREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("activityName", activity).and().eq("locationName", location);
@@ -167,7 +167,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int deleteTLAById(int id){
+    public int deleteZoneById(int id){
         DeleteBuilder<Zone, Integer> deleteBuilder = targetareasREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("_id", id);
@@ -179,7 +179,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int deleteTLAsByActivity(String activity){
+    public int deleteZonesByActivity(String activity){
         DeleteBuilder<Zone, Integer> deleteBuilder = targetareasREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("activityName", activity);
@@ -203,7 +203,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int deleteAllTLAs(){
+    public int deleteAllZones(){
         try {
             // Dropping and creating table will reset autoincrement for _id.
             TableUtils.dropTable(connectionSource, Zone.class, true);
@@ -259,18 +259,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return timeslotREDAO.update(toClose);
     }
 
-    public void _createSampleTLAs(){
+    public void _createSampleZones(){
         int status;
-        status = createNewTLA(48.743715, 9.095967, 50, "Home", "Vaihingen allmandring 26d");
-        status = createNewTLA(48.243962, 9.928635, 75, "Home", "Burgrieden mittelweg 10");
-        status = createNewTLA(48.742120, 9.101002, 100, "Uni", "HdM");
-        status = createNewTLA(48.745847, 9.105381, 50, "VVS", "Station Uni");
-        status = createNewTLA(48.74319107, 9.10227019, 50, "Bars", "Wuba");
-        status = createNewTLA(48.74642511, 9.10120401, 50, "Bars", "Sansibar");
-        status = createNewTLA(48.74506944, 9.09997154, 50, "Bars", "Boddschi");
-        status = createNewTLA(48.74311678, 9.09741271, 50, "Bars", "Unithekle");
-        status = createNewTLA(48.77232266, 9.15882993, 50, "Freizeit", "mgfitness");
-        status = createNewTLA(48.73002512, 9.111964, 75, "Freizeit", "Corso Kino");
+        status = createNewZone(48.743715, 9.095967, 50, "Home", "Vaihingen allmandring 26d");
+        status = createNewZone(48.243962, 9.928635, 75, "Home", "Burgrieden mittelweg 10");
+        status = createNewZone(48.742120, 9.101002, 100, "Uni", "HdM");
+        status = createNewZone(48.745847, 9.105381, 50, "VVS", "Station Uni");
+        status = createNewZone(48.74319107, 9.10227019, 50, "Bars", "Wuba");
+        status = createNewZone(48.74642511, 9.10120401, 50, "Bars", "Sansibar");
+        status = createNewZone(48.74506944, 9.09997154, 50, "Bars", "Boddschi");
+        status = createNewZone(48.74311678, 9.09741271, 50, "Bars", "Unithekle");
+        status = createNewZone(48.77232266, 9.15882993, 50, "Freizeit", "mgfitness");
+        status = createNewZone(48.73002512, 9.111964, 75, "Freizeit", "Corso Kino");
     }
 
 
@@ -414,17 +414,15 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return null;
     }
 
-    public List<Zone> getAllTLAs(){
+    public List<Zone> getAllZones(){
         getTargetLocationAreaREDAO();
-        List<Zone> tla = new ArrayList<Zone>();
 
         try {
-            tla = targetareasREDAO.queryForAll();
+            return targetareasREDAO.queryForAll();
         } catch (Exception e){
             e.printStackTrace();
-            tla = null;
         }
-        return tla;
+        return null;
     }
 
     public List<Timeslot> getAllTimeslots(){
@@ -532,7 +530,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public Cursor getCursorForTLAs(){
+    public Cursor getCursorForZones(){
         Cursor c = null;
         QueryBuilder<Zone, Integer> queryBuilder = targetareasREDAO.queryBuilder();
         //qb.where()...;
@@ -557,8 +555,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         QueryBuilder<Zone, Integer> queryBuilder = targetareasREDAO.queryBuilder();
         try{
             List<Zone> matches = queryBuilder.distinct().selectColumns("activityName").query();
-            for(Zone tla : matches){
-                activities.add(tla.getActivityName());
+            for(Zone zone : matches){
+                activities.add(zone.getActivityName());
             }
         } catch (SQLException e){
             e.printStackTrace();

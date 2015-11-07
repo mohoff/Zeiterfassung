@@ -162,8 +162,8 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         // the variable googleMap doesn't represent an empty map after navigating to this fragment
         // more than once.
         googleMap.clear();
-        // Inside drawExistingTLAs(), map center will be set and animated.
-        drawExistingTLAs();
+        // Inside drawExistingZones(), map center will be set and animated.
+        drawExistingZones();
 
         map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
@@ -211,7 +211,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         });
     }
 
-    public void drawExistingTLAs(){
+    public void drawExistingZones(){
         // Implementations need to assign cameraCenter!
 
 

@@ -43,13 +43,13 @@ public class AddZoneMap extends ManageZonesMapAbstract {
                 } else if (candidateMarker == null) {
                     GeneralHelper.showToast(getActivity(), "Please pin an area on the map first.");
                 } else {
-                    // TODO: Check if entered radius is not near other TLAs.
+                    // TODO: Check if entered radius is not near other Zones.
                     LatLng pos = candidateMarker.getPosition();
-                    int result = dbHelper.createNewTLA(pos.latitude, pos.longitude, radius, activityName, locationName);
+                    int result = dbHelper.createNewZone(pos.latitude, pos.longitude, radius, activityName, locationName);
                     if (result != 1) {
-                        GeneralHelper.showToast(getActivity(), "Couldn't add TLA. Does it already exist?");
+                        GeneralHelper.showToast(getActivity(), "Couldn't add Zone. Does it already exist?");
                     } else {
-                        GeneralHelper.showToast(getActivity(), "TLA successfully added.");
+                        GeneralHelper.showToast(getActivity(), "Zone successfully added.");
                         // Clear back stack because add-operation succeeded.
                         GeneralHelper.clearBackStack(getActivity());
                         // Go back to ManageZones fragment with clean back stack
@@ -62,8 +62,8 @@ public class AddZoneMap extends ManageZonesMapAbstract {
     }
 
     @Override
-    public void drawExistingTLAs(){
-        super.drawExistingTLAs();
+    public void drawExistingZones(){
+        super.drawExistingZones();
 
         // TODO: provide appropriate colors: gray (uneditable) and greenish (editable)
         // TODO: we want gray markers (custom markers) and gray fill colors to show that. Via .icon() ?
@@ -71,14 +71,14 @@ public class AddZoneMap extends ManageZonesMapAbstract {
 
         ArrayList<LatLng> latLngList = new ArrayList<>();
 
-        for(Zone tla : dbHelper.getAllTLAs()){
-            LatLng latLng = new LatLng(tla.getLatitude(), tla.getLongitude());
+        for(Zone zone : dbHelper.getAllZones()){
+            LatLng latLng = new LatLng(zone.getLatitude(), zone.getLongitude());
             latLngList.add(latLng);
             Marker marker = map.addMarker(
                 optionsFixMarker.position(latLng)
             );
             Circle circle = map.addCircle(
-                optionsFixCircle.center(latLng).radius(tla.getRadius())
+                optionsFixCircle.center(latLng).radius(zone.getRadius())
             );
 
             fixMarkers.add(marker);
