@@ -20,7 +20,7 @@ public class Settings extends Fragment {
     Context context;
     DatabaseHelper dbHelper;
 
-    Button deleteAllTimeslotsButton;
+    Button deleteAllTimeslotsButton, deleteAllZonesButton;
 
     public Settings() {
         // Required empty public constructor
@@ -37,6 +37,7 @@ public class Settings extends Fragment {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         deleteAllTimeslotsButton = (Button) view.findViewById(R.id.deleteAllTimeslotsButton);
+        deleteAllZonesButton = (Button) view.findViewById(R.id.deleteAllZonesButton);
 
         return view;
     }
@@ -55,7 +56,7 @@ public class Settings extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 // Execute delete on DB
-                                if(dbHelper.deleteAllTimeslots() == 1){
+                                if (dbHelper.deleteAllTimeslots() == 1) {
                                     GeneralHelper.showToast(context, "Deleted entries successfully.");
                                     dialog.dismiss();
                                 } else {
@@ -66,12 +67,40 @@ public class Settings extends Fragment {
                         .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
-                                // Cancel action
                                 dialog.dismiss();
                             }
                         })
-                        .setTitle("Delete all tracking entries")
-                        .setMessage("Do you really want to delete all tracking entries visible in 'Overview'?")
+                        //.setTitle("Delete all tracking entries")
+                        .setMessage("Delete all tracking entries?")
+                        .create();
+                alertDialog.show();
+            }
+        });
+
+        deleteAllZonesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog alertDialog = new AlertDialog.Builder(context)
+                        .setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                // Execute delete on DB
+                                if(dbHelper.deleteAllZones() == 1){
+                                    GeneralHelper.showToast(context, "Deleted entries successfully.");
+                                    dialog.dismiss();
+                                } else {
+                                    GeneralHelper.showToast(context, "Could not delete entries.");
+                                }
+                            }
+                        })
+                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        })
+                        //.setTitle("Delete all Zones")
+                        .setMessage("Delete all Zones?")
                         .create();
                 alertDialog.show();
             }

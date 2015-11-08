@@ -29,9 +29,9 @@
             android:layout_centerVertical="true"
             android:tint="@color/greenish"/>
         <TextView
+            android:id="@+id/infoText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Service is not running..."
             android:paddingLeft="10dp"
             android:layout_centerVertical="true"/>
 

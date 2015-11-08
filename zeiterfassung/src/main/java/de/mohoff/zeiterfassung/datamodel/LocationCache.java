@@ -162,14 +162,6 @@ public class LocationCache {
         return interpolatedPosition;
     }
 
-    public LatLng getInterpolatedPositionInLatLng(){
-        return new LatLng(getInterpolatedPosition().getLatitude(), getInterpolatedPosition().getLongitude());
-    }
-
-    private double _getStartWeight(int i, int size){
-        return LocationService.INTERPOLATION_VARIANCE * (((double)(i+1)/(double)activeCache.size()) + 0.5);
-    }
-
     // Returns value between 0.0 (bad) and 1.0 (good).
     public static double getNormedAgeMultiplier(long millisInPast){
         long minsInPast = millisInPast/(1000*60);

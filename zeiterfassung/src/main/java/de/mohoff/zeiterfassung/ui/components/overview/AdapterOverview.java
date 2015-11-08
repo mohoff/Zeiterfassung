@@ -2,6 +2,7 @@ package de.mohoff.zeiterfassung.ui.components.overview;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
@@ -27,16 +28,17 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private DatabaseHelper dbHelper = null;
     private ArrayList<Timeslot> data = new ArrayList<Timeslot>();
     private int lastPosition = 99999;
-    private Context context;
+    private MainActivity context;
     //private boolean isServiceRunning = false;
 
     private final static int VIEWTYPE_NORMAL = 1;
     private final static int VIEWTYPE_SERVICEINFO = 2;
+    private final static int VIEWTYPE_NOENTRYINFO = 3;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolderItem extends RecyclerView.ViewHolder {
+    public static class ViewHolderItem extends RecyclerView.ViewHolder{
         // each data item is just a string in this case
         public CardView container;
         public ImageView icon;
@@ -67,17 +69,22 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public static class ViewHolderServiceInfo extends RecyclerView.ViewHolder {
-        // public ImageButton dismissButton;
-        public ViewHolderServiceInfo(View v){
+    public static class ViewHolderInfoItem extends RecyclerView.ViewHolder {
+        // each data item is just a string in this case
+        public CardView container;
+        public TextView infoText;
+
+        public ViewHolderInfoItem(View v){
             super(v);
+            this.container = (CardView) v.findViewById(R.id.card_view);
+            this.infoText = (TextView) v.findViewById(R.id.infoText);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public AdapterOverview(Context context) {
         getDbHelper(context);
-        this.context = context;
+        this.context = (MainActivity) context;
         /*
         this.data.add(new Timeslot(1416759002267L, 1416760002267L, "activity1", "act1, location1"));
         this.data.add(new Timeslot(1416754002267L, 1416758002267L, "activity2", "act2, location1"));
@@ -106,10 +113,10 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     inflate(R.layout.fragment_overview_card, parent, false);
             return new ViewHolderItem(itemView);
         }
-        if(viewType == VIEWTYPE_SERVICEINFO){
+        if((viewType == VIEWTYPE_SERVICEINFO) || (viewType == VIEWTYPE_NOENTRYINFO)){
             View itemView = LayoutInflater.from(parent.getContext()).
-                    inflate(R.layout.fragment_overview_card_serviceinfo, parent, false);
-            return new ViewHolderServiceInfo(itemView);
+                    inflate(R.layout.fragment_overview_card_info, parent, false);
+            return new ViewHolderInfoItem(itemView);
         }
         return null;
     }
@@ -165,7 +172,11 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }*/
 
         } else if(holder.getItemViewType() == VIEWTYPE_SERVICEINFO){
-            // set dismiss action for dismissButton
+            ViewHolderInfoItem ivh = (ViewHolderInfoItem) holder;
+            ivh.infoText.setText("Service is not running...");
+        } else if(holder.getItemViewType() == VIEWTYPE_NOENTRYINFO){
+            ViewHolderInfoItem ivh = (ViewHolderInfoItem) holder;
+            ivh.infoText.setText("No entries yet");
         }
     }
 
@@ -207,15 +218,16 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
         };
     }
 
-    private boolean listHasItemAtIndex(int index){
-        return (data.size() > index) && index >= 0;
-    }
-
     @Override
     public int getItemViewType(int position) {
 
         if (showServiceNotRunningInfo() && position == getItemCount()-1) {
             return VIEWTYPE_SERVICEINFO;
+        } else if (data.size() == 0 &&
+                (position == getItemCount()-1 && !showServiceNotRunningInfo() ||
+                position == getItemCount()-2 && showServiceNotRunningInfo())
+                ) {
+            return VIEWTYPE_NOENTRYINFO;
         } else {
             return VIEWTYPE_NORMAL;
         }
@@ -235,11 +247,14 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
+        int extraInfoCards = 0;
         if(showServiceNotRunningInfo()){
-            return data.size() + 1;
-        } else {
-            return data.size();
+            extraInfoCards++;
         }
+        if(data.size() == 0){
+            extraInfoCards++;
+        }
+        return data.size() + extraInfoCards;
     }
 
     private boolean showServiceNotRunningInfo(){

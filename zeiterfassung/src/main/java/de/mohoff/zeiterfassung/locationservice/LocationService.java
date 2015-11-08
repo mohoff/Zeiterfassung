@@ -7,7 +7,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -40,50 +39,59 @@ import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String TAG = LocationService.class.getSimpleName();
-
+    // Flag to store the service status
     public static boolean IS_SERVICE_RUNNING = false;
     // Indicates if location update interval exceeded (REGULAR_UPDATE_INTERVAL + 10s) since the last real update
     public static boolean NO_CONNECTION = false;
+    // Holds the accumulated distance that the user travelled during this service session, so since he
+    // last started this service. While user is inbound a Zone SESSION_DISTANCE remains constant.
+    // Is 0 when service is stopped and last session value is already persisted
+    public static int SESSION_DISTANCE = 0; // meters
+    // Holds the last start timestamp of this service. When service is stopped the difference of
+    // System.currentTimeMillis() and SESSION_STARTTIME will be persistend and combined with the
+    // overall service uptime.
+    public static long SESSION_STARTTIME = 0; // milliseconds
     // Ignore location updates for activeCache which have accuracy > 300m
     public static double ACCURACY_TRESHOLD = 300.0;
-
-    // Determines the ratio of inbound locations in activeCache to trigger an enter-event.
+    // Determines the ratio of inbound locations in activeCache to trigger an enter-event
     public static float INBOUND_TRESHOLD = 0.8f;
     public static float OUTBOUND_TRESHOLD = 1 - INBOUND_TRESHOLD;
+    // Size of cache that is used to determine inbound and outbound events
     public static int ACTIVE_CACHE_SIZE = 5;
+    // Size of cache that is used to display location markers on maps
     public static int PASSIVE_CACHE_SIZE = 50;
     // TODO: What to do when service is started? We really need to wait ~ REGULAR_UPDATE_INTERVAL * ACTIVE_CACHE_SIZE until activeCache is full in order to perform first createNewTimeslot? Can we do better?
-    public static int REGULAR_UPDATE_INTERVAL = 60 * 1000; // ms, update interval, 60 * 1000, 150 * 1000, 120 * 1000
+    // Time interval after which a new location update is retrieved periodically
+    // In milliseconds. Used values so far:  60 * 1000, 150 * 1000, 120 * 1000
+    public static int REGULAR_UPDATE_INTERVAL = 60 * 1000;
+    // Time interval after which a new location update is accepted at the earliest from other applications' requests
     public static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
-    public static float INTERPOLATION_VARIANCE = 1.0f;
-    private static String locationProviderType = LocationManager.NETWORK_PROVIDER;  // LocationManager.NETWORK_PROVIDER or LocationManager.GPS_PROVIDER
+    private int numberOfUpdates = 0;
 
+    // General DB, service, googleAPI variables
     private DatabaseHelper dbHelper = null;
-
     private final LocalBinder binder = new LocalBinder();
     private GoogleApiClient googleApiClient;
     private LocationRequest locReq;
 
+    // Zone information
     private List<Zone> allZones = new ArrayList<Zone>();
     private Zone inboundZone;
-    public static Location mostRecentLocation = null;
-    private int numberOfUpdates = 0;
-    private int distanceTravelled = 0;
 
+    // Timers and Countdowns
     private LocationUpdateTimer locUpdateTimerTask = new LocationUpdateTimer();
     private Timer timer = new Timer();
-
     private ServiceRunningTime serviceRunningTime = new ServiceRunningTime(REGULAR_UPDATE_INTERVAL * ACTIVE_CACHE_SIZE * 2);
 
+    // Statistics information
     private List<Stat> stats;
-    public static long timestampServiceStarted = 0;
 
     @Override
     public boolean stopService(Intent name) {
         getHelper(this);
 
         updateNumericStat("serviceUptime", getServiceSessionUptime());
-        timestampServiceStarted = 0;
+        SESSION_STARTTIME = 0;
 
         sendServiceEventViaBroadcast("stop");
         return super.stopService(name);
@@ -91,13 +99,13 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     // Returns service session uptime in seconds
     public static int getServiceSessionUptime(){
-        if(timestampServiceStarted == 0) return 0;
-        return (int)((System.currentTimeMillis() - timestampServiceStarted)/1000);
+        if(SESSION_STARTTIME == 0) return 0;
+        return (int)((System.currentTimeMillis() - SESSION_STARTTIME)/1000);
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        LocationService.mostRecentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        //LocationService.mostRecentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locReq, this);
     }
 
@@ -109,7 +117,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     @Override
     public void onLocationChanged(Location location) {
-        LocationService.mostRecentLocation = location;
         Loc loc = Loc.convertLocationToLoc(location);
         loc.setIsRealUpdate(true);
 
@@ -121,7 +128,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     }
 
-    // ServiceBinder: Activities and other classes can bind to this service
     public class LocalBinder extends Binder {
         public LocationService getService() {
             return LocationService.this;
@@ -177,11 +183,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         // Update 'travelled distance' in DB.
         for(Stat stat : stats){
             if(stat.getIdentifier().equals(identifier)){
-                int oldValue = 0;
+                int oldValue = stat.getIntValue();
                 try {
-                    oldValue = Integer.parseInt(stat.getValue());
-                    int newValue = oldValue + deltaToAdd;
-                    dbHelper.updateStat(identifier, newValue);
+                    dbHelper.updateStat(identifier, oldValue + deltaToAdd);
                 } catch (Exception e){
                     e.printStackTrace();
                 }
@@ -203,11 +207,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         dbHelper.dumpLocs(LocationCache.getInstance().getPassiveCache());
 
         // Update relevant statistics
-        updateNumericStat("distanceTravelled", distanceTravelled);
-        if(timestampServiceStarted != 0){
+        updateNumericStat("distanceTravelled", SESSION_DISTANCE);
+        if(SESSION_STARTTIME != 0){
             updateNumericStat("serviceUptime", getServiceSessionUptime());
-            // No need to zero timestampServiceStarted since service instance is destroyed soon.
-            //timestampServiceStarted = 0;
         }
 
         IS_SERVICE_RUNNING = false;
@@ -226,7 +228,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         // Start counting service tracking uptime
         serviceRunningTime.start();
-        timestampServiceStarted = System.currentTimeMillis();
+        SESSION_STARTTIME = System.currentTimeMillis();
 
         return Service.START_STICKY;
     }
@@ -324,11 +326,12 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         if(inboundZone == null && loc != null && loc.getAccuracy() <= 100){
             Loc mostRecentLoc = LocationCache.getInstance().getMostRecentLoc();
             int distanceInMeters = loc.distanceTo(mostRecentLoc);
-            // Only add distance to distanceTravelled when greater than some value in order to prevent
-            // fluctuations which occur due to the inaccurate nature of our location service.
+            // Only add distance to distanceTravelled when it's greater than some value in order to
+            // prevent fluctuations which occur due to the inaccurate nature of used location service.
             if(distanceInMeters > 20){
+                // TODO: Make '20' a static variable
                 // TODO: Maybe add correction factor of 0.9 or similar.
-                distanceTravelled += loc.distanceTo(mostRecentLoc);
+                SESSION_DISTANCE += loc.distanceTo(mostRecentLoc);
             }
         }
     }

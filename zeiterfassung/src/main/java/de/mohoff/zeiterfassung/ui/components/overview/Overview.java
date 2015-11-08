@@ -1,5 +1,6 @@
 package de.mohoff.zeiterfassung.ui.components.overview;
 
+import android.graphics.Point;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -106,11 +107,14 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
     public void onNewTimeslot(int id) {
         // Adapter retrieves updated data from DB and updates its model accordingly.
         adapter.updateData();
+
         // The current implementation only expects inserts, no deletions.
         // Thus the only action is to notify the adapter that an item is added.
         adapter.notifyItemInserted(adapter.getItemCount()-1);
+        adapter.notifyItemInserted(adapter.getItemCount()-2);
         // Update the 2nd list element. Its endtime and enddate might have TYPEFACE.ITALIC still.
         adapter.notifyItemChanged(adapter.getItemCount()-2);
+        adapter.notifyItemChanged(adapter.getItemCount()-3);
         // Give visual feedback that a new item has beed added.
         // TODO: Does the following work?
         recList.scrollToPosition(adapter.getItemCount()-1);
@@ -119,12 +123,20 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
     @Override
     public void onTimeslotSealed(int id) {
         // Only most recent Timeslot can be possibly sealed. For that the item position is known anytime.
+        //adapter.notifyItemRangeChanged(adapter.getItemCount());
         adapter.notifyItemChanged(adapter.getItemCount()-1);
+        adapter.notifyItemChanged(adapter.getItemCount()-2);
     }
 
     @Override
     public void onServiceStatusEvent(boolean isRunning) {
-        adapter.notifyDataSetChanged();
+        if(isRunning){
+            adapter.notifyItemRemoved(adapter.getItemCount() - 1);
+        } else {
+            adapter.notifyItemInserted(adapter.getItemCount() - 1);
+        }
+
+        //adapter.notifyItemChanged(adapter.getItemCount()-2);
         if(!isRunning){
             // Because a reverse layout is used, the most upper card has index n and
             // the card at the bottom of the list has index 0. Taking screen height

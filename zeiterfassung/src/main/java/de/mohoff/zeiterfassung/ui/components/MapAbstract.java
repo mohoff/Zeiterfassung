@@ -187,7 +187,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 .position(latLng)
                 .draggable(false)
                 .alpha(opacity)
-                .icon(BitmapDescriptorFactory.defaultMarker(193))      // BitmapDescriptorFactory.HUE_MAGENTA
+                .icon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
+                //.icon(BitmapDescriptorFactory.defaultMarker(193))      // BitmapDescriptorFactory.HUE_MAGENTA
                 .title(title)
                 .snippet(snippet)
         ;

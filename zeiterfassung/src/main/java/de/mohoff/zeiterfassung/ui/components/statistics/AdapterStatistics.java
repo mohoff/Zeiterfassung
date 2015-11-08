@@ -85,6 +85,9 @@ public class AdapterStatistics extends RecyclerView.Adapter<AdapterStatistics.Vi
         if(stat.getIdentifier().equals("serviceUptime")){
             setupTextViewUpdater(holder.content, stat);
         }
+        if(stat.getIdentifier().equals("distanceTravelled")){
+            holder.content.setText(stat.getDisplayValueWithExtraTime(LocationService.SESSION_DISTANCE));
+        }
     }
 
     private void cancelTextViewUpdater(){
@@ -103,8 +106,8 @@ public class AdapterStatistics extends RecyclerView.Adapter<AdapterStatistics.Vi
             @Override
             public void run() {
                 if(LocationService.IS_SERVICE_RUNNING){
-                    //uptimeStat.addOneSecondToValue();
-                    tv.setText(uptimeStat.getDisplayValueWithExtraTime(LocationService.getServiceSessionUptime()));
+                    String computedValue = uptimeStat.getDisplayValueWithExtraTime(LocationService.getServiceSessionUptime());
+                    tv.setText(computedValue);
                 }
                 uptimeHandler.postDelayed(this, 1000);
             }
