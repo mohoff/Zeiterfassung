@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
+//import com.google.maps.android.clustering.Cluster;
+//import com.google.maps.android.clustering.ClusterManager;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
@@ -23,9 +25,11 @@ import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.ui.components.MapAbstract;
+//import de.mohoff.zeiterfassung.ui.components.LocClusterRenderer;
 
-public class MapLive extends MapAbstract implements LocationChangeListener {
+public class MapLive extends MapAbstract implements LocationChangeListener{
     //CircularFifoQueue<Loc> userLocs = new CircularFifoQueue<>();
+    //private ClusterManager<Loc> clusterManager;
     List<Marker> markers = new ArrayList<Marker>();
     Polyline currentPolyline;
 
@@ -75,9 +79,21 @@ public class MapLive extends MapAbstract implements LocationChangeListener {
     public void onMapReady(GoogleMap googleMap) {
         super.onMapReady(googleMap);
         CircularFifoQueue<Loc> cache = LocationCache.getInstance().getPassiveCache();
+        //clusterManager = new ClusterManager<Loc>(getActivity(), map);
+        //map.setOnCameraChangeListener(clusterManager);
+        //map.setOnInfoWindowClickListener(clusterManager);
+        //map.setOnMarkerClickListener(clusterManager);
+        //clusterManager.setOnClusterClickListener(this);
+        //clusterManager.setOnClusterInfoWindowClickListener(this);
+        //clusterManager.setOnClusterItemClickListener(this);
+        //clusterManager.setOnClusterItemInfoWindowClickListener(this);
+        //clusterManager.setRenderer(new LocClusterRenderer(getActivity(), map, clusterManager));
+        //clusterManager.setRenderer(new LocClusterRenderer(getActivity(), map, clusterManager));
+
 
         if(cache != null && cache.size() > 0){
             for(int i=0; i<cache.size(); i++){
+                //clusterManager.addItems(cache);
                 Loc loc = cache.get(i);
                 long lastMarkerTimestamp = (i-1)>= 0 ? cache.get(i-1).getTimestampInMillis() : 0;
                 super.addMarkerToMap(
@@ -108,6 +124,8 @@ public class MapLive extends MapAbstract implements LocationChangeListener {
                 // No other markers exist
                 timestampLastMarker = 0;
             }
+            //clusterManager.addItem(loc);
+            //clusterManager.cluster();
             super.addMarkerToMap(
                     map,
                     markers,
@@ -119,6 +137,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener {
                             "\n t:" + Timeslot.getReadableDuration(timestampLastMarker, loc.getTimestampInMillis(), false, false),
                     loc.isRealUpdate()
             );
+
             // Ensure that there are only passiveCache.maxSize() markers displayed to prevent memory leak.
             // If passiveQueue is full and at least one drop happened already in it, remove oldest marker.
             if(LocationCache.getInstance().hasFirstPassiveQueueDropHappened()){
@@ -137,11 +156,6 @@ public class MapLive extends MapAbstract implements LocationChangeListener {
             GeneralHelper.showToast(parentActivity, "no map object initialized.");
         }
     }
-
-
-
-
-
 
     // not applicable because you can't modify UI elements in doInBackground ("map" in this case)
     private class LoadingMapTask extends AsyncTask<Void, Void, Void> {
