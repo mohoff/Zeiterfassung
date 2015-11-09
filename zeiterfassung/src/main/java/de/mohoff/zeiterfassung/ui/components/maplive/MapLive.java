@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 //import com.google.maps.android.clustering.Cluster;
 //import com.google.maps.android.clustering.ClusterManager;
+//import de.mohoff.zeiterfassung.ui.components.LocClusterRenderer;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
@@ -25,7 +26,13 @@ import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.ui.components.MapAbstract;
-//import de.mohoff.zeiterfassung.ui.components.LocClusterRenderer;
+
+
+// TODO: Eventually add Cluster/ClusterManager. Also add polylines (how to compute polyline dots in cluster center?)
+// TODO: replace marker icon with greenish dot
+// TODO: Maintain two caches: One which represents activeCache, so location that are used for in/outbound computations. And a cache which holds all location updates. Show both on map, first with 100% opacity, second with 20% or similar.
+// TODO: Integrate "connection lost" icon
+
 
 public class MapLive extends MapAbstract implements LocationChangeListener{
     //CircularFifoQueue<Loc> userLocs = new CircularFifoQueue<>();
