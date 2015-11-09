@@ -29,13 +29,13 @@
     </style>
     -->
 
-    <style name="ImageButton" parent="android:style/Widget.Material.ImageButton">
+    <style name="AppTheme.ImageButton" parent="AppTheme.ImageButton">
         <item name="android:tint">@color/greenish</item>
         <item name="android:tintMode">src_atop</item>
         <item name="android:background">@color/transparent</item>
     </style>
 
-    <style name="LoadingSpinner" parent="android:style/Widget.Material.ProgressBar">
+    <style name="AppTheme.LoadingSpinner" parent="android:style/Widget.Material.ProgressBar">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerInParent">true</item>
@@ -44,8 +44,4 @@
         <item name="android:indeterminateTint">@color/greenish</item>
         <item name="android:indeterminateTintMode">src_atop</item>
     </style>
-
-
-
-
 </resources>

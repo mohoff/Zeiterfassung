@@ -169,7 +169,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                             })
                             .setTitle("Edit Activity")
                             .setMessage("Please enter a new name for the Activity")
-                            .setView(GeneralHelper.getAlertDialogEditTextContainer(context, et, actHolder.activityName.getText().toString()))
+                            .setView(GeneralHelper.getAlertDialogEditTextContainer(context, et, actHolder.activityName.getText().toString()), 0,0,0,0)
                             .create();
                     alertDialog.show();
                     return true;

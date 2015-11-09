@@ -169,8 +169,8 @@ public class GeneralHelper {
         FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
-        params.leftMargin = 50;
-        params.rightMargin = 50;
+        params.leftMargin = 60;
+        params.rightMargin = 60;
         et.setLayoutParams(params);
         container.addView(et);
         return container;

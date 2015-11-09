@@ -8,6 +8,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.maps.android.clustering.ClusterItem;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 
 
 @DatabaseTable(tableName = "locdump")
-public class Loc implements Parcelable{  //, daoClass = Loc.class)
+public class Loc implements Parcelable, ClusterItem{  //, daoClass = Loc.class)
 
     @DatabaseField(generatedId = true) // autoincrement primary key
     private int _id;
@@ -249,5 +250,10 @@ public class Loc implements Parcelable{  //, daoClass = Loc.class)
 
         if (Double.compare(loc.latitude, latitude) != 0) return false;
         return Double.compare(loc.longitude, longitude) == 0;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return new LatLng(latitude, longitude);
     }
 }

@@ -19,9 +19,11 @@
         <item name="android:imageButtonStyle">@color/transparent</item> <!-- in order to make ImageButton background transparent -->
 
         <!--<item name="android:windowActionBar">false</item>--> <!-- not needed anymore, because we inherit from NoActionBar -->
+
+        <!--<item name="alertDialogTheme">@style/AppTheme.AlertDialog</item>-->
     </style>
 
-    <style name="Button" parent="android:style/Widget.Material.Button">
+    <style name="AppTheme.Button" parent="android:style/Widget.Material.Button">
         <item name="colorButtonNormal">@color/greenish</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:minHeight">0dp</item>
@@ -33,12 +35,12 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="ImageButton" parent="android:style/Widget.Material.ImageButton">
+    <style name="AppTheme.ImageButton" parent="android:style/Widget.Material.ImageButton">
         <item name="android:tint">@color/greenish</item>
         <item name="android:background">@color/transparent</item>
     </style>
 
-    <style name="Button.ServiceControl">
+    <style name="AppTheme.Button.ServiceControl">
         <!-- duplicate of "Button". In case buttons need more diversification in the future -->
         <item name="android:textColor">@color/white</item>
         <item name="android:minHeight">0dp</item>
@@ -50,12 +52,12 @@
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="Button.ServiceControl.Start">
+    <style name="AppTheme.Button.ServiceControl.Start">
     </style>
-    <style name="Button.ServiceControl.Stop">
+    <style name="AppTheme.Button.ServiceControl.Stop">
     </style>
 
-    <style name="LoadingSpinner" parent="android:style/Widget.ProgressBar">
+    <style name="AppTheme.LoadingSpinner" parent="android:style/Widget.ProgressBar">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerHorizontal">true</item>
@@ -64,7 +66,7 @@
         <item name="android:indeterminateDrawable">@drawable/progress_bar</item>
     </style>
 
-    <style name="EditText">
+    <style name="AppTheme.EditText">
         <item name="colorControlNormal">#0000FF</item>
         <item name="colorControlActivated">#00FF00</item>
         <item name="colorControlHighlight">#FF0000</item>

@@ -63,7 +63,7 @@
 
                 <Button
                     android:id="@+id/buttonStartService"
-                    style="@style/Button.ServiceControl.Start"
+                    style="@style/AppTheme.Button.ServiceControl.Start"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:text="@string/servicecontrol_start"
@@ -71,7 +71,7 @@
                     />
                 <Button
                     android:id="@+id/buttonStopService"
-                    style="@style/Button.ServiceControl.Stop"
+                    style="@style/AppTheme.Button.ServiceControl.Stop"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:text="@string/servicecontrol_stop"

@@ -32,7 +32,7 @@
             android:layout_weight="0.3">
             <Button
                 android:id="@+id/deleteAllTimeslotsButton"
-                style="@style/Button"
+                style="@style/AppTheme.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="DELETE"
@@ -65,7 +65,7 @@
             android:layout_weight="0.3">
             <Button
                 android:id="@+id/deleteAllZonesButton"
-                style="@style/Button"
+                style="@style/AppTheme.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="DELETE"

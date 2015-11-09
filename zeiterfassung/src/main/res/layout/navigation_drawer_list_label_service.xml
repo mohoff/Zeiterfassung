@@ -52,7 +52,7 @@
 
         <Button
             android:id="@+id/navigationListLabelButtonStart"
-            style="@style/Button.ServiceControl.Start"
+            style="@style/AppTheme.Button.ServiceControl.Start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/servicecontrol_start"
@@ -60,7 +60,7 @@
             android:layout_alignLeft="@+id/upper"/>
         <Button
             android:id="@+id/navigationListLabelButtonStop"
-            style="@style/Button.ServiceControl.Stop"
+            style="@style/AppTheme.Button.ServiceControl.Stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/servicecontrol_stop"

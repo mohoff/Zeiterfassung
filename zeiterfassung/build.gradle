@@ -41,5 +41,6 @@ dependencies {
     compile 'org.apache.commons:commons-collections4:4.0'
     compile 'com.j256.ormlite:ormlite-core:4.48'
     compile 'com.j256.ormlite:ormlite-android:4.48'
+    compile 'com.google.maps.android:android-maps-utils:0.4+'
     //compile 'com.github.amlcurran.showcaseview:library:5.3.0'
 }
