@@ -32,7 +32,7 @@ public class Loc implements Parcelable{  //, daoClass = Loc.class)
     private int altitude;
     @DatabaseField
     private int speed;
-    private boolean isRealUpdate;
+    private boolean isRealUpdate = true;
 
     public boolean isRealUpdate() {
         return isRealUpdate;

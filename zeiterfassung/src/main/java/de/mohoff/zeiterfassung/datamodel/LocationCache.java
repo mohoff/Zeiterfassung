@@ -148,7 +148,18 @@ public class LocationCache {
         return firstPassiveCacheDropHappened;
     }
 
-    public Loc getMostRecentLoc(){
+    public Loc getMostRecentPassiveLoc(){
+        for(int i=passiveCache.size()-1; i>=0; i--){
+            try {
+                return passiveCache.get(i);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public Loc getMostRecentActiveLoc(){
         for(int i=activeCache.size()-1; i>=0; i--){
             try {
                 return activeCache.get(i);

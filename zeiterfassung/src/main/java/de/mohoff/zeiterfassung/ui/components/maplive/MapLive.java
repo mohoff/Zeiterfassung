@@ -4,7 +4,10 @@ import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -33,6 +36,8 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,9 +70,12 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     // Bitmap for Markers which will be displayed with a number on them.
     // While generating this Bitmap, the number will be printed on of the 3 templates above.
     Bitmap markerWithNumbers;
+    // Bitmap for Marker which shows most recent user location on top of
+    // markerAccurate||markerInaccurate||markerNoConnection
+    Bitmap markerCurrentLocation;
 
     private static int MARKER_DIM = 50; // px
-    private static int MARKER_ANIMATION_DURATION = 1000;
+    private static int MARKER_ANIMATION_DURATION = 1000; // ms
 
     private long timestampPreviousMarker = 0;
 
@@ -87,25 +95,56 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         super.onActivityCreated(savedInstanceState);
         polylineColor = getResources().getColor(R.color.greenish_50);
 
-        markerAccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker, true, "");
-        markerInaccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker, false, "");
-        markerNoConnection = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_noconnection, true, "");
+        markerAccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_accurate, true);
+        // TODO-FIX: For some reason, markerInaccurate is displayed with transparency 50% or similar...-> FIX
+        markerInaccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_inaccurate, true);
+        markerNoConnection = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_noconnection, true);
+
+        markerCurrentLocation = createCurrentLocationBitmap(parentActivity, "markers/marker1.png");
     }
 
-    private Bitmap createBitmapFromDrawable(int dim, int drawable, boolean fullOpacity, String text){
-        if(text == null) text = "";
-        //Bitmap b = BitmapFactory.decodeResource(getResources(), drawable);
-        //b = b.copy(Bitmap.Config.ARGB_8888, true);
-
+    private Bitmap createBitmapFromDrawable(int dim, int drawable, boolean fullOpacity){
         Bitmap b = Bitmap.createBitmap(dim, dim, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(b);
         Drawable shape = ContextCompat.getDrawable(parentActivity, drawable);
         shape.setAlpha(fullOpacity ? 255 : 150);
         shape.setBounds(0, 0, b.getWidth(), b.getHeight());
         shape.draw(canvas);
-
-
         return b;
+    }
+
+    public Bitmap createCurrentLocationBitmap(Context context, String filePath){
+        // Original from asset (png file)
+        Bitmap base = createBitmapFromAsset(context, filePath);
+
+        // Resize original down to with of 50px
+        int newWidth = 50; // px
+        int newHeight = (newWidth * base.getHeight()) / base.getWidth();
+        Bitmap resized = Bitmap.createScaledBitmap(base, newWidth, newHeight, false);
+
+        // Add bottom padding of 25px
+        int bottomPadding = 25; // px
+        Bitmap result = Bitmap.createBitmap(resized.getWidth(), resized.getHeight() + bottomPadding, Bitmap.Config.ARGB_8888);
+        Canvas can = new Canvas(result);
+        //can.drawARGB(FF,FF,FF,FF); //This represents White color
+        can.drawBitmap(resized, 0, 0, null);
+
+        return result;
+    }
+
+    public static Bitmap createBitmapFromAsset(Context context, String filePath) {
+        AssetManager assetManager = context.getAssets();
+        InputStream istr;
+        Bitmap bitmap = null;
+
+        try {
+            istr = assetManager.open(filePath);
+            bitmap = BitmapFactory.decodeStream(istr);
+            //istr.close(); // TODO: Should we close input stream here? Stackoverflow snippet was without close().
+        } catch (IOException e) {
+            // handle exception
+        }
+        return bitmap;
     }
 
     @Override
@@ -146,22 +185,12 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
 
         if(cache != null && cache.size() > 0){
             for(int i=0; i<cache.size(); i++){
-                //clusterManager.addItems(cache);
                 Loc loc = cache.get(i);
-                long lastMarkerTimestamp = (i-1)>= 0 ? cache.get(i-1).getTimestampInMillis() : 0;
-                super.addMarkerToMap(
-                        map,
-                        markers,
-                        GeneralHelper.convertLocToLatLng(loc),
-                        GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()),
-                        "Location",
-                        "A:" + loc.getAccuracy() +
-                                "\n O:" + GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()) +
-                                "\n t:" + Timeslot.getReadableDuration(lastMarkerTimestamp, loc.getTimestampInMillis(), false, false),
-                        loc.isRealUpdate()
-                );
+                MarkerOptions markerOptions = createMarkerOptions(loc, LocationService.ACCURACY_TRESHOLD);
+                addMarkerToMap(map, markers, markerOptions);
             }
             currentPolyline = addPolylineToMap(map, cache);
+            followWithCamera(markers);
         } else {
             GeneralHelper.showToast(parentActivity, "no location data available.");
         }
@@ -184,32 +213,37 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                 )
                 ;
 
-        if(loc.getAccuracy() < accuracyTreshold){
-            setIcon(markerAccurate, markerOptions, latLng);
+        // Artificially created (non-real) Locs are always accurate because they are retrieved
+        // from activeCache. Therefore there is no need for distinguishing accurate and inaccurate
+        // markers visually.
+        if(loc.isRealUpdate()){
+            if(loc.getAccuracy() < accuracyTreshold){
+                markerOptions = setIcon(markerAccurate, markerOptions, latLng);
+            } else {
+                markerOptions = setIcon(markerInaccurate, markerOptions, latLng);
+            }
         } else {
-            setIcon(markerInaccurate, markerOptions, latLng);
-        }
-        // Overwrite .icon property if provided Loc is not a real update
-        if(!loc.isRealUpdate()){
-            setIcon(markerNoConnection, markerOptions, latLng);
+            markerOptions = setIcon(markerNoConnection, markerOptions, latLng);
         }
         return markerOptions;
     }
 
-    private void setIcon(Bitmap b, MarkerOptions mo, LatLng newLatLng){
+    private MarkerOptions setIcon(Bitmap template, MarkerOptions mo, LatLng newLatLng){
         int latLngSeries = getLengthOfLatLngSeries(newLatLng);
         if(latLngSeries > 1){
-            markerWithNumbers = b.copy(b.getConfig(), true);
+            markerWithNumbers = template.copy(template.getConfig(), true);
             markerWithNumbers = addTextToBitmap(markerWithNumbers, String.valueOf(latLngSeries));
             mo.icon(BitmapDescriptorFactory.fromBitmap(markerWithNumbers));
         } else {
-            mo.icon(BitmapDescriptorFactory.fromBitmap(b));
+            mo.icon(BitmapDescriptorFactory.fromBitmap(template));
         }
+        return mo;
     }
 
     private Bitmap addTextToBitmap(Bitmap b, String text){
-        Canvas canvas = new Canvas(b);
+        if(text == null) text = "";
 
+        Canvas canvas = new Canvas(b);
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         paint.setColor(Color.WHITE);
@@ -220,8 +254,8 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         paint.getTextBounds(text, 0, text.length(), bounds);
         float x = b.getWidth() / 2.0f;
         float y = (b.getHeight() - bounds.height()) / 2.0f - bounds.top;
-
         canvas.drawText(text, x, y, paint);
+
         return b;
     }
 
@@ -243,7 +277,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         // Ensure that there are only passiveCache.maxSize() markers displayed to prevent memory leak.
         // If passiveQueue is full and at least one drop happened already in it
         // (= hasFirstPassiveQueueDropHappened()), remove oldest marker.
-        if(LocationCache.getInstance().hasFirstPassiveQueueDropHappened()){
+        if(LocationCache.getInstance().hasFirstPassiveQueueDropHappened() && markers.size() > 2){
             try {
                 // Determine index which should be deleted in markers arraylist. Markers with numbers
                 // are placed on top of each other. If there one marker of that marker stack needs to
@@ -324,12 +358,13 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     }
 
     private void updateCurrentLocationMarker(GoogleMap map, Loc loc){
+        // TODO: replace marker icon for currentLocationMarker with greenish color, width=50px and bottomPadding of 25px. Then the new icon directly points to a marker dot icon. dot-dimensions are 50x50px.
         if(currentLocation == null){
             currentLocation = map.addMarker(new MarkerOptions()
                     .position(loc.getLatLng())
                     .draggable(false)
                             //.icon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
-                    .icon(BitmapDescriptorFactory.defaultMarker(0))
+                    .icon(BitmapDescriptorFactory.fromBitmap(markerCurrentLocation))
                     .title("Current location"))
                     ;
         } else {

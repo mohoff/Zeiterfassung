@@ -300,7 +300,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         }
     }
 
-
     public void handleLocationUpdate(Loc loc){
         NO_CONNECTION = !loc.isRealUpdate();
         numberOfUpdates++;
@@ -329,7 +328,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     public void updateTravelDistance(Loc loc){
         // TODO: Maybe add condition '&& numberOfUpdates % 2 == 0' in order to reduce update frequency
         if(inboundZone == null && loc != null && loc.getAccuracy() <= 100){
-            Loc mostRecentLoc = LocationCache.getInstance().getMostRecentLoc();
+            Loc mostRecentLoc = LocationCache.getInstance().getMostRecentActiveLoc();
             int distanceInMeters = loc.distanceTo(mostRecentLoc);
             // Only add distance to distanceTravelled when it's greater than some value in order to
             // prevent fluctuations which occur due to the inaccurate nature of used location service.
@@ -339,7 +338,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             }
         }
     }
-
 
     public static long getEventTimestamp() {
         // Old approach: Substract static duration from current time and return result.
@@ -386,7 +384,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     private class LocationUpdateTimer extends TimerTask {
         public void run(){
-            Loc loc = LocationCache.getInstance().getMostRecentLoc();
+            Loc loc = LocationCache.getInstance().getMostRecentActiveLoc();
             if(loc != null){
                 loc.setIsRealUpdate(false);
                 handleLocationUpdate(loc);

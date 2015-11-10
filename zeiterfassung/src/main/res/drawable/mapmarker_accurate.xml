@@ -3,11 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <solid
-        android:color="@color/marker_no_connection"/>
+        android:color="@color/marker_accurate"/>
     <size
         android:width="100dp"
         android:height="100dp"/>
 
     <!--<stroke android:width="2px" android:color="#ff00ffff"/>-->
-    <stroke android:width="4px" android:color="@color/marker_no_connection_border"/>
+    <stroke android:width="4px" android:color="@color/marker_accurate_border"/>
 </shape>

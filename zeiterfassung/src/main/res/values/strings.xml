@@ -8,8 +8,12 @@
     <color name="almost_black">#FF111111</color>
     <color name="almost_white">#FFEEEEEE</color>
 
-    <color name="redish">#FF9E0025</color>
-    <color name="redish_light">#FFBF002D</color>
+    <color name="marker_accurate">@color/greenish</color>
+    <color name="marker_accurate_border">@color/greenish_light</color>
+    <color name="marker_inaccurate">@color/greenish_lighter</color>
+    <color name="marker_inaccurate_border">@color/greenish_almost_white</color>
+    <color name="marker_no_connection">#FF880B08</color>
+    <color name="marker_no_connection_border">#FFF32A25</color>
 
     <color name="grey_05">#FFF2F2F2</color>
     <color name="grey_05_alpha">#0D000000</color>
@@ -25,7 +29,12 @@
     <color name="grey_75_alpha">#BF000000</color>
     <color name="grey_navigation_drawer_text">#858585</color>
 
-    <color name="greenish">#025167</color>
+    <!-- true RGB colors -->
+    <color name="greenish">#FF025167</color>
+    <color name="greenish_light">#FF1B7C97</color>
+    <color name="greenish_lighter">#FF54A5BD</color>
+    <color name="greenish_almost_white">#FF94D2E3</color>
+
     <color name="greenish_100">#FF025167</color>
     <color name="greenish_75">#BF025167</color>
     <color name="greenish_50">#80025167</color>
@@ -34,7 +43,7 @@
     <color name="greenish_15">#26025167</color>
     <color name="greenish_10">#1A025167</color>
     <color name="greenish_5">#0D025167</color>
-    <color name="greenish_light">#FF037899</color>
+
 
     <color name="navigation_drawer_bg">@color/white</color>
     <color name="navigation_drawer_top_bg">@color/greenish_10</color>
