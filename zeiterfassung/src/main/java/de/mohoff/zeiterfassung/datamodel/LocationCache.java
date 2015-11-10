@@ -123,14 +123,15 @@ public class LocationCache {
         }
 
         // Handle passiveCache.
+        if(isPassiveCacheFull()){
+            firstPassiveCacheDropHappened = true;
+        }
         // Add newLoc to passiveCache if newLoc is a real update or there was a real update added
         // in the last call of this function.
         if(newLoc.isRealUpdate() || passiveCache.get(0).isRealUpdate()){
             passiveCache.add(newLoc);
         }
-        if(isPassiveCacheFull()){
-            firstPassiveCacheDropHappened = true;
-        }
+
     }
 
     public boolean isActiveCacheFull(){

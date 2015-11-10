@@ -69,7 +69,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     // Size of cache that is used to determine inbound and outbound events
     public static int ACTIVE_CACHE_SIZE = 5;
     // Size of cache that is used to display location markers on maps
-    public static int PASSIVE_CACHE_SIZE = 50;
+    public static int PASSIVE_CACHE_SIZE = 50; // 50
 
     private int numberOfUpdates = 0;
 

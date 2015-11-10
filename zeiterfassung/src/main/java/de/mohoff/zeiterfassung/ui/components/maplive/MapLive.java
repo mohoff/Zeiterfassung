@@ -227,8 +227,10 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
 
     private int getLengthOfLatLngSeries(LatLng latLng){
         int result = 1;
-        for(Marker m : markers){
-            if(m.getPosition().equals(latLng)){
+        // Only check for markers array interval [0...size-2] since the last element (size-1) will
+        // drop out this iteration and latLng will be added to markers at index 0.
+        for(int i=0; i<=markers.size()-2; i++){
+            if(markers.get(i).getPosition().equals(latLng)){
                 result++;
             } else {
                 return result;
@@ -238,27 +240,43 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     }
 
     private void addMarkerToMap(GoogleMap map, List<Marker> markers, MarkerOptions markerOptions) {
-        // Add marker to map
-        Marker marker = map.addMarker(markerOptions);
-        markers.add(0, marker); // Existing elements will be shifted if index 0 is given.//markers.add(marker);
-
-        // Change color for old marker
-        //if(markers.size() > 1){
-        //    markers.get(1).setIcon(BitmapDescriptorFactory.defaultMarker(0)); // BitmapDescriptorFactory.HUE_VIOLET
-        //}
-
         // Ensure that there are only passiveCache.maxSize() markers displayed to prevent memory leak.
-        // If passiveQueue is full and at least one drop happened already in it, remove oldest marker.
+        // If passiveQueue is full and at least one drop happened already in it
+        // (= hasFirstPassiveQueueDropHappened()), remove oldest marker.
         if(LocationCache.getInstance().hasFirstPassiveQueueDropHappened()){
             try {
-                // Remove oldest marker from map
-                markers.get(markers.size()-1).remove();
-                // Remove oldest/first element from marker list
-                //markers.remove(0);
+                // Determine index which should be deleted in markers arraylist. Markers with numbers
+                // are placed on top of each other. If there one marker of that marker stack needs to
+                // be removed, delete the one with the highest number (=youngest one).
+                // Implementation: If all elements of arraylist are distinct,
+                // deleteIndex = markers.size()-1. If not, iterate from [size()-2 ... 0] to get the
+                // youngest marker which position is the same as the oldest marker. Delete the
+                // youngest marker in this series of markers of same positions.
+                Marker oldest = markers.get(markers.size()-1);
+                int deleteIndex = markers.size()-1;
+                for(int i=markers.size()-2; i>=0; i--){
+                    if(!markers.get(i).getPosition().equals(oldest.getPosition())) {
+                        deleteIndex = i+1;
+                        break;
+                    }
+                    deleteIndex = i;
+                }
+                // Remove marker from map (marker object is still in markers arraylist)
+                markers.get(deleteIndex).remove();
+                // Remove marker from markers arraylist, so marker is completely removed.
+                markers.remove(deleteIndex);
             } catch (Exception e){
                 e.printStackTrace();
             }
         }
+
+        // Add new marker to map and to arraylist markers. markers' size is at most markers.maxSize()-1
+        // as we ensured above in this method. Thus inserting the new marker at index 0 is ok because
+        // all other elements can be shifted so that the empty space in the arraylist is filled.
+        // Now the arraylist is full (again) and in the next iteration one element needs to be removed
+        // again to create one empty index in arraylist.
+        Marker marker = map.addMarker(markerOptions);
+        markers.add(0, marker);
     }
 
     private Polyline addPolylineToMap(GoogleMap map, CircularFifoQueue<Loc> locs){
