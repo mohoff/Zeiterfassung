@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
+import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 
 /**
  * Created by moo on 10/9/15.
@@ -85,6 +86,6 @@ public class AddZoneMap extends ManageZonesMapAbstract {
             fixCircles.add(circle);
         }
 
-        centerMapTo(Loc.getMapViewport(latLngList, 100));
+        centerMapTo(MapAbstract.getMapViewport(latLngList, 100));
     }
 }

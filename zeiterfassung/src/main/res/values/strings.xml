@@ -8,6 +8,9 @@
     <color name="almost_black">#FF111111</color>
     <color name="almost_white">#FFEEEEEE</color>
 
+    <color name="redish">#FF9E0025</color>
+    <color name="redish_light">#FFBF002D</color>
+
     <color name="grey_05">#FFF2F2F2</color>
     <color name="grey_05_alpha">#0D000000</color>
     <color name="grey_10">#FFE6E6E6</color>

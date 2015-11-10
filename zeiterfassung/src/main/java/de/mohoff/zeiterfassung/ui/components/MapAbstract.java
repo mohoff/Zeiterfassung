@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +26,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -30,6 +35,7 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
@@ -51,7 +57,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     protected Geocoder geocoder;
     // Should be replaced with "greenish_50" in onCreateView().
     // Work around for "fragment not attached to activity" error.
-    int polylineColor = Color.BLACK;
+
 
     protected DatabaseHelper dbHelper = null;
 
@@ -118,8 +124,6 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         parentActivity = (MainActivity) getActivity();
         geocoder = new Geocoder(getActivity());
         dbHelper = getDbHelper(parentActivity);
-
-        polylineColor = getResources().getColor(R.color.greenish_50);
     }
 
     @Override
@@ -187,8 +191,10 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 .position(latLng)
                 .draggable(false)
                 .alpha(opacity)
-                .icon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
-                //.icon(BitmapDescriptorFactory.defaultMarker(193))      // BitmapDescriptorFactory.HUE_MAGENTA
+                .anchor(0.5f, 0.5f)
+                //.icon(BitmapDescriptorFactory.fromBitmap(markerBitmap))
+                //.icon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
+                .icon(BitmapDescriptorFactory.defaultMarker(193))      // BitmapDescriptorFactory.HUE_MAGENTA
                 .title(title)
                 .snippet(snippet)
         ;
@@ -220,21 +226,9 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    protected Polyline addPolylineToMap(GoogleMap map, CircularFifoQueue<Loc> queueLocs){
-        PolylineOptions options = new PolylineOptions()  // .geodesic(false)
-                .color(polylineColor)
-                .width(15);
-
-        for(Loc loc : queueLocs){
-            options.add(GeneralHelper.convertLocToLatLng(loc));
-        }
-
-        return map.addPolyline(options);
-    }
-
     protected void centerMapTo(LatLng cameraCenter, int zoomLevel){
         if(zoomLevel <= 0){
-            zoomLevel = 15;
+            zoomLevel = 17;
         }
         centerMapTo(CameraUpdateFactory.newLatLngZoom(cameraCenter, zoomLevel));
     }
@@ -260,6 +254,15 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 .strokeColor(Color.TRANSPARENT);
     }
 
+    public static CameraUpdate getMapViewport(ArrayList<LatLng> latLngList, int padding){
+        LatLngBounds.Builder boundBilder = LatLngBounds.builder();
+        for(LatLng latLng : latLngList){
+            boundBilder.include(latLng);
+        }
+        LatLngBounds bounds = boundBilder.build();
+
+        return CameraUpdateFactory.newLatLngBounds(bounds, padding);
+    }
 
     protected DatabaseHelper getDbHelper(Context context) {
         if (dbHelper == null) {

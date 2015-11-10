@@ -47,25 +47,30 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     // last started this service. While user is inbound a Zone SESSION_DISTANCE remains constant.
     // Is 0 when service is stopped and last session value is already persisted
     public static int SESSION_DISTANCE = 0; // meters
+    // Don't update SESSION_DISTANCE when the delta which is to add is smaller than SESSION_DISTANCE_IGNORE_TRESHOLD.
+    public static int SESSION_DISTANCE_IGNORE_TRESHOLD = 20;
     // Holds the last start timestamp of this service. When service is stopped the difference of
     // System.currentTimeMillis() and SESSION_STARTTIME will be persistend and combined with the
     // overall service uptime.
     public static long SESSION_STARTTIME = 0; // milliseconds
-    // Ignore location updates for activeCache which have accuracy > 300m
-    public static double ACCURACY_TRESHOLD = 300.0;
-    // Determines the ratio of inbound locations in activeCache to trigger an enter-event
-    public static float INBOUND_TRESHOLD = 0.8f;
-    public static float OUTBOUND_TRESHOLD = 1 - INBOUND_TRESHOLD;
-    // Size of cache that is used to determine inbound and outbound events
-    public static int ACTIVE_CACHE_SIZE = 5;
-    // Size of cache that is used to display location markers on maps
-    public static int PASSIVE_CACHE_SIZE = 50;
+
     // TODO: What to do when service is started? We really need to wait ~ REGULAR_UPDATE_INTERVAL * ACTIVE_CACHE_SIZE until activeCache is full in order to perform first createNewTimeslot? Can we do better?
     // Time interval after which a new location update is retrieved periodically
     // In milliseconds. Used values so far:  60 * 1000, 150 * 1000, 120 * 1000
     public static int REGULAR_UPDATE_INTERVAL = 60 * 1000;
     // Time interval after which a new location update is accepted at the earliest from other applications' requests
     public static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
+    // Ignore location updates for activeCache which have accuracy > 300m
+    public static double ACCURACY_TRESHOLD = 300.0;
+    // Determines the ratio of inbound locations in activeCache to trigger an enter-event
+    public static int NO_CONNECTION_INTERVAL = REGULAR_UPDATE_INTERVAL + 1000 * 30; // wait extra 30sec
+    public static float INBOUND_TRESHOLD = 0.8f;
+    public static float OUTBOUND_TRESHOLD = 1 - INBOUND_TRESHOLD;
+    // Size of cache that is used to determine inbound and outbound events
+    public static int ACTIVE_CACHE_SIZE = 5;
+    // Size of cache that is used to display location markers on maps
+    public static int PASSIVE_CACHE_SIZE = 50;
+
     private int numberOfUpdates = 0;
 
     // General DB, service, googleAPI variables
@@ -318,7 +323,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         locUpdateTimerTask.cancel();
         locUpdateTimerTask = new LocationUpdateTimer();
         // Execute locUpdateTimerTask after <2nd parameter> and repeat every <3rd parameter>
-        timer.schedule(locUpdateTimerTask, REGULAR_UPDATE_INTERVAL + 1000 * 10, REGULAR_UPDATE_INTERVAL);
+        timer.schedule(locUpdateTimerTask, NO_CONNECTION_INTERVAL, REGULAR_UPDATE_INTERVAL);
     }
 
     public void updateTravelDistance(Loc loc){
@@ -328,8 +333,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             int distanceInMeters = loc.distanceTo(mostRecentLoc);
             // Only add distance to distanceTravelled when it's greater than some value in order to
             // prevent fluctuations which occur due to the inaccurate nature of used location service.
-            if(distanceInMeters > 20){
-                // TODO: Make '20' a static variable
+            if(distanceInMeters > SESSION_DISTANCE_IGNORE_TRESHOLD){
                 // TODO: Maybe add correction factor of 0.9 or similar.
                 SESSION_DISTANCE += loc.distanceTo(mostRecentLoc);
             }
@@ -360,18 +364,12 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private void sendTimeslotEventViaBroadcast(String eventType) {
         Intent intent = new Intent("locationServiceTimeslotEvents");
         intent.putExtra("type", eventType);
-        /*intent.putExtra("id", _id);
-        intent.putExtra("message", message);
-        intent.putExtra("timestamp", String.valueOf(timestamp));
-        intent.putExtra("activityName", activityName);
-        intent.putExtra("locationName", locationName);*/
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     // Broadcast for locationUpdate events
     private void sendLocationUpdateViaBroadcast(double lat, double lng, double accuracy, boolean isRealUpdate){
         Intent intent = new Intent("locationServiceLocUpdateEvents");
-        // message = "newTimeslotStarted"
         intent.putExtra("lat", String.valueOf(lat));
         intent.putExtra("lng", String.valueOf(lng));
         intent.putExtra("accuracy", String.valueOf(accuracy));
