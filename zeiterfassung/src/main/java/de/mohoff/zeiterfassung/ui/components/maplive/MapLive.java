@@ -60,7 +60,7 @@ import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 public class MapLive extends MapAbstract implements LocationChangeListener{
     //CircularFifoQueue<Loc> userLocs = new CircularFifoQueue<>();
     //private ClusterManager<Loc> clusterManager;
-    List<Marker> markers = new ArrayList<Marker>();
+    List<Marker> markers = new ArrayList<Marker>(LocationService.PASSIVE_CACHE_SIZE);
     Polyline currentPolyline;
     int polylineColor = Color.BLACK;
     Marker currentLocation;
@@ -96,7 +96,6 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         polylineColor = getResources().getColor(R.color.greenish_50);
 
         markerAccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_accurate, true);
-        // TODO-FIX: For some reason, markerInaccurate is displayed with transparency 50% or similar...-> FIX
         markerInaccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_inaccurate, true);
         markerNoConnection = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_noconnection, true);
 
@@ -169,6 +168,11 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
     }
@@ -202,16 +206,13 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         MarkerOptions markerOptions = new MarkerOptions()
                 .position(latLng)
                 .draggable(false)
-                .alpha(GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()))
+                //.alpha(GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()))
                 .anchor(0.5f, 0.5f) // anchor in the very center of the marker icon
-                        //.icon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
-                        //.icon(BitmapDescriptorFactory.defaultMarker(HUE_MAGENTA))
                 .title("Location")
                 .snippet("A:" + loc.getAccuracy() +
                                 "\n O:" + GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()) +
                                 "\n t:" + Timeslot.getReadableDuration(timestampPreviousMarker, loc.getTimestampInMillis(), false, false)
-                )
-                ;
+                );
 
         // Artificially created (non-real) Locs are always accurate because they are retrieved
         // from activeCache. Therefore there is no need for distinguishing accurate and inaccurate
@@ -358,7 +359,6 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     }
 
     private void updateCurrentLocationMarker(GoogleMap map, Loc loc){
-        // TODO: replace marker icon for currentLocationMarker with greenish color, width=50px and bottomPadding of 25px. Then the new icon directly points to a marker dot icon. dot-dimensions are 50x50px.
         if(currentLocation == null){
             currentLocation = map.addMarker(new MarkerOptions()
                     .position(loc.getLatLng())

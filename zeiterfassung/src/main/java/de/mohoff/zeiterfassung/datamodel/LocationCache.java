@@ -64,6 +64,11 @@ public class LocationCache {
         }
     }
 
+    public int clearPassiveCache(){
+        passiveCache.clear();
+        return 1;
+    }
+
     public float validateInBoundsForZone(Zone zone){
         float positives = 0;
 

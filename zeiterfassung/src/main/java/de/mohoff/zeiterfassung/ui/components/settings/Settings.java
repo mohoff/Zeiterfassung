@@ -12,6 +12,7 @@ import android.widget.Button;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
+import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
@@ -20,7 +21,7 @@ public class Settings extends Fragment {
     Context context;
     DatabaseHelper dbHelper;
 
-    Button deleteAllTimeslotsButton, deleteAllZonesButton;
+    Button deleteAllTimeslotsButton, deleteAllZonesButton, deleteAllMarkersButton;
 
     public Settings() {
         // Required empty public constructor
@@ -38,6 +39,7 @@ public class Settings extends Fragment {
 
         deleteAllTimeslotsButton = (Button) view.findViewById(R.id.deleteAllTimeslotsButton);
         deleteAllZonesButton = (Button) view.findViewById(R.id.deleteAllZonesButton);
+        deleteAllMarkersButton = (Button) view.findViewById(R.id.deleteAllMarkersButton);
 
         return view;
     }
@@ -70,7 +72,7 @@ public class Settings extends Fragment {
                                 dialog.dismiss();
                             }
                         })
-                        //.setTitle("Delete all tracking entries")
+                                //.setTitle("Delete all tracking entries")
                         .setMessage("Delete all tracking entries?")
                         .create();
                 alertDialog.show();
@@ -101,6 +103,35 @@ public class Settings extends Fragment {
                         })
                         //.setTitle("Delete all Zones")
                         .setMessage("Delete all Zones?")
+                        .create();
+                alertDialog.show();
+            }
+        });
+
+        deleteAllMarkersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog alertDialog = new AlertDialog.Builder(context)
+                        .setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                // Clear passiveCache in LocationCache singleton and execute delete on DB
+                                if(LocationCache.getInstance().clearPassiveCache() == 1 && dbHelper.cleanLocs() == 1){
+                                    GeneralHelper.showToast(context, "Cleaned map successfully.");
+                                    dialog.dismiss();
+                                } else {
+                                    GeneralHelper.showToast(context, "Could not clean map.");
+                                }
+                            }
+                        })
+                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        })
+                                //.setTitle("Delete all Zones")
+                        .setMessage("Clean map?")
                         .create();
                 alertDialog.show();
             }

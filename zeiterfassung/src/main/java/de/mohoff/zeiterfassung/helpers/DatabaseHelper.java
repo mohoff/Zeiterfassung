@@ -612,32 +612,37 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return timeslots;
     }*/
 
-    public int dumpLocs(CircularFifoQueue<Loc> cache){
-        getLocREDAO();
-        int result = -1;
-
-        // Remove existing records first
+    public int cleanLocs(){
         try {
             // Dropping and creating table will reset autoincrement for _id.
             TableUtils.dropTable(connectionSource, Loc.class, true);
             TableUtils.createTable(connectionSource, Loc.class);
-            //TableUtils.clearTable(connectionSource, Loc.class);
+            return 1;
         } catch (SQLException e){
             e.printStackTrace();
-            return result;
+            return -1;
+        }
+    }
+
+    public int dumpLocs(CircularFifoQueue<Loc> cache){
+        getLocREDAO();
+
+        // Remove existing records first
+        if(cleanLocs() != 1){
+            return -1;
         }
 
         // Dump new records
         for(Loc record : cache){
             try {
                 getLocDAO();
-                result = locDAO.create(record);
+                locDAO.create(record);
             } catch(SQLException e){
                 e.printStackTrace();
-                return result;
+                return -1;
             }
         }
-        return result;
+        return 1;
     }
 
     public List<Loc> getLocs(long maxAge){

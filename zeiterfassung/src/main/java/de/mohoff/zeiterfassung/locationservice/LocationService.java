@@ -84,7 +84,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private Zone inboundZone;
 
     // Timers and Countdowns
-    private LocationUpdateTimer locUpdateTimerTask = new LocationUpdateTimer();
+    private LocationUpdateTimer timerTask = new LocationUpdateTimer();
     private Timer timer = new Timer();
     private ServiceRunningTime serviceRunningTime = new ServiceRunningTime(REGULAR_UPDATE_INTERVAL * ACTIVE_CACHE_SIZE * 2);
 
@@ -99,6 +99,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         SESSION_STARTTIME = 0;
 
         sendServiceEventViaBroadcast("stop");
+
+        resetLocRepeatTimer();
+
         return super.stopService(name);
     }
 
@@ -218,6 +221,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         }
 
         IS_SERVICE_RUNNING = false;
+
+        resetLocRepeatTimer();
+
         super.onDestroy();
     }
 
@@ -234,6 +240,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         // Start counting service tracking uptime
         serviceRunningTime.start();
         SESSION_STARTTIME = System.currentTimeMillis();
+
+        startLocRepeatTimer();
 
         return Service.START_STICKY;
     }
@@ -319,10 +327,28 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             updateTimeslots();
         }
 
-        locUpdateTimerTask.cancel();
-        locUpdateTimerTask = new LocationUpdateTimer();
-        // Execute locUpdateTimerTask after <2nd parameter> and repeat every <3rd parameter>
-        timer.schedule(locUpdateTimerTask, NO_CONNECTION_INTERVAL, REGULAR_UPDATE_INTERVAL);
+        resetLocRepeatTimer();
+        startLocRepeatTimer();
+    }
+
+    private void resetLocRepeatTimer(){
+        if(timerTask != null){
+            timerTask.cancel();
+        }
+        if(timer != null){
+            timer.cancel();
+            timer.purge();
+        }
+        timerTask = null;
+        timer = null;
+    }
+
+    private void startLocRepeatTimer(){
+        timerTask = new LocationUpdateTimer();
+        timer = new Timer();
+        // Execute timerTask after <2nd parameter> and repeat every <3rd parameter>
+        //timer.schedule(timerTask, NO_CONNECTION_INTERVAL, REGULAR_UPDATE_INTERVAL);
+        timer.schedule(timerTask, NO_CONNECTION_INTERVAL);
     }
 
     public void updateTravelDistance(Loc loc){
