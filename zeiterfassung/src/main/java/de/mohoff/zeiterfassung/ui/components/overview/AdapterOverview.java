@@ -7,7 +7,10 @@ import android.graphics.Typeface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -22,6 +25,7 @@ import java.util.ArrayList;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
@@ -35,10 +39,13 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final static int VIEWTYPE_SERVICEINFO = 2;
     private final static int VIEWTYPE_NOENTRYINFO = 3;
 
+
+
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolderItem extends RecyclerView.ViewHolder{
+        public Context context;
         // each data item is just a string in this case
         public CardView container;
         public ImageView icon;
@@ -47,13 +54,17 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public TextView startTime, startDate;
         public TextView duration;
         public TextView endTime, endDate;
+        //public LongClickListener longClickListener;
 
         //public RelativeLayout topConnectorPart, bottomConnectorPart;
         //public View middleConnectorPart;
 
-        public ViewHolderItem(View v){
+        public ViewHolderItem(Context context, View v){
             super(v);
+            this.context = context;
             this.container = (CardView) v.findViewById(R.id.card_view);
+            //this.container.setOnLongClickListener(this);
+
             this.icon = (ImageView) v.findViewById(R.id.icon);
             this.activity = (TextView) v.findViewById(R.id.activity);
             this.location = (TextView) v.findViewById(R.id.location);
@@ -67,6 +78,16 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             //this.bottomConnectorPart = (RelativeLayout) v.findViewById(R.id.bottomConnectorPart);
             //this.middleConnectorPart = (View) v.findViewById(R.id.middleConnectorPart);
         }
+
+        /*public boolean onLongClick(View v) {
+            GeneralHelper.showToast(context, "long clicked");
+            if (v.isSelected()) {
+                v.setSelected(false);
+            } else {
+                v.setSelected(true);
+            }
+            return true;
+        }*/
     }
 
     public static class ViewHolderInfoItem extends RecyclerView.ViewHolder {
@@ -111,7 +132,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if(viewType == VIEWTYPE_NORMAL){
             View itemView = LayoutInflater.from(parent.getContext()).
                     inflate(R.layout.fragment_overview_card, parent, false);
-            return new ViewHolderItem(itemView);
+            return new ViewHolderItem(context, itemView);
         }
         if((viewType == VIEWTYPE_SERVICEINFO) || (viewType == VIEWTYPE_NOENTRYINFO)){
             View itemView = LayoutInflater.from(parent.getContext()).

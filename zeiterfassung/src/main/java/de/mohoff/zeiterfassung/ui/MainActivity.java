@@ -46,7 +46,6 @@ import de.mohoff.zeiterfassung.ui.components.maplive.MapLive;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
-        setContentView(R.layout.navigation_drawer_main);
+        setContentView(R.layout.activity_main);
         getDbHelper();
         fragM = getFragmentManager();
         fragT = fragM.beginTransaction();

@@ -61,6 +61,9 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         recList.setAdapter(adapter);
         recList.setLayoutManager(llm);
 
+        //recList.addOnItemTouchListener(new );
+
+
         updateFirstCardPeriodically();
     }
 
@@ -75,6 +78,8 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         // Update adapter model and update UI
         adapter.updateData();
         adapter.notifyDataSetChanged();
+        // Scroll to top
+        recList.scrollToPosition(adapter.getItemCount()-1);
     }
 
     @Override
@@ -115,9 +120,8 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         // Update the 2nd list element. Its endtime and enddate might have TYPEFACE.ITALIC still.
         adapter.notifyItemChanged(adapter.getItemCount()-2);
         adapter.notifyItemChanged(adapter.getItemCount()-3);
-        // Give visual feedback that a new item has beed added.
-        // TODO: Does the following work?
-        recList.scrollToPosition(adapter.getItemCount()-1);
+        // Give visual feedback that a new item has beed added: Scroll smoothly to top
+        recList.smoothScrollToPosition(adapter.getItemCount()-1);
     }
 
     @Override

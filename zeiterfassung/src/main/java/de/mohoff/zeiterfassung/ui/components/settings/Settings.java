@@ -116,7 +116,8 @@ public class Settings extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 // Clear passiveCache in LocationCache singleton and execute delete on DB
-                                if(LocationCache.getInstance().clearPassiveCache() == 1 && dbHelper.cleanLocs() == 1){
+                                if(LocationCache.getInstance().clearPassiveCache() == 1
+                                        && dbHelper.cleanLocs() == 1){
                                     GeneralHelper.showToast(context, "Cleaned map successfully.");
                                     dialog.dismiss();
                                 } else {

@@ -60,7 +60,7 @@ import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 public class MapLive extends MapAbstract implements LocationChangeListener{
     //CircularFifoQueue<Loc> userLocs = new CircularFifoQueue<>();
     //private ClusterManager<Loc> clusterManager;
-    List<Marker> markers = new ArrayList<Marker>(LocationService.PASSIVE_CACHE_SIZE);
+    List<Marker> markers;
     Polyline currentPolyline;
     int polylineColor = Color.BLACK;
     Marker currentLocation;
@@ -81,6 +81,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        markers = new ArrayList<Marker>(LocationCache.getInstance().getPassiveCacheMaxSize());
         super.onCreate(savedInstanceState);
     }
 
@@ -278,7 +279,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         // Ensure that there are only passiveCache.maxSize() markers displayed to prevent memory leak.
         // If passiveQueue is full and at least one drop happened already in it
         // (= hasFirstPassiveQueueDropHappened()), remove oldest marker.
-        if(LocationCache.getInstance().hasFirstPassiveQueueDropHappened() && markers.size() > 2){
+        if(LocationCache.getInstance().hasFirstPassiveQueueDropHappened() && markers.size() == LocationCache.getInstance().getPassiveCacheMaxSize()){
             try {
                 // Determine index which should be deleted in markers arraylist. Markers with numbers
                 // are placed on top of each other. If there one marker of that marker stack needs to
@@ -365,6 +366,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                     .draggable(false)
                             //.icon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
                     .icon(BitmapDescriptorFactory.fromBitmap(markerCurrentLocation))
+                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title("Current location"))
                     ;
         } else {

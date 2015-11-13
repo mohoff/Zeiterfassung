@@ -7,12 +7,14 @@
     card_view:cardCornerRadius="4dp"
     card_view:cardElevation="2dp"
     card_view:cardUseCompatPadding="true"
-    card_view:cardBackgroundColor="#fff"
+
     android:layout_marginTop="2dp"
     android:layout_marginBottom="2dp"
     android:layout_marginLeft="5dp"
     android:layout_marginRight="5dp"
-    android:padding="0dp">
+    android:padding="0dp"
+    android:clickable="true"
+    android:foreground="@drawable/selector_overview">
 
     <!-- 70% width for activity, location, etc.
          30% width for starttime, duration, endtime -->

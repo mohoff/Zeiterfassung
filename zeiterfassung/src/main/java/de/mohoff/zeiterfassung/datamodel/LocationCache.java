@@ -54,6 +54,10 @@ public class LocationCache {
     public CircularFifoQueue<Loc> getPassiveCache(){
         return passiveCache;
     }
+    public int getPassiveCacheMaxSize(){
+        return passiveCache.maxSize();
+    }
+
     public CircularFifoQueue<Loc> getActiveCache(){
         return activeCache;
     }
