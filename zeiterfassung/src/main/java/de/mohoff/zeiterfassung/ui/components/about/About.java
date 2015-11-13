@@ -8,8 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class About extends Fragment {
+    MainActivity context;
+
 
     public About() {
         // Required empty public constructor
@@ -25,6 +28,13 @@ public class About extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_about, container, false);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        context = (MainActivity) getActivity();
+        context.fab.hide();
     }
 
     @Override

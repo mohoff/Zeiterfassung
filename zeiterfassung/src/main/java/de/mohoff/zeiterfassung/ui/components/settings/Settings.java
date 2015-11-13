@@ -16,9 +16,10 @@ import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
+import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class Settings extends Fragment {
-    Context context;
+    MainActivity context;
     DatabaseHelper dbHelper;
 
     Button deleteAllTimeslotsButton, deleteAllZonesButton, deleteAllMarkersButton;
@@ -47,8 +48,9 @@ public class Settings extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        context = getActivity();
+        context = (MainActivity) getActivity();
         getDbHelper(context);
+        context.fab.hide();
 
         deleteAllTimeslotsButton.setOnClickListener(new View.OnClickListener() {
             @Override

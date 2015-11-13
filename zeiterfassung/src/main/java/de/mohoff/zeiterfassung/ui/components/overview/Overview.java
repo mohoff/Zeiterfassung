@@ -1,8 +1,8 @@
 package de.mohoff.zeiterfassung.ui.components.overview;
 
-import android.graphics.Point;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,6 +22,8 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
     AdapterOverview adapter;
     RecyclerView recList;
     LinearLayoutManager llm;
+
+    Snackbar snackbar;
 
     public Overview() {
         // Required empty public constructor
@@ -61,8 +63,22 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         recList.setAdapter(adapter);
         recList.setLayoutManager(llm);
 
-        //recList.addOnItemTouchListener(new );
+        // Set FAB icon and click listener
+        parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_search_black_24dp));
+        parentActivity.fab.show();
+        /*parentActivity.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (currentLocation != null) {
+                    centerMapTo(currentLocation.getPosition());
+                }
+            }
+        });*/
 
+        snackbar = Snackbar.make(parentActivity.coordinatorLayout, "Location Service is not running...", Snackbar.LENGTH_INDEFINITE);
+        if(!parentActivity.serviceStatus.isRunning()){
+            snackbar.show();
+        }
 
         updateFirstCardPeriodically();
     }
@@ -136,8 +152,11 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
     public void onServiceStatusEvent(boolean isRunning) {
         if(isRunning){
             adapter.notifyItemRemoved(adapter.getItemCount() - 1);
+            snackbar.dismiss();
+            //snackbar = Snackbar.make(parentActivity.coordinatorLayout, "Location Service is not running...", Snackbar.LENGTH_INDEFINITE);
         } else {
             adapter.notifyItemInserted(adapter.getItemCount() - 1);
+            //snackbar.show();
         }
 
         //adapter.notifyItemChanged(adapter.getItemCount()-2);

@@ -34,7 +34,7 @@ public class EditZonesMap extends ManageZonesMapAbstract {
         radius = editZone.getRadius();
         radiusValue.setText(String.valueOf(radius));
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
+        parentActivity.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (radius < 50) {
@@ -92,12 +92,12 @@ public class EditZonesMap extends ManageZonesMapAbstract {
         // TODO: rework this
 
         // Provide color feedback. Disable button if radius hasn't changed.
-        if (radius == editZone.getRadius()) {
+        /*if (radius == editZone.getRadius()) {
             saveButton.setColorFilter(colorButtonDisabled);
             //saveButton.setClickable(false);
         } else {
             saveButton.setColorFilter(colorButtonEnabled);
             //saveButton.setClickable(true);
-        }
+        }*/
     }
 }

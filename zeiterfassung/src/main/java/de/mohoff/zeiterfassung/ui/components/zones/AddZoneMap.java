@@ -2,6 +2,7 @@ package de.mohoff.zeiterfassung.ui.components.zones;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
 
+import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
@@ -35,7 +37,11 @@ public class AddZoneMap extends ManageZonesMapAbstract {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
+        //CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) parentActivity.fab.getLayoutParams();
+        //params.setAnchorId(R.id.topView);
+        //parentActivity.fab.setLayoutParams(params);
+
+        parentActivity.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (radius < 50) {

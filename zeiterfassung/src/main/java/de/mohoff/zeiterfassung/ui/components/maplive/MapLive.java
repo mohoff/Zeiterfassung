@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.internal.view.ContextThemeWrapper;
 import android.util.Property;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,12 +96,26 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         polylineColor = getResources().getColor(R.color.greenish_50);
+        //parentActivity.toolbar.setVisibility(View.GONE);
 
         markerAccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_accurate, true);
         markerInaccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_inaccurate, true);
         markerNoConnection = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_noconnection, true);
 
         markerCurrentLocation = createCurrentLocationBitmap(parentActivity, "markers/marker1.png");
+
+        // Set FAB icon and click listener
+
+        parentActivity.fab.setImageBitmap(markerCurrentLocation);
+        parentActivity.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(currentLocation != null){
+                    centerMapTo(currentLocation.getPosition());
+                }
+            }
+        });
+        parentActivity.fab.show();
     }
 
     private Bitmap createBitmapFromDrawable(int dim, int drawable, boolean fullOpacity){
@@ -149,7 +164,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
 
     @Override
     public void onResume() {
-        // set newest fixMarkers
+        // setIsRunning newest fixMarkers
 
         // Get most recent locations from MainActivity and convert to LatLngs (google map objects)
         //CircularFifoQueue<Loc> userLocs = parentActivity.getLocs();
@@ -158,7 +173,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         //}
         //userLocs = parentActivity.getLocs();
 
-        parentActivity.setOnNewLocationListener(this); // set listener
+        parentActivity.setOnNewLocationListener(this); // setIsRunning listener
         super.onResume();
     }
 
@@ -285,7 +300,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                 // are placed on top of each other. If there one marker of that marker stack needs to
                 // be removed, delete the one with the highest number (=youngest one).
                 // Implementation: If all elements of arraylist are distinct,
-                // deleteIndex = markers.size()-1. If not, iterate from [size()-2 ... 0] to get the
+                // deleteIndex = markers.size()-1. If not, iterate from [size()-2 ... 0] to isRunning the
                 // youngest marker which position is the same as the oldest marker. Delete the
                 // youngest marker in this series of markers of same positions.
                 Marker oldest = markers.get(markers.size()-1);
@@ -333,7 +348,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             respectedLatLngs.add(markers.get(0).getPosition());
             respectedLatLngs.add(markers.get(1).getPosition());
         } catch (Exception e){
-            // .get(1) failed because it's not yet filled.
+            // .isRunning(1) failed because it's not yet filled.
         }
         centerMapTo(getMapViewport(respectedLatLngs, 200));
     }

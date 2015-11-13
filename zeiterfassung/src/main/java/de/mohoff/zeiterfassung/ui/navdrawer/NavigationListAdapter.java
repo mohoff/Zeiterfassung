@@ -111,7 +111,7 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
             // start button
             navHolder.buttonStart.getBackground().setColorFilter(context.getResources().getColor(R.color.grey_25), PorterDuff.Mode.MULTIPLY);
             navHolder.buttonStart.setEnabled(false);
-            navHolder.buttonStart.setTextColor(context.getResources().getColor(R.color.white)); // need to set text color explicitly after setEnabled(false). Else text color gets grey somehow
+            navHolder.buttonStart.setTextColor(context.getResources().getColor(R.color.white)); // need to setIsRunning text color explicitly after setEnabled(false). Else text color gets grey somehow
             navHolder.buttonStart.setOnClickListener(null);
             // stop button
             navHolder.buttonStop.getBackground().setColorFilter(context.getResources().getColor(R.color.greenish), PorterDuff.Mode.MULTIPLY);
@@ -147,7 +147,7 @@ public class NavigationListAdapter extends ArrayAdapter<NavigationListItem>{
             // stop button
             navHolder.buttonStop.getBackground().setColorFilter(context.getResources().getColor(R.color.grey_25), PorterDuff.Mode.MULTIPLY);
             navHolder.buttonStop.setEnabled(false);
-            navHolder.buttonStop.setTextColor(context.getResources().getColor(R.color.white)); // need to set text color explicitly after setEnabled(false). Else text color gets grey somehow
+            navHolder.buttonStop.setTextColor(context.getResources().getColor(R.color.white)); // need to setIsRunning text color explicitly after setEnabled(false). Else text color gets grey somehow
             navHolder.buttonStop.setOnClickListener(null);
         }
 

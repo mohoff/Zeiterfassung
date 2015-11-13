@@ -98,7 +98,7 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
         int width = 0;
         int height = 0;
 
-        // it's possible to get scrap views in recycler which are bound to old (invalid) adapter entities. This
+        // it's possible to isRunning scrap views in recycler which are bound to old (invalid) adapter entities. This
         // happens because their invalidation happens after "onMeasure" method. As a workaround let's clear the
         // recycler now (it should not cause any performance issues while scrolling as "onMeasure" is never
         // called whiles scrolling)
@@ -113,7 +113,7 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
             if (vertical) {
                 if (!hasChildSize) {
                     if (i < stateItemCount) {
-                        // we should not exceed state count, otherwise we'll get IndexOutOfBoundsException. For such items
+                        // we should not exceed state count, otherwise we'll isRunning IndexOutOfBoundsException. For such items
                         // we will use previously calculated dimensions
                         measureChild(recycler, i, widthSize, unspecified, childDimensions);
                     } else {
@@ -130,7 +130,7 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
             } else {
                 if (!hasChildSize) {
                     if (i < stateItemCount) {
-                        // we should not exceed state count, otherwise we'll get IndexOutOfBoundsException. For such items
+                        // we should not exceed state count, otherwise we'll isRunning IndexOutOfBoundsException. For such items
                         // we will use previously calculated dimensions
                         measureChild(recycler, i, unspecified, heightSize, childDimensions);
                     } else {

@@ -12,13 +12,15 @@
         <item name="colorPrimary">@color/greenish</item>
         <item name="colorPrimaryDark">@color/greenish</item>
         <item name="colorAccent">@color/greenish</item>
-        <!-- You can also set colorControlNormal, colorControlActivated
+        <!-- You can also setIsRunning colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
 
         <item name="colorButtonNormal">@color/greenish</item>
         <item name="android:imageButtonStyle">@color/transparent</item> <!-- in order to make ImageButton background transparent -->
 
         <!--<item name="android:windowActionBar">false</item>--> <!-- not needed anymore, because we inherit from NoActionBar -->
+
+
     </style>
 
     <style name="Button" parent="android:style/Widget.Material.Button">
@@ -69,6 +71,5 @@
         <item name="colorControlActivated">#00FF00</item>
         <item name="colorControlHighlight">#FF0000</item>
     </style>
-
 
 </resources>

@@ -56,6 +56,7 @@ public class Statistics extends Fragment {
         super.onActivityCreated(savedInstanceState);
         parentActivity = (MainActivity) getActivity();
         getDbHelper();
+        parentActivity.fab.hide();
 
         layoutManager = new LinearLayoutManager(getActivity());
         recList.setLayoutManager(layoutManager);

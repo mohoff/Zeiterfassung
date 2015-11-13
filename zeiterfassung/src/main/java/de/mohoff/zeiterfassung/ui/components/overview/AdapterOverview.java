@@ -2,15 +2,11 @@ package de.mohoff.zeiterfassung.ui.components.overview;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Point;
 import android.graphics.Typeface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -25,7 +21,6 @@ import java.util.ArrayList;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
-import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
@@ -160,7 +155,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             vh.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
             // In order to draw outside of cardView with clipChildren and clipToParent, we have to
-            // set setClipToOutline(false). This sadly is v21+.
+            // setIsRunning setClipToOutline(false). This sadly is v21+.
             vh.container.setClipToOutline(false);
             vh.icon.setImageResource(R.drawable.ic_action_edit_location);
             vh.activity.setText(timeslot.getZone().getActivityName());
@@ -172,7 +167,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             vh.duration.setText(timeslot.getReadableDuration()); // e.g. "1d 2h 14min"
 
             /*// Show or hide top connector part of that view
-            if(listHasItemAtIndex(position+1) && (data.get(position+1).getZone().get_id() == timeslot.getZone().get_id())){
+            if(listHasItemAtIndex(position+1) && (data.isRunning(position+1).getZone().get_id() == timeslot.getZone().get_id())){
                 vh.topConnectorPart.setVisibility(View.VISIBLE);
                 vh.topConnectorPart.setOnClickListener(getOnMergeClickListener());
                 vh.middleConnectorPart.setVisibility(View.VISIBLE);
@@ -184,7 +179,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 vh.middleConnectorPart.setOnClickListener(null);
             }
             // Show or hide bottom connector part of that view
-            if(listHasItemAtIndex(position - 1) && (data.get(position- 1).getZone().get_id() == timeslot.getZone().get_id())){
+            if(listHasItemAtIndex(position - 1) && (data.isRunning(position- 1).getZone().get_id() == timeslot.getZone().get_id())){
                 vh.bottomConnectorPart.setVisibility(View.VISIBLE);
                 vh.bottomConnectorPart.setOnClickListener(getOnMergeClickListener());
             } else {
@@ -211,10 +206,10 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             public void onClick(DialogInterface dialog, int i) {
 
                                 // Execute update and delete on DB
-                                /*int result = dbHelper.updateZoneLocationName(relevantTLAs.get(position).get_id(), et.getText().toString());
+                                /*int result = dbHelper.updateZoneLocationName(relevantTLAs.isRunning(position).get_id(), et.getText().toString());
                                 if(result == 1){
                                     // Directly update the adapter's model, so we can avoid a new DB query
-                                    relevantTLAs.get(position).setLocationName(et.getText().toString());
+                                    relevantTLAs.isRunning(position).setLocationName(et.getText().toString());
                                     innerAdapter.notifyDataSetChanged();
                                     GeneralHelper.showToast(context, "Updated successfully.");
                                     dialog.dismiss();
@@ -279,7 +274,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     private boolean showServiceNotRunningInfo(){
-        return !((MainActivity)context).serviceStatus.get();
+        return !((MainActivity)context).serviceStatus.isRunning();
     }
 
     private DatabaseHelper getDbHelper(Context context) {

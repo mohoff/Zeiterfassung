@@ -32,7 +32,7 @@ public class ScrollAwareFAB extends FloatingActionButton.Behavior {
                                final View target, final int dxConsumed, final int dyConsumed,
                                final int dxUnconsumed, final int dyUnconsumed) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
-        Log.v("ScrollAwareFAB: ", String.valueOf(target.getWidth()) + " " + String.valueOf(target.getHeight()));
+        //Log.v("ScrollAwareFAB: ", String.valueOf(target.getWidth()) + " " + String.valueOf(target.getHeight()));
 
         // Don't hide FAB if we are in 'Manage Zones'-fragment (contains R.id.recyclerView)
         if(target.getId() != R.id.recyclerView){

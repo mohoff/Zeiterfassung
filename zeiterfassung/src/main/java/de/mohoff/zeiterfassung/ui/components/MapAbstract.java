@@ -48,6 +48,8 @@ import de.mohoff.zeiterfassung.ui.MainActivity;
  * Created by moo on 8/16/15.
  */
 public class MapAbstract extends Fragment implements OnMapReadyCallback {
+    private int DEFAULT_ZOOM_LEVEL = 17;
+
     protected MainActivity parentActivity;
     protected static View view;
     protected ProgressBar progressBar;
@@ -78,7 +80,6 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
             view = inflater.inflate(layout, container, false);
         } catch (InflateException e) {
             // map is already there, just return view as it is
-            int bla = 5;
         }
         //return this.onCreateView(inflater, container, savedInstanceState);
 
@@ -226,9 +227,13 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    protected void centerMapTo(LatLng cameraCenter){
+        centerMapTo(CameraUpdateFactory.newLatLngZoom(cameraCenter, DEFAULT_ZOOM_LEVEL));
+    }
+
     protected void centerMapTo(LatLng cameraCenter, int zoomLevel){
         if(zoomLevel <= 0){
-            zoomLevel = 17;
+            zoomLevel = DEFAULT_ZOOM_LEVEL;
         }
         centerMapTo(CameraUpdateFactory.newLatLngZoom(cameraCenter, zoomLevel));
     }

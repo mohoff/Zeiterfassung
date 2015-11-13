@@ -53,7 +53,6 @@ public class AddZone extends Fragment {
 
         autoCompleteTextView = (AutoCompleteTextView) view.findViewById(R.id.inputActivity);
         editText = (EditText) view.findViewById(R.id.inputLocation);
-        pinButton = (CardView) view.findViewById(R.id.buttonRight);
 
         return view;
     }
@@ -65,6 +64,7 @@ public class AddZone extends Fragment {
         parentActivity = (MainActivity) getActivity();
         parentActivity.getDrawerToggle().setDrawerIndicatorEnabled(false);
         parentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         dbHelper = getDbHelper(parentActivity);
         // Get distinct Activity names to suggest them while typing in AutoCompleteTextView
@@ -105,7 +105,10 @@ public class AddZone extends Fragment {
             }
         });
 
-        pinButton.setOnClickListener(new View.OnClickListener() {
+        // Set FAB icon and click listener
+        parentActivity.fab.show();
+        parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_chevron_right_white_24dp));
+        parentActivity.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 autoCompleteTextView.clearFocus();
@@ -124,6 +127,7 @@ public class AddZone extends Fragment {
                 }
             }
         });
+
     }
 
     @Override

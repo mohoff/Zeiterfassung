@@ -13,6 +13,7 @@ import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class ManageZones extends Fragment {
+    private MainActivity parentActivity;
     private DatabaseHelper dbHelper = null;
     private RecyclerView recyclerView;
     private LinearLayoutManager linLayoutManager;
@@ -47,6 +48,23 @@ public class ManageZones extends Fragment {
         recyclerView.setClickable(false); // taken from old listView. Can use here?
 
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        parentActivity = (MainActivity) getActivity();
+
+        // Set FAB icon and click listener
+        parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_white_24dp));
+        parentActivity.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment nextFragment = new AddZone();
+                parentActivity.replaceFragment(nextFragment, true);
+            }
+        });
+        parentActivity.fab.show();
     }
 
     @Override

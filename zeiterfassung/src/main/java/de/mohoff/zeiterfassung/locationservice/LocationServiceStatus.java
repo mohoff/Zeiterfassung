@@ -12,10 +12,10 @@ import java.util.ArrayList;
 public class LocationServiceStatus {
     private boolean isServiceRunning;
     ArrayList<ServiceChangeListener> listeners = new ArrayList<>();
-    public boolean get(){
+    public boolean isRunning(){
         return isServiceRunning;
     }
-    public void set(boolean newValue){
+    public void setIsRunning(boolean newValue){
         if(isServiceRunning != newValue){
             isServiceRunning = !isServiceRunning;
             for(ServiceChangeListener listener : listeners){

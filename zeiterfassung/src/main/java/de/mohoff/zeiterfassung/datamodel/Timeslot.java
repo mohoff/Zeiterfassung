@@ -14,7 +14,7 @@ public class Timeslot {
     private int _id;
     @DatabaseField(canBeNull = false, unique = true)
     private long starttime; // in seconds
-    // TODO: Set ..IsVague flags to 'true' when the corresponding start- or endtime is set within 5-10mins after LocationService got started. Display IsVague visually in "Overview" fragment saying measurement might be inaccurate / wrong.
+    // TODO: Set ..IsVague flags to 'true' when the corresponding start- or endtime is setIsRunning within 5-10mins after LocationService got started. Display IsVague visually in "Overview" fragment saying measurement might be inaccurate / wrong.
     private boolean starttimeIsVague = false;
     @DatabaseField
     private long endtime = 0; // in seconds
@@ -156,13 +156,15 @@ public class Timeslot {
         return output;
     }
 
+    // TODO: move function to central position because both Timeslot.java and Stat.java use it.
+
     private static String addToDurationOutput(String result, int value, String unit, boolean multiLine){
         if(multiLine && !result.equals("")){
             result += "\n";
         } else if(!multiLine && !result.equals("")){
             result += " ";
         }
-        result += String.valueOf(value) + " " + unit;
+        result += String.valueOf(value) + unit;
         return result;
     }
 

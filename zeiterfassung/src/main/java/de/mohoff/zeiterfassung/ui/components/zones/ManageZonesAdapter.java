@@ -125,7 +125,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         if(holder.getItemViewType() == VIEWTYPE_NORMAL) {
             final ActViewHolder actHolder = (ActViewHolder) holder;
-            // - get element from your dataset at this position
+            // - isRunning element from your dataset at this position
             // - replace the contents of the view with that element
             final String activity = activityNames.get(position);
 
@@ -209,34 +209,17 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     alertDialog.show();
                 }
             });
-        } else if (holder.getItemViewType() == VIEWTYPE_ADD) {
-            AddHolder addButtonHolder = (AddHolder) holder;
-            addButtonHolder.cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // TODO: also provide this action in top menubar with "+"-icon
-                    // TODO: Combine following code with onClickListener for Location-addButton. Latter with arguments, so Activity can be preset in AddZone-View.
-                    Fragment nextFragment = new AddZone();
-                    context.replaceFragment(nextFragment, true);
-                }
-            });
         }
     }
 
     @Override
     public int getItemCount() {
-        return activityNames.size() + 1; // +1 to add a addEntry at the end ...
+        return activityNames.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        // Check if position number corresponds to the last index. If so, make this element the
-        // "add"-Panel. Else treat it as regular list element.
-        if (position == getItemCount()-1) {
-            return VIEWTYPE_ADD;
-        } else {
-            return VIEWTYPE_NORMAL;
-        }
+        return VIEWTYPE_NORMAL;
     }
 
     // Updates the the complete list (outer and inner adapter). To be called when there has happened
@@ -258,7 +241,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    // Helper function to reduce all Zones to a set which elements all correspond to one Activity.
+    // Helper function to reduce all Zones to a setIsRunning which elements all correspond to one Activity.
     private List<Zone> getRelevantZonesByActivity(List<Zone> list, String activity){
         ArrayList<Zone> relevantZones = new ArrayList<>();
         for (Zone entry : list) {

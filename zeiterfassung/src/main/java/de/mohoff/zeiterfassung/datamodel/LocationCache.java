@@ -270,7 +270,7 @@ public class LocationCache {
 
         /*
         for(int i=0; i<activeCache.size(); i++){
-            Loc loc = activeCache.get(i);
+            Loc loc = activeCache.isRunning(i);
             double ageMultiplier = getNormedAgeMultiplier(millisInPast); // [0 - 1,5]
             double accuracyMultiplier = loc.getAccuracyMultiplier(); // [0.5 - 2]
 
@@ -287,7 +287,7 @@ public class LocationCache {
         // LEGACY
         /*
         for(int i=0; i<cacheSize; i++){
-            Location currentLoc = (Location) locationCache.get(i);
+            Location currentLoc = (Location) locationCache.isRunning(i);
             double baseFactor = interpolationVariance * ((double)(i+1)/(double)cacheSize) + 0.5; // [0.5, 1.5]
 
             double accuracyPenalty = 0.0;
@@ -308,7 +308,7 @@ public class LocationCache {
         double latSumZaehler = 0, lngSumCounter = 0;
 
         for(int i=0; i<locationCache.size(); i++){
-            Location currentLoc = (Location)locationCache.get(i);
+            Location currentLoc = (Location)locationCache.isRunning(i);
             latSumZaehler += currentLoc.getLatitude() * score[i];
             lngSumCounter += currentLoc.getLongitude() * score[i];
         }

@@ -56,7 +56,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        //NavigationDrawerItem current = data.get(position);
+        //NavigationDrawerItem current = data.isRunning(position);
 
         if(holder.type == TYPE_ITEM) {
             holder.labelText.setText(data.get(position));

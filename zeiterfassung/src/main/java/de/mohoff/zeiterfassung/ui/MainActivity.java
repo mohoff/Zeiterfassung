@@ -7,6 +7,8 @@ import android.content.*;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.os.IBinder;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -55,7 +57,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     private Fragment nextFragment;
     private boolean nextFragmentAvailable = false;
 
-    private Toolbar toolbar;
+    public CoordinatorLayout coordinatorLayout;
+    public Toolbar toolbar;
+    public FloatingActionButton fab;
     private RelativeLayout leftDrawer;
     private RecyclerView recyclerView;
     private NavigationDrawerListener drawerListener;
@@ -112,7 +116,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         fragM = getFragmentManager();
         fragT = fragM.beginTransaction();
 
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         //toolbar.setTitle("Zeiterfassung");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -214,7 +220,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
         // Initialize LocationServiceStatus and sync its state with the LocationService
         serviceStatus = new LocationServiceStatus();
-        serviceStatus.set(LocationService.IS_SERVICE_RUNNING);
+        serviceStatus.setIsRunning(LocationService.IS_SERVICE_RUNNING);
+
+
 
         updateServiceButtons();
 
@@ -230,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         boolean bindResult;
         // Calling startService() first prevents it from being killed on unbind()
         if(startService(new Intent(MainActivity.this, LocationService.class)) != null){
-            serviceStatus.set(true);
+            serviceStatus.setIsRunning(true);
             //isServiceRunning = true;
             updateServiceButtons();
 
@@ -249,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         // does not provide any feedback about its success, I prefer UI feedback
         // first.
 
-        serviceStatus.set(false);
+        serviceStatus.setIsRunning(false);
         updateServiceButtons();
         unbindLocationService();
         stopService(new Intent(MainActivity.this, LocationService.class));
@@ -295,11 +303,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     }
 
     private void updateServiceButtons(){
-        if(serviceStatus.get()){
+        if(serviceStatus.isRunning()){
             // manage start button
             buttonStartService.getBackground().setColorFilter(getResources().getColor(R.color.grey_25), PorterDuff.Mode.MULTIPLY);
             buttonStartService.setEnabled(false);
-            buttonStartService.setTextColor(getResources().getColor(R.color.white)); // need to set text color explicitly after setEnabled(false). Else text color gets grey somehow
+            buttonStartService.setTextColor(getResources().getColor(R.color.white)); // need to setIsRunning text color explicitly after setEnabled(false). Else text color gets grey somehow
             buttonStartService.setOnClickListener(null);
             // manage stop button
             buttonStopService.getBackground().setColorFilter(getResources().getColor(R.color.greenish), PorterDuff.Mode.MULTIPLY);
@@ -331,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             // manage stop button
             buttonStopService.getBackground().setColorFilter(getResources().getColor(R.color.grey_25), PorterDuff.Mode.MULTIPLY);
             buttonStopService.setEnabled(false);
-            buttonStopService.setTextColor(getResources().getColor(R.color.white)); // need to set text color explicitly after setEnabled(false). Else text color gets grey somehow
+            buttonStopService.setTextColor(getResources().getColor(R.color.white)); // need to setIsRunning text color explicitly after setEnabled(false). Else text color gets grey somehow
             buttonStopService.setOnClickListener(null);
         }
     }
@@ -413,6 +421,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     }
 
     public void replaceFragment(Fragment fragment, boolean addToBackStack){
+        // TODO: Investigate why .show() doesn't work in 'Manage Zones'
+        //fab.hide();
         String backStateName = fragment.getClass().getName();
         String fragmentTag = backStateName;
 
@@ -499,9 +509,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         public void onReceive(Context context, Intent intent) {
             String receivedMessage = intent.getStringExtra("type");
             if(receivedMessage.equals("start")){
-                serviceStatus.set(true);
+                serviceStatus.setIsRunning(true);
             } else if(receivedMessage.equals("stop")){
-                serviceStatus.set(false);
+                serviceStatus.setIsRunning(false);
             }
         }
     };

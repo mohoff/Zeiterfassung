@@ -43,7 +43,6 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
 
     EditText radiusValue, addressValue;
     ImageButton searchButton;
-    FloatingActionButton saveButton;
     // TODO: Replace button with appropriate SAVE icon
 
     int colorButtonEnabled, colorButtonDisabled;
@@ -76,6 +75,9 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         //MainActivity main = (MainActivity) getActivity();
         parentActivity.getDrawerToggle().setDrawerIndicatorEnabled(false);
         parentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // Set FAB icon and click listener
+        parentActivity.fab.show();
+        parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_save_black_24dp));
 
         colorButtonDisabled = getResources().getColor(R.color.grey_25);
         colorButtonEnabled = getResources().getColor(R.color.greenish);
@@ -112,7 +114,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                 } else {
                     try {
                         // Do the lookup
-                        Address lookupResult = geocoder.getFromLocationName(addressValue.getText().toString(), 1).get(0); // get(0) can cause IndexOutOfBoundException
+                        Address lookupResult = geocoder.getFromLocationName(addressValue.getText().toString(), 1).get(0); // isRunning(0) can cause IndexOutOfBoundException
                         lookupLatLng = new LatLng(lookupResult.getLatitude(), lookupResult.getLongitude());
                         // Add marker and circle for the lookup position to the map
                         candidateMarker = map.addMarker(
@@ -132,7 +134,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
             }
         });
 
-        saveButton = (FloatingActionButton) view.findViewById(R.id.saveButton);
+        //saveButton = (FloatingActionButton) view.findViewById(R.id.saveButton);
         addressValue = (EditText) view.findViewById(R.id.addressValue);
     }
 
@@ -162,7 +164,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         // the variable googleMap doesn't represent an empty map after navigating to this fragment
         // more than once.
         googleMap.clear();
-        // Inside drawExistingZones(), map center will be set and animated.
+        // Inside drawExistingZones(), map center will be setIsRunning and animated.
         drawExistingZones();
 
         map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
