@@ -20,6 +20,7 @@ import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
+import de.mohoff.zeiterfassung.ui.components.ColorPicker;
 
 public class AddZone extends Fragment {
     private MainActivity parentActivity;
@@ -27,6 +28,7 @@ public class AddZone extends Fragment {
     private ArrayAdapter adapter;
     private AutoCompleteTextView autoCompleteTextView;
     private EditText editText;
+    private ColorPicker colorPicker;
     private CardView pinButton;
     private String activityNames[];
 
@@ -53,6 +55,7 @@ public class AddZone extends Fragment {
 
         autoCompleteTextView = (AutoCompleteTextView) view.findViewById(R.id.inputActivity);
         editText = (EditText) view.findViewById(R.id.inputLocation);
+        colorPicker = (ColorPicker) view.findViewById(R.id.colorPicker);
 
         return view;
     }
@@ -64,7 +67,6 @@ public class AddZone extends Fragment {
         parentActivity = (MainActivity) getActivity();
         parentActivity.getDrawerToggle().setDrawerIndicatorEnabled(false);
         parentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
         dbHelper = getDbHelper(parentActivity);
         // Get distinct Activity names to suggest them while typing in AutoCompleteTextView
@@ -114,13 +116,16 @@ public class AddZone extends Fragment {
                 autoCompleteTextView.clearFocus();
                 editText.clearFocus();
                 if (inputActivityName == "" || inputLocationName == "") {
-                    GeneralHelper.showToast(parentActivity, "Please enter both names first.");
+                    GeneralHelper.showToast(parentActivity, "Please fill in both names.");
+                } else if(!colorPicker.isColorSelected()){
+                    GeneralHelper.showToast(parentActivity, "Please choose a color.");
                 } else {
                     Fragment nextFragment = new AddZoneMap();
                     // pass ZoneId to map fragment
                     Bundle args = new Bundle();
                     args.putString("activityName", inputActivityName);
                     args.putString("locationName", inputLocationName);
+                    args.putInt("color", colorPicker.getSelectedColor());
                     nextFragment.setArguments(args);
 
                     parentActivity.replaceFragment(nextFragment, true);

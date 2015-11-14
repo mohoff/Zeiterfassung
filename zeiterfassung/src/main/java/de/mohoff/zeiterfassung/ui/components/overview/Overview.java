@@ -75,7 +75,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
             }
         });*/
 
-        snackbar = Snackbar.make(parentActivity.coordinatorLayout, "Location Service is not running...", Snackbar.LENGTH_INDEFINITE);
+        snackbar = Snackbar.make(parentActivity.coordinatorLayout, "Location Service is not running...", Snackbar.LENGTH_LONG);
         if(!parentActivity.serviceStatus.isRunning()){
             snackbar.show();
         }

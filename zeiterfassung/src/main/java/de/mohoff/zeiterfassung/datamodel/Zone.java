@@ -7,7 +7,7 @@ import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "zones")//, daoClass = Zone.class)
 public class Zone {
-    //private LatLng center; // not usable coz we want to store position in db, so we fallback to 2 floats/doubles
+    public static int MIN_RADIUS = 30;
 
     @DatabaseField(generatedId = true) // autoincrement primary key
     private int _id;
@@ -21,17 +21,17 @@ public class Zone {
     private String activityName;
     @DatabaseField(canBeNull = false, uniqueCombo = true)
     private String locationName;
-    private Color colorScheme;
+    private int color; // e.g. 0xFF000000 as black;
 
     public Zone(){}
 
-    public Zone(float latitude, float longitude, int radius, String activityName, String locationName, Color colorScheme) {
+    public Zone(float latitude, float longitude, int radius, String activityName, String locationName, int color) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.radius = radius;
         this.activityName = activityName;
         this.locationName = locationName;
-        this.colorScheme = colorScheme;
+        this.color = color;
     }
 
     public Zone(float latitude, float longitude, int radius, String activityName, String locationName) {
@@ -40,7 +40,8 @@ public class Zone {
         this.radius = radius;
         this.activityName = activityName;
         this.locationName = locationName;
-        this.colorScheme = null; // or some default gray
+        // TODO: check default color
+        this.color = 0; // or some default gray
     }
 
     public int get_id() {
@@ -91,12 +92,12 @@ public class Zone {
         this.locationName = locationName;
     }
 
-    public Color getColorScheme() {
-        return colorScheme;
+    public int getColor() {
+        return color;
     }
 
-    public void setColorScheme(Color colorScheme) {
-        this.colorScheme = colorScheme;
+    public void setColor(int color) {
+        this.color = color;
     }
     //float dataQuality; // indicator for accuracy ratings over time in this target location area
 

@@ -31,20 +31,22 @@ public class EditZonesMap extends ManageZonesMapAbstract {
         super.onActivityCreated(savedInstanceState);
 
         editZone = dbHelper.getZoneById(candidateZoneId);
+        candidateColor = editZone.getColor();
         radius = editZone.getRadius();
         radiusValue.setText(String.valueOf(radius));
 
         parentActivity.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (radius < 50) {
-                    GeneralHelper.showToast(getActivity(), "Input must be >= 50 meters.");
+                if (radius < Zone.MIN_RADIUS) {
+                    GeneralHelper.showToast(getActivity(), "Input must be >=" + Zone.MIN_RADIUS + " meters.");
                     // cancel save process
                 } else if (candidateMarker == null) {
-                    GeneralHelper.showToast(getActivity(), "Please pin an area on the map first.");
+                    GeneralHelper.showToast(getActivity(), "Please pin area on map.");
                 } else {
+                    // TODO: check if oldPos == newPos here. If so, showToast "Position already saved"
                     if (radius == editZone.getRadius()) {
-                        GeneralHelper.showToast(getActivity(), "Input is already saved.");
+                        GeneralHelper.showToast(getActivity(), "Radius already saved.");
                         // cancel save process
                     } else {
                         // TODO: Check if entered radius is valid (> 50m && not near other Zones).

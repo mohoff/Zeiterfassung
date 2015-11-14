@@ -39,7 +39,8 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
 
     Marker candidateMarker = null;
     Circle candidateCircle = null;
-    int radius = 100;
+    int candidateColor;
+    int radius = 50;
 
     EditText radiusValue, addressValue;
     ImageButton searchButton;
@@ -110,7 +111,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
             @Override
             public void onClick(View v) {
                 if (addressValue.getText() == null) {
-                    GeneralHelper.showToast(parentActivity, "Please enter address or place first.");
+                    GeneralHelper.showToast(parentActivity, "Please fill in address or place.");
                 } else {
                     try {
                         // Do the lookup
@@ -126,15 +127,14 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                         // Move camera to lookup position
                         centerMapTo(lookupLatLng, 0);
                     } catch (IOException e) {
-                        GeneralHelper.showToast(parentActivity, "Lookup failed. Do you have internet connection?");
+                        GeneralHelper.showToast(parentActivity, "Lookup failed. Is internet connection available?");
                     } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
-                        GeneralHelper.showToast(parentActivity, "Lookup failed. Please enter a valid address or place.");
+                        GeneralHelper.showToast(parentActivity, "Lookup failed. Please enter valid address or place.");
                     }
                 }
             }
         });
 
-        //saveButton = (FloatingActionButton) view.findViewById(R.id.saveButton);
         addressValue = (EditText) view.findViewById(R.id.addressValue);
     }
 

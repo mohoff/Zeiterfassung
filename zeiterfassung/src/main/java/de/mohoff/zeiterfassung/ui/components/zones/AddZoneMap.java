@@ -29,6 +29,7 @@ public class AddZoneMap extends ManageZonesMapAbstract {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         activityName = getArguments().getString("activityName");
         locationName = getArguments().getString("locationName");
+        candidateColor = getArguments().getInt("color");
 
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -44,11 +45,11 @@ public class AddZoneMap extends ManageZonesMapAbstract {
         parentActivity.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (radius < 50) {
-                    GeneralHelper.showToast(getActivity(), "Input must be >= 50 meters.");
-                    // cancel save process
+                if (radius < Zone.MIN_RADIUS) {
+                    GeneralHelper.showToast(getActivity(), "Input must be >= " + Zone.MIN_RADIUS + " meters.");
+                    // Cancel save process
                 } else if (candidateMarker == null) {
-                    GeneralHelper.showToast(getActivity(), "Please pin an area on the map first.");
+                    GeneralHelper.showToast(getActivity(), "Please pin area on map.");
                 } else {
                     // TODO: Check if entered radius is not near other Zones.
                     LatLng pos = candidateMarker.getPosition();
@@ -74,7 +75,6 @@ public class AddZoneMap extends ManageZonesMapAbstract {
 
         // TODO: provide appropriate colors: gray (uneditable) and greenish (editable)
         // TODO: we want gray markers (custom markers) and gray fill colors to show that. Via .icon() ?
-        // TODO: rework camera center so viewport contains all markers.
 
         ArrayList<LatLng> latLngList = new ArrayList<>();
 

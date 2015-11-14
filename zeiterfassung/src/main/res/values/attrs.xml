@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ColorPicker">
+        <attr name="orientation" format="enum">
+            <enum name="horizontal" value="0" />
+            <enum name="vertical" value="1" />
+        </attr>
+        <attr name="colors" format="reference" />
+        <attr name="defaultIndex" format="enum">
+            <enum name="first" value="0"/>
+            <enum name="last" value="1"/>
+            <enum name="none" value="2"/>
+        </attr>
+        <!--<attr name="selectedColorIndex" format="integer" />-->
+        <attr name="usePalette" format="enum">
+            <enum name="normal" value="0"/>
+            <enum name="light" value="1"/>
+            <enum name="ultralight" value="2"/>
+        </attr>
+    </declare-styleable>
+</resources>
