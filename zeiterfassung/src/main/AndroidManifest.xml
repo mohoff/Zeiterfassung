@@ -21,7 +21,7 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="Zeiterfassung"
+        android:label="@string/app_name"
         android:theme="@style/AppTheme.Base" >
         <meta-data
             android:name="com.google.android.gms.version"
@@ -35,42 +35,12 @@
             android:label="Zeiterfassung" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<activity
-            android:name=".activities.MapLive"
-            android:label="@string/title_activity_map" >
-        </activity>-->
-        <activity
-            android:name=".legacy.AddTargetLocationArea"
-            android:label="@string/title_activity_add_tla" >
-        </activity>
-
-        <!--
-        <service
-            android:name=".LocationService"
-            android:exported="false" >
-        </service>-->
         <service
             android:name=".locationservice.LocationService"
             android:exported="false" >
         </service>
-
-        <activity
-            android:name=".legacy.ManageTLA"
-            android:label="@string/title_activity_manage_tl"
-            android:parentActivityName=".ui.MainActivity"
-            android:windowSoftInputMode="adjustPan"><!-- listView- vs editView-focus workaround -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.MainActivity" />
-        </activity>
-        <activity
-            android:name=".legacy.ManageTLADetail"
-            android:label="@string/title_activity_manage_tladetail" >
-        </activity>
     </application>
-
 </manifest>

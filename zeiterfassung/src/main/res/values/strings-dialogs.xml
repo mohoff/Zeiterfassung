@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- AlertDialog button text -->
+
+    <string name="dialog_save">SAVE</string>
+    <string name="dialog_delete">DELETE</string>
+    <string name="dialog_cancel">@android:string/cancel</string>    <!-- CANCEL -->
+
+
+    <!-- Update Zone/s -->
+    <string name="alert_title_update_zone_location">Edit Zone\'s Location name</string>
+    <string name="alert_title_update_zone_activity">Edit Zones\' Activity name</string>
+    <string name="alert_msg_update_zone">Please enter a new name:</string>
+    <!-- Delete Zone/s -->
+    <string name="alert_title_delete_zone">Delete Zone</string>
+    <string name="alert_msg_delete_zone">Delete Zone with Location \"%1$s\"?</string>
+    <string name="alert_title_delete_zone_multiple">Delete Zones</string>
+    <string name="alert_msg_delete_zone_multiple">Delete Zone(s) with Activity \"%1$s\" and its related Location(s)?</string>
+
+
+</resources>

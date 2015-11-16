@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="app_name">Zeiterfassung</string>
+
+    <string name="drawer_open">Open drawer</string>
+    <string name="drawer_close">Close drawer</string>
+
+    <string name="servicecontrol_start">START</string>
+    <string name="servicecontrol_stop">STOP</string>
+
+
+
+    <!-- Colors -->
     <color name="transparent">#00000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="white_90">#EEFFFFFF</color>
@@ -50,22 +61,5 @@
     <color name="navigation_drawer_top_bg">@color/greenish_10</color>
     <color name="navigation_drawer_items">@color/grey_navigation_drawer_text</color>
     <color name="navigation_drawer_separator">@color/greenish_10</color>
-
-
-    <string name="app_name">ZeiterfassungWithGradle</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_save">Save</string>
-    <string name="action_cancel">Cancel</string>
-    <string name="title_activity_map">Map</string>
-    <string name="title_activity_add_tla">Add New TargetLocationArea</string>
-    <string name="title_activity_manage_tl">ManageTLA</string>
-    <string name="title_activity_manage_tladetail">ManageTLADetail</string>
-    <string name="drawer_open">drawer open</string>
-    <string name="drawer_close">drawer close</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <string name="servicecontrol_start">START</string>
-    <string name="servicecontrol_stop">STOP</string>
 
 </resources>

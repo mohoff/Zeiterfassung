@@ -38,6 +38,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private DatabaseHelper dbHelper = null;
     //private LayoutInflater li;
     List<Zone> zones;
+    // TODO: make activityNames a HashMap, key:name, value: #(Zones referred to it). Then we can improve alert dialog message (from "delete Zone(s)" to "delete 3 Zones or delete 1 Zone" (see strings-dialogs.xml)
     List<String> activityNames = new ArrayList<String>();
     private ManageZonesAdapter outerAdapter = this;
 
