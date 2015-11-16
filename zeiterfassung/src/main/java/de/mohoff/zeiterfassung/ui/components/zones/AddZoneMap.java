@@ -2,7 +2,7 @@ package de.mohoff.zeiterfassung.ui.components.zones;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
-import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 
 /**
@@ -27,9 +26,9 @@ public class AddZoneMap extends ManageZonesMapAbstract {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        activityName = getArguments().getString("activityName");
-        locationName = getArguments().getString("locationName");
-        candidateColor = getArguments().getInt("color");
+        activityName = getArguments().getString(getString(R.string.arg_activity));
+        locationName = getArguments().getString(getString(R.string.arg_location));
+        candidateColor = getArguments().getInt(getString(R.string.arg_color));
 
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -46,18 +45,22 @@ public class AddZoneMap extends ManageZonesMapAbstract {
             @Override
             public void onClick(View v) {
                 if (radius < Zone.MIN_RADIUS) {
-                    GeneralHelper.showToast(getActivity(), "Input must be >= " + Zone.MIN_RADIUS + " meters.");
+                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_radius_min, Zone.MIN_RADIUS), Snackbar.LENGTH_LONG)
+                            .show();
                     // Cancel save process
                 } else if (candidateMarker == null) {
-                    GeneralHelper.showToast(getActivity(), "Please pin area on map.");
+                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_no_pin), Snackbar.LENGTH_LONG)
+                            .show();
                 } else {
                     // TODO: Check if entered radius is not near other Zones.
                     LatLng pos = candidateMarker.getPosition();
                     int result = dbHelper.createNewZone(pos.latitude, pos.longitude, radius, activityName, locationName, candidateColor);
                     if (result != 1) {
-                        GeneralHelper.showToast(getActivity(), "Couldn't add Zone. Does it already exist?");
+                        Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.create_zone_failure), Snackbar.LENGTH_LONG)
+                                .show();
                     } else {
-                        GeneralHelper.showToast(getActivity(), "Zone successfully added.");
+                        Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.create_zone_success), Snackbar.LENGTH_LONG)
+                                .show();
                         // Clear back stack because add-operation succeeded.
                         GeneralHelper.clearBackStack(getActivity());
                         // Go back to ManageZones fragment with clean back stack

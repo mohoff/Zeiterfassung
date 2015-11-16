@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +14,6 @@ import android.widget.Button;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
-import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
@@ -56,26 +56,27 @@ public class Settings extends Fragment {
             @Override
             public void onClick(View v) {
                 AlertDialog alertDialog = new AlertDialog.Builder(context)
-                        .setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getString(R.string.dialog_delete), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 // Execute delete on DB
                                 if (dbHelper.deleteAllTimeslots() == 1) {
-                                    GeneralHelper.showToast(context, "Deleted entries successfully.");
+                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_delete_entries_success), Snackbar.LENGTH_LONG)
+                                            .show();
                                     dialog.dismiss();
                                 } else {
-                                    GeneralHelper.showToast(context, "Could not delete entries.");
+                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_delete_entries_failure), Snackbar.LENGTH_LONG)
+                                            .show();
                                 }
                             }
                         })
-                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 dialog.dismiss();
                             }
                         })
-                                //.setTitle("Delete all tracking entries")
-                        .setMessage("Delete all tracking entries?")
+                        .setMessage(getString(R.string.settings_alert_msg_delete_entries))
                         .create();
                 alertDialog.show();
             }
@@ -85,26 +86,27 @@ public class Settings extends Fragment {
             @Override
             public void onClick(View v) {
                 AlertDialog alertDialog = new AlertDialog.Builder(context)
-                        .setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getString(R.string.dialog_delete), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 // Execute delete on DB
                                 if(dbHelper.deleteAllZones() == 1){
-                                    GeneralHelper.showToast(context, "Deleted entries successfully.");
+                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_delete_zones_success), Snackbar.LENGTH_LONG)
+                                            .show();
                                     dialog.dismiss();
                                 } else {
-                                    GeneralHelper.showToast(context, "Could not delete entries.");
+                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_delete_zones_failure), Snackbar.LENGTH_LONG)
+                                            .show();
                                 }
                             }
                         })
-                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 dialog.dismiss();
                             }
                         })
-                        //.setTitle("Delete all Zones")
-                        .setMessage("Delete all Zones?")
+                        .setMessage(getString(R.string.settings_alert_msg_delete_zones))
                         .create();
                 alertDialog.show();
             }
@@ -114,27 +116,29 @@ public class Settings extends Fragment {
             @Override
             public void onClick(View v) {
                 AlertDialog alertDialog = new AlertDialog.Builder(context)
-                        .setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getString(R.string.dialog_delete), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 // Clear passiveCache in LocationCache singleton and execute delete on DB
                                 if(LocationCache.getInstance().clearPassiveCache() == 1
                                         && dbHelper.cleanLocs() == 1){
-                                    GeneralHelper.showToast(context, "Cleaned map successfully.");
+                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_clean_map_success), Snackbar.LENGTH_LONG)
+                                            .show();
                                     dialog.dismiss();
                                 } else {
-                                    GeneralHelper.showToast(context, "Could not clean map.");
+                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_clean_map_failure), Snackbar.LENGTH_LONG)
+                                            .show();
                                 }
                             }
                         })
-                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 dialog.dismiss();
                             }
                         })
                                 //.setTitle("Delete all Zones")
-                        .setMessage("Clean map?")
+                        .setMessage(getString(R.string.settings_alert_msg_clean_map))
                         .create();
                 alertDialog.show();
             }

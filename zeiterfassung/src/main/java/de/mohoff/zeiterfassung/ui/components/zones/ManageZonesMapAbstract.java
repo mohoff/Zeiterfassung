@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.location.Address;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -94,7 +95,8 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                     radius = Integer.valueOf(inputString);
                 } catch (Exception e) {
                     //radiusValue.setText(String.valueOf(radius));
-                    GeneralHelper.showToast(parentActivity, "Input is not a number.");
+                    Snackbar.make(parentActivity.coordinatorLayout, "Input isn't a number.", Snackbar.LENGTH_LONG)
+                            .show();
                 }
                 if (candidateCircle != null) {
                     candidateCircle.setRadius(radius);
@@ -113,7 +115,8 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
             @Override
             public void onClick(View v) {
                 if (addressValue.getText() == null) {
-                    GeneralHelper.showToast(parentActivity, "Please fill in address or place.");
+                    Snackbar.make(parentActivity.coordinatorLayout, "Please fill in address or place.", Snackbar.LENGTH_LONG)
+                            .show();
                 } else {
                     try {
                         // Do the lookup
@@ -135,9 +138,11 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                         // Move camera to lookup position
                         centerMapTo(lookupLatLng, 0);
                     } catch (IOException e) {
-                        GeneralHelper.showToast(parentActivity, "Lookup failed. Is internet connection available?");
+                        Snackbar.make(parentActivity.coordinatorLayout, "Lookup failed. Do you have internet?", Snackbar.LENGTH_LONG)
+                                .show();
                     } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
-                        GeneralHelper.showToast(parentActivity, "Lookup failed. Please enter valid address or place.");
+                        Snackbar.make(parentActivity.coordinatorLayout, "Lookup failed. Please enter valid address or place.", Snackbar.LENGTH_LONG)
+                                .show();
                     }
                 }
             }

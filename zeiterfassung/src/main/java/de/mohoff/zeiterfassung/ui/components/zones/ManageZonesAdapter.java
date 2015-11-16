@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -146,33 +147,35 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 public boolean onLongClick(View v) {
                     final EditText et = new EditText(context);
                     AlertDialog alertDialog = new AlertDialog.Builder(context)
-                            .setPositiveButton("save", new DialogInterface.OnClickListener() {
+                            .setPositiveButton(context.getString(R.string.dialog_save), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int i) {
                                     if (et.getText().toString().equals(actHolder.activityName.getText().toString())) {
-                                        GeneralHelper.showToast(context, "Name has not changed.");
+                                        Snackbar.make(context.coordinatorLayout, context.getString(R.string.error_input_name_equal), Snackbar.LENGTH_LONG)
+                                                .show();
                                     } else {
                                         // Execute update on DB
                                         int result = dbHelper.updateZoneActivityName(activity, et.getText().toString());
-                                        if (result == 1) {
+                                        if (result > 0) {
                                             updateList(outerAdapter, locationAdapterMap.get(activity)); // (outerAdapter, innerAdapter)
-                                            GeneralHelper.showToast(context, "Updated successfully.");
+                                            Snackbar.make(context.coordinatorLayout, context.getResources().getQuantityString(R.plurals.update_zone_multiple_success, result), Snackbar.LENGTH_LONG)
+                                                    .show();
                                             dialog.dismiss();
                                         } else {
-                                            GeneralHelper.showToast(context, "Could not update Activity.");
+                                            Snackbar.make(context.coordinatorLayout, context.getString(R.string.update_zone_multiple_failure), Snackbar.LENGTH_LONG)
+                                                    .show();
                                         }
                                     }
                                 }
                             })
-                            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            .setNegativeButton(context.getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int i) {
-                                    // Cancel action
                                     dialog.dismiss();
                                 }
                             })
-                            .setTitle("Edit Activity")
-                            .setMessage("Please enter a new name for the Activity")
+                            .setTitle(context.getString(R.string.alert_title_update_zone_activity))
+                            .setMessage(context.getString(R.string.alert_msg_update_zone))
                             .setView(GeneralHelper.getAlertDialogEditTextContainer(context, et, actHolder.activityName.getText().toString()))
                             .create();
                     alertDialog.show();
@@ -185,30 +188,32 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 public void onClick(View v) {
                     AlertDialog alertDialog = new AlertDialog.Builder(
                             context)
-                            .setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                            .setPositiveButton(context.getString(R.string.dialog_delete), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int i) {
                                     // Delete action
-                                    if (dbHelper.deleteZonesByActivity(activity) == 1) {
-                                        GeneralHelper.showToast(context, "Activity deleted.");
+                                    int result = dbHelper.deleteZonesByActivity(activity);
+                                    if (result > 0) {
+                                        Snackbar.make(context.coordinatorLayout, context.getResources().getQuantityString(R.plurals.delete_zone_multiple_success, result), Snackbar.LENGTH_LONG)
+                                                .show();
                                         actHolder.recyclerView.setAdapter(null);
                                         updateList(outerAdapter, null); // outerAdapter == this
                                     } else {
-                                        GeneralHelper.showToast(context, "Couldn't delete Activity. Does it still exist?");
+                                        Snackbar.make(context.coordinatorLayout, context.getString(R.string.delete_zone_multiple_failure), Snackbar.LENGTH_LONG)
+                                                .show();
                                     }
                                     dialog.dismiss();
                                 }
                             })
-                            .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            .setNegativeButton(context.getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int i) {
-                                    // Cancel action
                                     dialog.dismiss();
                                 }
                             })
-                            .setTitle("Delete Activity")
-                            .setMessage("Are you sure that you want to delete Activity \"" + activity + "\" with all its Locations?")
-                            .create();
+                            .setTitle(context.getString(R.string.alert_title_delete_zone_multiple))
+                            .setMessage(context.getString(R.string.alert_msg_delete_zone_multiple, activity))
+                                    .create();
                     // TODO: add app icon to the alertDialog.
                     alertDialog.show();
                 }
@@ -303,11 +308,12 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         // TODO: add color picker in alertDialog to edit color in it as well.
                         final EditText et = new EditText(context);
                         AlertDialog alertDialog = new AlertDialog.Builder(context)
-                                .setPositiveButton("save", new DialogInterface.OnClickListener() {
+                                .setPositiveButton(context.getString(R.string.dialog_save), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
                                         if(et.getText().toString().equals(locHolder.locationName.getText().toString())){
-                                            GeneralHelper.showToast(context, "Name has not changed.");
+                                            Snackbar.make(context.coordinatorLayout, context.getString(R.string.error_input_name_equal), Snackbar.LENGTH_LONG)
+                                                    .show();
                                         } else {
                                             // Execute update on DB
                                             int result = dbHelper.updateZoneLocationName(relevantZones.get(position).get_id(), et.getText().toString());
@@ -315,23 +321,25 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                                 // Directly update the adapter's model, so we can avoid a new DB query
                                                 relevantZones.get(position).setLocationName(et.getText().toString());
                                                 innerAdapter.notifyDataSetChanged();
-                                                GeneralHelper.showToast(context, "Updated successfully.");
+                                                Snackbar.make(context.coordinatorLayout, context.getString(R.string.update_zone_success), Snackbar.LENGTH_LONG)
+                                                        .show();
                                                 dialog.dismiss();
                                             } else {
-                                                GeneralHelper.showToast(context, "Could not update Location.");
+                                                Snackbar.make(context.coordinatorLayout, context.getString(R.string.update_zone_failure), Snackbar.LENGTH_LONG)
+                                                        .show();
                                             }
                                         }
                                     }
                                 })
-                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                .setNegativeButton(context.getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
                                         // Cancel action
                                         dialog.dismiss();
                                     }
                                 })
-                                .setTitle("Edit Name")
-                                .setMessage("Please enter a new name:")
+                                .setTitle(context.getString(R.string.alert_title_update_zone_location))
+                                .setMessage(context.getString(R.string.alert_msg_update_zone))
                                 .setView(GeneralHelper.getAlertDialogEditTextContainer(context, et, locHolder.locationName.getText().toString()))
                                 .create();
                         // TODO: add app icon to the alertDialog.
@@ -347,7 +355,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         Fragment nextFragment = new EditZonesMap();
                         // pass ZoneId to map fragment
                         Bundle args = new Bundle();
-                        args.putInt("ZoneId", zone.get_id());
+                        args.putInt(context.getString(R.string.arg_zone_id), zone.get_id());
                         nextFragment.setArguments(args);
 
                         context.replaceFragment(nextFragment, true);
@@ -358,28 +366,30 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     public void onClick(View v) {
                         AlertDialog alertDialog = new AlertDialog.Builder(
                                 context)
-                                .setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                                .setPositiveButton(context.getString(R.string.dialog_delete), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
                                         // Delete action
                                         if (dbHelper.deleteZoneById(zone.get_id()) == 1) {
-                                            GeneralHelper.showToast(context, "Location deleted.");
+                                            Snackbar.make(context.coordinatorLayout, context.getString(R.string.delete_zone_success), Snackbar.LENGTH_LONG)
+                                                    .show();
                                             updateList(outerAdapter, innerAdapter); // innerAdapter == this
                                         } else {
-                                            GeneralHelper.showToast(context, "Couldn't delete Location. Does it still exist?");
+                                            Snackbar.make(context.coordinatorLayout, context.getString(R.string.delete_zone_failure), Snackbar.LENGTH_LONG)
+                                                    .show();
                                         }
                                         dialog.dismiss();
                                     }
                                 })
-                                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                .setNegativeButton(context.getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
                                         // Cancel action
                                         dialog.dismiss();
                                     }
                                 })
-                                .setTitle("Delete Location")
-                                .setMessage("Are you sure that you want to delete Location \"" + zone.getLocationName() + "\"?")
+                                .setTitle(context.getString(R.string.alert_title_delete_zone))
+                                .setMessage(context.getString(R.string.alert_msg_delete_zone, zone.getLocationName()))
                                 .create();
                                 // TODO: add app icon to the alertDialog.
                         alertDialog.show();
@@ -392,7 +402,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     public void onClick(View v) {
                         Fragment nextFragment = new AddZone();
                         Bundle args = new Bundle();
-                        args.putString("activityName", relevantZones.get(0).getActivityName());
+                        args.putString(context.getString(R.string.arg_activity), relevantZones.get(0).getActivityName());
                         nextFragment.setArguments(args);
                         context.replaceFragment(nextFragment, true);
                         // TODO: Also provide this action in top menubar with "+"-icon. Or by placing the round red bottom right button (see material design)

@@ -17,8 +17,8 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.internal.view.ContextThemeWrapper;
 import android.util.Property;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -212,7 +212,8 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             currentPolyline = addPolylineToMap(map, cache);
             followWithCamera(markers);
         } else {
-            GeneralHelper.showToast(parentActivity, "no location data available.");
+            Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_no_data), Snackbar.LENGTH_LONG)
+                    .show();
         }
     }
 
@@ -369,7 +370,8 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             }
             currentPolyline = addPolylineToMap(map, LocationCache.getInstance().getPassiveCache());
         } else {
-            GeneralHelper.showToast(parentActivity, "No map object initialized.");
+            Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_no_init), Snackbar.LENGTH_LONG)
+                    .show();
         }
         timestampPreviousMarker = loc.getTimestampInMillis();
     }
@@ -464,7 +466,8 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             // hide spinner
             progressBar.setVisibility(View.GONE);
             if(!this.markersAdded){
-                GeneralHelper.showToast(parentActivity, "no location data available.");
+                //Snackbar.make(parentActivity.coordinatorLayout, "Currently no location data available.", Snackbar.LENGTH_LONG)
+                //        .show();
             }
         }
     }

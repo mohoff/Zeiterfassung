@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- LocationService events -->
+
+    <string name="service_not_running">Location Service is not running&#8230;</string>
+    <string name="timeslot_opened">Timeslot opened.</string>
+    <string name="timeslot_closed">Timeslot closed.</string>
+
+
+    <!-- Map -->
+
+    <string name="error_no_data">Currently no location data available.</string>
+    <string name="error_no_init">Map not initialized.</string>
+
+
+    <!-- Manage Zones -->
+
+    <string name="arg_activity">activityName</string>
+    <string name="arg_location">locationName</string>
+    <string name="arg_color">color</string>
+    <string name="arg_zone_id">zoneId</string>
+
+    <string name="error_input_names">Please fill in both names.</string>
+    <string name="error_input_name_exists">Zone already exists.</string>
+    <string name="error_input_name_equal">Name hasn't changed.</string>
+    <string name="error_input_color">Please pick a color.</string>
+    <string name="error_input_radius_min">Input must be >= %1$d meters.</string>
+    <string name="error_input_radius_equal">Radius already saved.</string>
+    <string name="error_input_no_pin">Please pin area on map.</string>
+    <!-- Create/Add Zone/s -->
+    <string name="create_zone_failure">Couldn't add Zone. Does it already exist?</string>
+    <string name="create_zone_success">Zone added.</string>
+    <!-- Update Zone/s -->
+    <string name="update_zone_success">Zone updated.</string>
+    <plurals name="update_zone_multiple_success">
+        <item quantity="one">%d Zone updated.</item>
+        <item quantity="other">%d Zones updated.</item>
+    </plurals>
+    <string name="update_zone_failure">Couldn't update Zone.</string>
+    <string name="update_zone_multiple_failure">Couldn't update Zone(s)</string>
+    <string name="alert_title_update_zone_location">Edit Zone's location name</string>
+    <string name="alert_title_update_zone_activity">Edit Zone's activity name</string>
+    <string name="alert_msg_update_zone">Please enter a new name:</string>
+    <!-- Delete Zone/s -->
+    <string name="delete_zone_success">Zone deleted.</string>
+    <plurals name="delete_zone_multiple_success">
+        <item quantity="one">%d Zone deleted.</item>
+        <item quantity="other">%d Zones deleted.</item>
+    </plurals>
+    <string name="delete_zone_failure">Couldn't delete Zone.</string>
+    <string name="delete_zone_multiple_failure">Couldn't delete Zone(s)</string>
+    <string name="alert_title_delete_zone">Delete Zone</string>
+    <string name="alert_msg_delete_zone">Delete Zone with Location \"%1$s\"?</string>
+    <string name="alert_title_delete_zone_multiple">Delete Zones</string>
+    <string name="alert_msg_delete_zone_multiple">Delete Zone(s) with Activity \"%1$s\" and its related Location(s)?</string>
+
+
+    <!-- Settings -->
+
+    <string name="settings_alert_msg_clean_map">Clean map?</string>
+    <string name="settings_clean_map_success">Map cleaned.</string>
+    <string name="settings_clean_map_failure">Couldn't clean map.</string>
+
+    <string name="settings_alert_msg_delete_entries">Delete all tracking entries?</string>
+    <string name="settings_delete_entries_success">Entries deleted.</string>
+    <string name="settings_delete_entries_failure">Couldn't delete entries.</string>
+
+    <string name="settings_alert_msg_delete_zones">Delete all Zones?</string>
+    <string name="settings_delete_zones_success">Zones deleted.</string>
+    <string name="settings_delete_zones_failure">Couldn't delete Zones.</string>
+
+
+    <!-- AlertDialog button text -->
+
+    <string name="dialog_save">SAVE</string>
+    <string name="dialog_delete">DELETE</string>
+    <string name="dialog_cancel">CANCEL</string>
+</resources>

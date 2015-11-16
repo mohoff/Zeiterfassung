@@ -94,7 +94,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         // Scroll to top
         recList.scrollToPosition(adapter.getItemCount()-1);
 
-        snackbar = Snackbar.make(parentActivity.coordinatorLayout, "Location Service is not running...", Snackbar.LENGTH_LONG);
+        snackbar = Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.service_not_running), Snackbar.LENGTH_LONG);
         if(!parentActivity.serviceStatus.isRunning()){
             snackbar.show();
         }

@@ -3,6 +3,7 @@ package de.mohoff.zeiterfassung.ui.components.zones;
 import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -78,8 +79,8 @@ public class AddZone extends Fragment {
 
         // If activityName is passed, use it and disable corresponding AutoCompleteTextView.
         // If not passed, enable AutoCompleteTextView
-        if(getArguments() != null && getArguments().containsKey("activityName")){
-            inputActivityName = getArguments().getString("activityName");
+        if(getArguments() != null && getArguments().containsKey(getString(R.string.arg_activity))){
+            inputActivityName = getArguments().getString(getString(R.string.arg_activity));
             autoCompleteTextView.setText(inputActivityName);
             autoCompleteTextView.setEnabled(false);
         } else {
@@ -116,16 +117,18 @@ public class AddZone extends Fragment {
                 autoCompleteTextView.clearFocus();
                 editText.clearFocus();
                 if (inputActivityName.equals("") || inputLocationName.equals("")) {
-                    GeneralHelper.showToast(parentActivity, "Please fill in both names.");
+                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_names), Snackbar.LENGTH_LONG)
+                            .show();
                 } else if(!colorPicker.isColorSelected()){
-                    GeneralHelper.showToast(parentActivity, "Please choose a color.");
+                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_color), Snackbar.LENGTH_LONG)
+                            .show();
                 } else {
                     Fragment nextFragment = new AddZoneMap();
                     // pass ZoneId to map fragment
                     Bundle args = new Bundle();
-                    args.putString("activityName", inputActivityName);
-                    args.putString("locationName", inputLocationName);
-                    args.putInt("color", colorPicker.getSelectedColor());
+                    args.putString(getString(R.string.arg_activity), inputActivityName);
+                    args.putString(getString(R.string.arg_location), inputLocationName);
+                    args.putInt(getString(R.string.arg_color), colorPicker.getSelectedColor());
                     nextFragment.setArguments(args);
 
                     parentActivity.replaceFragment(nextFragment, true);

@@ -9,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.os.IBinder;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -475,12 +476,14 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             // Extract data included in the Intent
             String receivedMessage = intent.getStringExtra("type");
             if(receivedMessage.equals("opened")){
-                GeneralHelper.showToast(that, "Timeslot opened.");
+                Snackbar.make(that.coordinatorLayout, getString(R.string.timeslot_opened), Snackbar.LENGTH_LONG)
+                        .show();
                 //if (newTimeslotEventListener != null) {
                 //    newTimeslotEventListener.onNewTimeslot(intent.getIntExtra("id", 0)); // Why need to provide default value?
                 //}
             } else if(receivedMessage.equals("closed")){
-                GeneralHelper.showToast(that, "Timeslot opened.");
+                Snackbar.make(that.coordinatorLayout, getString(R.string.timeslot_closed), Snackbar.LENGTH_LONG)
+                        .show();
                 //if (newTimeslotEventListener != null) {
                 //   newTimeslotEventListener.onTimeslotSealed(intent.getIntExtra("id", 0));
                 //}
@@ -515,7 +518,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             }
         }
     };
-
 
     @Override
     protected void onResume() {

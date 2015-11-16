@@ -1,6 +1,7 @@
 package de.mohoff.zeiterfassung.ui.components.zones;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 
@@ -21,7 +23,8 @@ public class EditZonesMap extends ManageZonesMapAbstract {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        candidateZoneId = getArguments().getInt("ZoneId");
+        // TODO: Does parentActivity reference work in onCreateView? (usually only in onActivityCreated()...)
+        candidateZoneId = getArguments().getInt(parentActivity.getString(R.string.arg_zone_id));
 
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -39,19 +42,24 @@ public class EditZonesMap extends ManageZonesMapAbstract {
             @Override
             public void onClick(View v) {
                 if (radius < Zone.MIN_RADIUS) {
-                    GeneralHelper.showToast(getActivity(), "Input must be >=" + Zone.MIN_RADIUS + " meters.");
-                    // cancel save process
+                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_radius_min, Zone.MIN_RADIUS), Snackbar.LENGTH_LONG)
+                            .show();
                 } else if (candidateMarker == null) {
-                    GeneralHelper.showToast(getActivity(), "Please pin area on map.");
+                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_no_pin), Snackbar.LENGTH_LONG)
+                            .show();
                 } else {
-                    // TODO: check if oldPos == newPos here. If so, showToast "Position already saved"
+                    // TODO: check if oldPos == newPos here. If so, showSnack "Position already saved"
                     if (radius == editZone.getRadius()) {
-                        GeneralHelper.showToast(getActivity(), "Radius already saved.");
-                        // cancel save process
+                        Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_radius_equal), Snackbar.LENGTH_LONG)
+                                .show();
                     } else {
                         // TODO: Check if entered radius is valid (> 50m && not near other Zones).
                         // TODO: execute save action on DB
-                        GeneralHelper.showToast(getActivity(), "Successfully saved.");
+                        Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.update_zone_success), Snackbar.LENGTH_LONG)
+                                .show();
+                        // TODO: Make use of:
+                        Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.update_zone_failure), Snackbar.LENGTH_LONG)
+                                .show();
                     }
                 }
             }

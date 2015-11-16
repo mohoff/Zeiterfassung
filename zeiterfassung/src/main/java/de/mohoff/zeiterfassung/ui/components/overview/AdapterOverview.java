@@ -73,16 +73,6 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             //this.bottomConnectorPart = (RelativeLayout) v.findViewById(R.id.bottomConnectorPart);
             //this.middleConnectorPart = (View) v.findViewById(R.id.middleConnectorPart);
         }
-
-        /*public boolean onLongClick(View v) {
-            GeneralHelper.showToast(context, "long clicked");
-            if (v.isSelected()) {
-                v.setSelected(false);
-            } else {
-                v.setSelected(true);
-            }
-            return true;
-        }*/
     }
 
     public static class ViewHolderInfoItem extends RecyclerView.ViewHolder {
@@ -211,10 +201,12 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                     // Directly update the adapter's model, so we can avoid a new DB query
                                     relevantTLAs.isRunning(position).setLocationName(et.getText().toString());
                                     innerAdapter.notifyDataSetChanged();
-                                    GeneralHelper.showToast(context, "Updated successfully.");
+                                    Snackbar.make(parentActivity.coordinatorLayout, "Updated.", Snackbar.LENGTH_LONG)
+                            .show();
                                     dialog.dismiss();
                                 } else {
-                                    GeneralHelper.showToast(context, "Could not update Location.");
+                                    Snackbar.make(parentActivity.coordinatorLayout, "Couldn't update Location.", Snackbar.LENGTH_LONG)
+                            .show();
                                 }*/
 
                             }
