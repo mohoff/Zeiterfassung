@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung.ui.components;
+package de.mohoff.zeiterfassung.ui.colorpicker;
 
 import android.graphics.Color;
 
@@ -9,6 +9,14 @@ public class ColorPalette {
     public static int[] ULTRALIGHT;
     public static int[] LIGHT;
     public static int[] NORMAL;
+
+
+    public static int getIndexForColor(int[] palette, int color){
+        for(int i=0; i<palette.length; i++){
+            if(palette[i] == color) return i;
+        }
+        return -1;
+    }
 
     static {
         ULTRALIGHT = new int[] {
@@ -70,6 +78,7 @@ public class ColorPalette {
                 Color.parseColor("#FF5722"),    // deep orange
                 Color.parseColor("#795548"),    // brown
         };
+
     }
 }
 

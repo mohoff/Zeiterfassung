@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung.ui.components;
+package de.mohoff.zeiterfassung.ui.colorpicker;
 
 /**
  * Created by moo on 11/13/15.
@@ -26,24 +26,28 @@ public class ColorPicker extends View {
     public static final int HORIZONTAL = 0;
     public static final int VERTICAL = 1;
 
-    private static int POPOUT_SIZE = 8; // px
+    protected static int POPOUT_SIZE = 8; // px
 
-    private int mOrientation;
-    private int mDefaultIndex, mSelectedIndex;
-    private int[] mUsedPalette;
+    protected int mOrientation;
+    protected int mDefaultIndex;
 
-    private Paint paint, popoutPaint;
-    private Rect rect = new Rect();
-    private Rect popoutRect = new Rect();
-    private OnColorChangedListener onColorChanged;
+    protected int mSelectedIndex;
+    protected int[] mUsedPalette;
+    protected int mNumberOfFields;
+
+    protected Canvas c;
+    protected Paint paint, popoutPaint;
+    protected Rect rect = new Rect();
+    protected Rect popoutRect = new Rect();
+    protected OnColorChangedListener onColorChanged;
 
     // Width and height without padding
-    private int pickerWidth, pickerHeight;
+    protected int pickerWidth, pickerHeight;
     // Width (for horizontal pickers) and height (for vertical pickers)
     // of a single color field.
-    private int cellSize;
+    protected int cellSize;
 
-    private boolean isClick = false;
+    protected boolean isClick = false;
 
     /*{
         if (isInEditMode()) {
@@ -74,37 +78,60 @@ public class ColorPicker extends View {
             a.recycle();
         }
 
+        mNumberOfFields = mUsedPalette.length;
+
         paint = new Paint();
         popoutPaint = new Paint();
         paint.setStyle(Style.FILL);
         popoutPaint.setStyle(Style.FILL);
 
         recalcCellSize();
+
+
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        c = canvas;
         if (mOrientation == HORIZONTAL) {
             drawHorizontalPicker(canvas);
         } else {
-            drawVerticalPicker(canvas);
+            drawVerticalPalette(canvas);
         }
     }
 
-    private void drawVerticalPicker(Canvas canvas) {
+    protected Rect getFirstPaletteRect(int left, int top, int right, int bottom){
+        rect.left = left;
+        rect.top = top;
+        rect.right = right;
+        rect.bottom = bottom;
+        return rect;
+    }
+
+    protected void drawHorizontalPicker(Canvas canvas){
+        drawHorizontalPalette(canvas, mUsedPalette.length,
+                getFirstPaletteRect(
+                        0,
+                        POPOUT_SIZE,
+                        POPOUT_SIZE,
+                        canvas.getHeight() - POPOUT_SIZE)
+        );
+    }
+
+    protected void drawVerticalPalette(Canvas canvas) {
         rect.left = 0;
         rect.top = POPOUT_SIZE;
         rect.right = canvas.getWidth();
         rect.bottom = POPOUT_SIZE;
 
-        for (int i=0; i<mUsedPalette.length; i++) {
+        for (int i=0; i<mNumberOfFields; i++) {
             paint.setColor(mUsedPalette[i]);
             rect.top = rect.bottom;
             rect.bottom += cellSize;
 
             if(isColorSelected() &&
-                    mUsedPalette[i] == mUsedPalette[mSelectedIndex]){
+                    mUsedPalette[i] == mUsedPalette[getSelectedPaletteIndex()]){
                 popoutRect.left = 0;
                 popoutRect.top = rect.top - POPOUT_SIZE;
                 popoutRect.right = canvas.getWidth();
@@ -120,35 +147,30 @@ public class ColorPicker extends View {
         canvas.drawRect(popoutRect, popoutPaint);
     }
 
-    private void drawHorizontalPicker(Canvas canvas) {
-        rect.left = POPOUT_SIZE;
-        rect.top = 0;
-        rect.right = POPOUT_SIZE;
-        rect.bottom = canvas.getHeight();
-
-        for (int i=0; i<mUsedPalette.length; i++) {
+    protected void drawHorizontalPalette(Canvas canvas, int paletteSize, Rect rect) {
+        for (int i=0; i<paletteSize; i++) {
             paint.setColor(mUsedPalette[i]);
             rect.left = rect.right;
             rect.right += cellSize;
 
             if(isColorSelected() &&
-                    mUsedPalette[i] == mUsedPalette[mSelectedIndex]){
+                    mUsedPalette[i] == getSelectedColor()){
                 popoutRect.left = rect.left - POPOUT_SIZE;
-                popoutRect.top = 0;
+                popoutRect.top = rect.top - POPOUT_SIZE;
                 popoutRect.right = rect.right + POPOUT_SIZE;
-                popoutRect.bottom = canvas.getHeight();
+                popoutRect.bottom = rect.bottom + POPOUT_SIZE;
                 popoutPaint.setColor(mUsedPalette[i]);
                 continue;
             } else {
-                rect.top = POPOUT_SIZE;
-                rect.bottom = canvas.getHeight() - POPOUT_SIZE;
+                //rect.top = POPOUT_SIZE;
+                //rect.bottom = canvas.getHeight() - POPOUT_SIZE;
             }
             canvas.drawRect(rect, paint);
         }
         canvas.drawRect(popoutRect, popoutPaint);
     }
 
-    private void onColorChanged(int color) {
+    protected void onColorChanged(int color) {
         if (onColorChanged != null) {
             onColorChanged.onColorChanged(color);
         }
@@ -157,20 +179,20 @@ public class ColorPicker extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int actionId = event.getAction();
-        int newPaletteIndex;
+        int newFieldIndex;
 
         switch (actionId) {
             case MotionEvent.ACTION_DOWN:
                 isClick = true;
                 break;
             case MotionEvent.ACTION_UP:
-                newPaletteIndex = getPaletteIndexAt(event.getX(), event.getY());
-                setSelectedIndex(newPaletteIndex);
+                newFieldIndex = getFieldIndexAt(event.getX(), event.getY());
+                setSelectedIndex(newFieldIndex);
                 if(isClick) super.performClick();
                 break;
             case MotionEvent.ACTION_MOVE:
-                newPaletteIndex = getPaletteIndexAt(event.getX(), event.getY());
-                setSelectedIndex(newPaletteIndex);
+                newFieldIndex = getFieldIndexAt(event.getX(), event.getY());
+                setSelectedIndex(newFieldIndex);
                 break;
             case MotionEvent.ACTION_CANCEL:
                 isClick = false;
@@ -184,7 +206,7 @@ public class ColorPicker extends View {
         return true;
     }
 
-    private int getPaletteIndexAt(float x, float y) {
+    protected int getFieldIndexAt(float x, float y) {
         if (mOrientation == HORIZONTAL) {
             return (int)x/cellSize;
         } else {
@@ -201,11 +223,11 @@ public class ColorPicker extends View {
         super.onSizeChanged(w, h, oldw, oldh);
     }
 
-    private void recalcCellSize() {
+    protected void recalcCellSize() {
         if (mOrientation == HORIZONTAL) {
-            cellSize = (pickerWidth-(2*POPOUT_SIZE)) / mUsedPalette.length;
+            cellSize = (pickerWidth-(2*POPOUT_SIZE)) / mNumberOfFields;
         } else {
-            cellSize = (pickerHeight-(2*POPOUT_SIZE)) / mUsedPalette.length;
+            cellSize = (pickerHeight-(2*POPOUT_SIZE)) / mNumberOfFields;
         }
     }
 
@@ -215,6 +237,10 @@ public class ColorPicker extends View {
         else {
             return -1;
         }
+    }
+
+    protected int getSelectedPaletteIndex() {
+        return mSelectedIndex;
     }
 
     public int getIndexForColor(int color){
@@ -227,7 +253,7 @@ public class ColorPicker extends View {
     }
 
     public boolean isColorSelected(){
-        if(mSelectedIndex >= 0 && mSelectedIndex > mUsedPalette.length){
+        if(mSelectedIndex >= 0 && mSelectedIndex < mNumberOfFields){
             return true;
         }
         return false;

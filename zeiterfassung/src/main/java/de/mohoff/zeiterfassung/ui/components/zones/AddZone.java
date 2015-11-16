@@ -20,7 +20,7 @@ import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
-import de.mohoff.zeiterfassung.ui.components.ColorPicker;
+import de.mohoff.zeiterfassung.ui.colorpicker.ColorPicker;
 
 public class AddZone extends Fragment {
     private MainActivity parentActivity;
@@ -115,7 +115,7 @@ public class AddZone extends Fragment {
             public void onClick(View v) {
                 autoCompleteTextView.clearFocus();
                 editText.clearFocus();
-                if (inputActivityName == "" || inputLocationName == "") {
+                if (inputActivityName.equals("") || inputLocationName.equals("")) {
                     GeneralHelper.showToast(parentActivity, "Please fill in both names.");
                 } else if(!colorPicker.isColorSelected()){
                     GeneralHelper.showToast(parentActivity, "Please choose a color.");

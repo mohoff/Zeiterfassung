@@ -41,15 +41,23 @@
             android:layout_height="match_parent"
             android:text="Color:"
             android:layout_marginTop="30dp"/>
-        <de.mohoff.zeiterfassung.ui.components.ColorPicker
+        <!--<de.mohoff.zeiterfassung.ui.colorpicker.ColorPicker
             android:id="@+id/colorPicker"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginTop="10dp"
             app:defaultIndex="none"
             app:orientation="horizontal"
+            app:usePalette="normal"/>-->
+        <de.mohoff.zeiterfassung.ui.colorpicker.ExtraColorPicker
+            android:id="@+id/colorPicker"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginTop="10dp"
+            app:defaultIndex="none"
+            app:extraColor="@color/greenish"
+            app:orientation="horizontal"
             app:usePalette="normal"/>
 
     </LinearLayout>
-
 </RelativeLayout>

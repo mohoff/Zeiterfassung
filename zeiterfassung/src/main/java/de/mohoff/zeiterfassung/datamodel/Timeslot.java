@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-@DatabaseTable(tableName = "timeslots")//, daoClass = Timeslot.class)
+@DatabaseTable(tableName = "timeslots")
 public class Timeslot {
     @DatabaseField(generatedId = true) // autoincrement primary key
     private int _id;

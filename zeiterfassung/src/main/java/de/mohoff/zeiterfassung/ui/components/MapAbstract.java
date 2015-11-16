@@ -242,14 +242,14 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         map.animateCamera(cu);
     }
 
-    protected MarkerOptions createMarkerOptions(boolean isDraggable, String title, String snippet, BitmapDescriptor bitmapDescriptor){
+    /*protected MarkerOptions createMarkerOptions(boolean isDraggable, String title, String snippet, BitmapDescriptor bitmapDescriptor){
         // without position
         return new MarkerOptions()
                 .draggable(isDraggable)
                 .title(title)
                 .snippet(snippet)
                 .icon(bitmapDescriptor);
-    }
+    }*/
 
     protected CircleOptions createCircleOptions(int fillColor){
         // without position and radius

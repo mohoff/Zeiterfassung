@@ -68,12 +68,16 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     // Location ViewHolderItem (inner holder)
     public static class LocViewHolder extends RecyclerView.ViewHolder {
+        public CardView cardView;
+        public View colorBar;
         public TextView locationName;
         public ImageButton repinButton;
         public ImageButton deleteButton;
 
         public LocViewHolder(View view) {
             super(view);
+            cardView = (CardView) view.findViewById(R.id.card_view_inner);
+            colorBar = view.findViewById(R.id.colorBar);
             locationName = (TextView) view.findViewById(R.id.locationName);
             repinButton = (ImageButton) view.findViewById(R.id.repinLocationButton);
             deleteButton = (ImageButton) view.findViewById(R.id.deleteLocationButton);
@@ -289,10 +293,14 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 // Get Zone at position to setup textView and clickListeners below
                 final Zone zone = relevantZones.get(position);
 
+                locHolder.colorBar.setBackgroundColor(zone.getColor());
+
                 locHolder.locationName.setText(zone.getLocationName());
-                locHolder.locationName.setOnLongClickListener(new View.OnLongClickListener() {
+
+                locHolder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
+                        // TODO: add color picker in alertDialog to edit color in it as well.
                         final EditText et = new EditText(context);
                         AlertDialog alertDialog = new AlertDialog.Builder(context)
                                 .setPositiveButton("save", new DialogInterface.OnClickListener() {
@@ -322,8 +330,8 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                         dialog.dismiss();
                                     }
                                 })
-                                .setTitle("Edit Location")
-                                .setMessage("Please enter a new name for the Location")
+                                .setTitle("Edit Name")
+                                .setMessage("Please enter a new name:")
                                 .setView(GeneralHelper.getAlertDialogEditTextContainer(context, et, locHolder.locationName.getText().toString()))
                                 .create();
                         // TODO: add app icon to the alertDialog.

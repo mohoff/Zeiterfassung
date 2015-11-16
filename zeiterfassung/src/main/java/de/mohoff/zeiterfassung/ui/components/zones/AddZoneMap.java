@@ -53,7 +53,7 @@ public class AddZoneMap extends ManageZonesMapAbstract {
                 } else {
                     // TODO: Check if entered radius is not near other Zones.
                     LatLng pos = candidateMarker.getPosition();
-                    int result = dbHelper.createNewZone(pos.latitude, pos.longitude, radius, activityName, locationName);
+                    int result = dbHelper.createNewZone(pos.latitude, pos.longitude, radius, activityName, locationName, candidateColor);
                     if (result != 1) {
                         GeneralHelper.showToast(getActivity(), "Couldn't add Zone. Does it already exist?");
                     } else {

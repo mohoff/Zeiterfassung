@@ -18,4 +18,8 @@
             <enum name="ultralight" value="2"/>
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="ExtraColorPicker" parent="ColorPicker">
+        <attr name="extraColor" format="color" />
+    </declare-styleable>
 </resources>

@@ -37,7 +37,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_NAME = "database.db";
 
     // any time you make changes to your database objects, you may have to increase the database version
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
 
     // the DAO object we use to access the SimpleData table
     private Dao<Timeslot, Integer> timeslotDAO = null;
@@ -101,20 +101,16 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int createNewZone(double latitude, double longitude, int radius, String activity, String location){
+    public int createNewZone(double latitude, double longitude, int radius, String activity, String location, int color){
         getTargetLocationAreaREDAO();
-
-        Zone zone = new Zone((float)latitude, (float)longitude, radius, activity, location);
-        int result = -1;
+        Zone zone = new Zone((float)latitude, (float)longitude, radius, activity, location, color);
 
         try {
             getTargetLocationAreaDAO();
-            result = targetareasDAO.create(zone);
+            return targetareasDAO.create(zone);
         } catch(SQLException e){
-
+            return -1;
         }
-
-        return result;
     }
 
     public int updateZoneLocationName(int id, String newLocationName){
@@ -261,16 +257,16 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public void _createSampleZones(){
         int status;
-        status = createNewZone(48.743715, 9.095967, 50, "Home", "Vaihingen allmandring 26d");
-        status = createNewZone(48.243962, 9.928635, 75, "Home", "Burgrieden mittelweg 10");
-        status = createNewZone(48.742120, 9.101002, 100, "Uni", "HdM");
-        status = createNewZone(48.745847, 9.105381, 50, "VVS", "Station Uni");
-        status = createNewZone(48.74319107, 9.10227019, 50, "Bars", "Wuba");
-        status = createNewZone(48.74642511, 9.10120401, 50, "Bars", "Sansibar");
-        status = createNewZone(48.74506944, 9.09997154, 50, "Bars", "Boddschi");
-        status = createNewZone(48.74311678, 9.09741271, 50, "Bars", "Unithekle");
-        status = createNewZone(48.77232266, 9.15882993, 50, "Freizeit", "mgfitness");
-        status = createNewZone(48.73002512, 9.111964, 75, "Freizeit", "Corso Kino");
+        status = createNewZone(48.743715, 9.095967, 50, "Home", "Vaihingen Allmandring 26d", 0xFF025167);
+        status = createNewZone(48.243962, 9.928635, 75, "Home", "Burgrieden Mittelweg 10", 0xFF025167);
+        status = createNewZone(48.742120, 9.101002, 100, "Uni", "HdM", 0xFF025167);
+        status = createNewZone(48.745847, 9.105381, 50, "VVS", "Station Uni", 0xFF025167);
+        status = createNewZone(48.74319107, 9.10227019, 50, "Bars", "Wuba", 0xFF025167);
+        status = createNewZone(48.74642511, 9.10120401, 50, "Bars", "Sansibar", 0xFF025167);
+        status = createNewZone(48.74506944, 9.09997154, 50, "Bars", "Boddschi", 0xFF025167);
+        status = createNewZone(48.74311678, 9.09741271, 50, "Bars", "Unithekle", 0xFF025167);
+        status = createNewZone(48.77232266, 9.15882993, 50, "Freizeit", "mgfitness", 0xFF025167);
+        status = createNewZone(48.73002512, 9.111964, 75, "Freizeit", "Corso Kino", 0xFF025167);
     }
 
 

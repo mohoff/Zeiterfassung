@@ -19,7 +19,7 @@
         <item name="android:imageButtonStyle">@color/transparent</item> <!-- in order to make ImageButton background transparent -->
 
         <!--<item name="android:windowActionBar">false</item>--> <!-- not needed anymore, because we inherit from NoActionBar -->
-
+        <item name="alertDialogTheme">@style/AlertDialog</item>
 
     </style>
 
@@ -70,6 +70,12 @@
         <item name="colorControlNormal">#0000FF</item>
         <item name="colorControlActivated">#00FF00</item>
         <item name="colorControlHighlight">#FF0000</item>
+    </style>
+
+    <style name="AlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/greenish</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <!--<item name="android:background">#FFFFFFFF</item>-->
     </style>
 
 </resources>

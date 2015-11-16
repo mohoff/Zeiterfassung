@@ -5,9 +5,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "zones")//, daoClass = Zone.class)
+@DatabaseTable(tableName = "zones")
 public class Zone {
-    public static int MIN_RADIUS = 30;
+    public static int MIN_RADIUS = 30; // m
 
     @DatabaseField(generatedId = true) // autoincrement primary key
     private int _id;
@@ -21,7 +21,9 @@ public class Zone {
     private String activityName;
     @DatabaseField(canBeNull = false, uniqueCombo = true)
     private String locationName;
-    private int color; // e.g. 0xFF000000 as black;
+    @DatabaseField(canBeNull = false)
+    private int color; // e.g. 0xFF000000 as black
+    // ;
 
     public Zone(){}
 

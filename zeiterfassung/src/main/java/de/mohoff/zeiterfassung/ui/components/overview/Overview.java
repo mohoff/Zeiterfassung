@@ -75,10 +75,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
             }
         });*/
 
-        snackbar = Snackbar.make(parentActivity.coordinatorLayout, "Location Service is not running...", Snackbar.LENGTH_LONG);
-        if(!parentActivity.serviceStatus.isRunning()){
-            snackbar.show();
-        }
+
 
         updateFirstCardPeriodically();
     }
@@ -96,6 +93,11 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         adapter.notifyDataSetChanged();
         // Scroll to top
         recList.scrollToPosition(adapter.getItemCount()-1);
+
+        snackbar = Snackbar.make(parentActivity.coordinatorLayout, "Location Service is not running...", Snackbar.LENGTH_LONG);
+        if(!parentActivity.serviceStatus.isRunning()){
+            snackbar.show();
+        }
     }
 
     @Override
@@ -152,11 +154,8 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
     public void onServiceStatusEvent(boolean isRunning) {
         if(isRunning){
             adapter.notifyItemRemoved(adapter.getItemCount() - 1);
-            snackbar.dismiss();
-            //snackbar = Snackbar.make(parentActivity.coordinatorLayout, "Location Service is not running...", Snackbar.LENGTH_INDEFINITE);
         } else {
             adapter.notifyItemInserted(adapter.getItemCount() - 1);
-            //snackbar.show();
         }
 
         //adapter.notifyItemChanged(adapter.getItemCount()-2);

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 
 @DatabaseTable(tableName = "locdump")
-public class Loc implements Parcelable{  //, daoClass = Loc.class)
+public class Loc implements Parcelable{
 
     @DatabaseField(generatedId = true) // autoincrement primary key
     private int _id;
