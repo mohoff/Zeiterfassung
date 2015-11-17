@@ -32,19 +32,7 @@ public class ManageZones extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_manage_zones, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-
-        // used when size of recyclerView doesn't change (can we use it here?)
         recyclerView.setHasFixedSize(false);
-
-        // use a linear layout manager
-        linLayoutManager = new LinearLayoutManager(getActivity());
-        linLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(linLayoutManager);
-
-        // specify an adapter (see also next example)
-        adapter = new ManageZonesAdapter(getActivity());
-        recyclerView.setAdapter(adapter);
-
         recyclerView.setClickable(false); // taken from old listView. Can use here?
 
         return view;
@@ -54,6 +42,15 @@ public class ManageZones extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         parentActivity = (MainActivity) getActivity();
+
+        // use a linear layout manager
+        linLayoutManager = new LinearLayoutManager(parentActivity);
+        linLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(linLayoutManager);
+
+        // specify an adapter (see also next example)
+        adapter = new ManageZonesAdapter(parentActivity);
+        recyclerView.setAdapter(adapter);
 
         // Set FAB icon and click listener
         parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_white_24dp));
@@ -69,6 +66,8 @@ public class ManageZones extends Fragment {
 
     @Override
     public void onResume() {
+        // TODO: What's up with that snippet? Still needed in NavigationView?
+        // TODO: current status: NEEDED!
         if(getFragmentManager().getBackStackEntryCount() > 0){
             ((MainActivity)getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(false);
         } else {

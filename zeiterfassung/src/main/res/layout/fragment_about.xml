@@ -5,32 +5,37 @@
     android:tag="ABOUT"
     tools:context="de.mohoff.zeiterfassung.ui.components.about.About">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_centerInParent="true">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_location_on_black_48dp"
-            android:tint="@color/greenish"
-            android:layout_gravity="center"
-            android:padding="30dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Zeiterfassung"
-            android:textColor="@color/greenish"
-            android:textSize="16sp"
-            android:padding="10dp"
-            android:layout_gravity="center"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="by Moritz Hoffmann"
-            android:layout_gravity="center"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_location_on_black_48dp"
+                android:tint="@color/greenish"
+                android:layout_gravity="center"
+                android:padding="30dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Zeiterfassung"
+                android:textColor="@color/greenish"
+                android:textSize="16sp"
+                android:padding="10dp"
+                android:layout_gravity="center"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="by Moritz Hoffmann"
+                android:layout_gravity="center"/>
 
-    </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
 </RelativeLayout>

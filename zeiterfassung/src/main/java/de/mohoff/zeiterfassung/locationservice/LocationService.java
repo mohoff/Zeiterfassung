@@ -183,7 +183,12 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         startForeground(1337, notification);
 
         stats = dbHelper.getAllStats();
-        inboundZone = dbHelper.getOpenTimeslot().getZone();
+
+        Timeslot openTimeslot = dbHelper.getOpenTimeslot();
+        if(openTimeslot != null){
+            inboundZone = openTimeslot.getZone();
+        }
+
     }
 
     private void updateNumericStat(String identifier, int deltaToAdd){

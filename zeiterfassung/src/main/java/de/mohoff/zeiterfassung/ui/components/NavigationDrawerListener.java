@@ -1,4 +1,4 @@
-package de.mohoff.zeiterfassung.ui.navdrawer;
+package de.mohoff.zeiterfassung.ui.components;
 
 import android.view.View;
 

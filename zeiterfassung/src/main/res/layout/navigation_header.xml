@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="192dp"
+              android:padding="5dp"
+              android:orientation="vertical"
+              android:background="@color/greenish_5">
+
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/ic_location_on_black_48dp"
+        android:tint="@color/white"
+        android:layout_centerInParent="true"/>
+
+    <!-- LocationService controls -->
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="center_vertical"
+        android:gravity="center"
+        android:weightSum="6">
+        <Button
+            android:id="@+id/buttonStartService"
+            style="@style/Button.ServiceControl.Start"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:text="@string/servicecontrol_start"
+            android:layout_weight="2"/>
+        <Button
+            android:id="@+id/buttonStopService"
+            style="@style/Button.ServiceControl.Stop"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:text="@string/servicecontrol_stop"
+            android:layout_weight="2"/>
+    </LinearLayout>
+
+    <!--<TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Header"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>-->
+
+</RelativeLayout>

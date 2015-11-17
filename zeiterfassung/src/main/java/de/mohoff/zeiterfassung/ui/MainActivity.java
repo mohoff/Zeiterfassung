@@ -6,29 +6,30 @@ import android.app.FragmentTransaction;
 import android.content.*;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.IBinder;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.ActionProvider;
+import android.view.ContextMenu;
 import android.view.GestureDetector;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
@@ -42,46 +43,34 @@ import de.mohoff.zeiterfassung.ui.components.overview.Overview;
 import de.mohoff.zeiterfassung.ui.components.settings.Settings;
 import de.mohoff.zeiterfassung.ui.components.statistics.Statistics;
 import de.mohoff.zeiterfassung.ui.components.zones.ManageZones;
-import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerAdapter;
-import de.mohoff.zeiterfassung.ui.navdrawer.NavigationDrawerListener;
-import de.mohoff.zeiterfassung.ui.navdrawer.NavigationListItem;
+import de.mohoff.zeiterfassung.ui.components.NavigationDrawerListener;
 import de.mohoff.zeiterfassung.ui.components.maplive.MapLive;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 
-import java.util.ArrayList;
-
 // TODO: add lite version of google maps to lower area of navigation drawer and maybe 'About' page
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerListener {
+    private DatabaseHelper dbHelper;
+
     public static FragmentManager fragM;
     FragmentTransaction fragT;
     private Fragment nextFragment;
-    private boolean nextFragmentAvailable = false;
 
     public CoordinatorLayout coordinatorLayout;
+    public NavigationView navigationView;
     public Toolbar toolbar;
     public FloatingActionButton fab;
-    private RelativeLayout leftDrawer;
-    private RecyclerView recyclerView;
     private NavigationDrawerListener drawerListener;
 
     private DrawerLayout drawerLayout;
-    private NavigationDrawerAdapter drawerAdapter;
-    private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
-    private NavigationListItem[] items = new NavigationListItem[8];
-    private CharSequence title;
 
     private Button buttonStartService;
     private Button buttonStopService;
-    private TextView outputTV;
-    private DatabaseHelper dbHelper = null;
 
-    //private LocationService service;
     private LocationServiceConnection lsc = null;
     private MainActivity that = this;
-    //public boolean isServiceRunning = false;
     public LocationServiceStatus serviceStatus;
 
     // listener for MapLive fragment
@@ -112,50 +101,62 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         fragM = getFragmentManager();
         fragT = fragM.beginTransaction();
 
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        navigationView = ((NavigationView) findViewById(R.id.navigationView));
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            //title = actionBar.getTitle();
+        }
 
-        title = getSupportActionBar().getTitle();
-        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        //mDrawerToggle.setDrawerIndicatorEnabled(false);
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                menuItem.setChecked(true);
+                selectedDrawerItem(menuItem);
+                return true;
+            }
+        });
+        // Select the first menu item at app start.
+        navigationView.getMenu().getItem(0).setChecked(true);
+        navigationView.getMenu().performIdentifierAction(R.id.item_overview, 0);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         drawerToggle = new ActionBarDrawerToggle(
-                this,                  /* host Activity */
-                drawerLayout,          /* DrawerLayout object */
-                R.string.drawer_open,  /* "open drawer" description for accessibility */
-                R.string.drawer_close  /* "close drawer" description for accessibility */
+                this,                  // host Activity
+                drawerLayout,          // DrawerLayout object
+                R.string.drawer_open,  // "open drawer" description for accessibility
+                R.string.drawer_close  // "close drawer" description for accessibility
         ) {
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                getSupportActionBar().setTitle(title);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                //getSupportActionBar().setTitle(title);
+                //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
 
-                if(nextFragmentAvailable){
-                    replaceFragment(nextFragment, false);
-                    nextFragmentAvailable = false;
-                }
+                //if(nextFragmentAvailable){
+                //    replaceFragment(nextFragment, false);
+                //    nextFragmentAvailable = false;
+                //}
             }
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
-                toolbar.setAlpha(1 - slideOffset / 2);
+                //toolbar.setAlpha(1 - slideOffset / 2);
             }
         };
-
         drawerLayout.setDrawerListener(drawerToggle);
+
         drawerLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -163,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             }
         });
 
-        leftDrawer = (RelativeLayout) findViewById(R.id.left_drawer);
+        /*leftDrawer = (RelativeLayout) findViewById(R.id.left_drawer);
         recyclerView = (RecyclerView) findViewById(R.id.drawerList);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -184,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             public void onLongClick(View view, int position) {
             }
         }));
+        */
 
         buttonStartService = (Button) findViewById(R.id.buttonStartService);
         buttonStopService = (Button) findViewById(R.id.buttonStopService);
@@ -211,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
         // Show overview at initial app start
         //if(savedInstanceState == null){
-            selectItem(NavigationDrawerAdapter.CURRENTLY_SELECTED);
+            //selectItem(NavigationDrawerAdapter.CURRENTLY_SELECTED);
         //}
 
         // Initialize LocationServiceStatus and sync its state with the LocationService
@@ -298,6 +300,10 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         unbindAndStopLocationService();
     }
 
+    @Override
+    public void onItemSelected(View view, int position) {
+    }
+
     private void updateServiceButtons(){
         if(serviceStatus.isRunning()){
             // manage start button
@@ -340,51 +346,57 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         }
     }
 
-    @Override
-    public void onItemSelected(View view, int position) {
-        selectItem(position);
-    }
+    public void selectedDrawerItem(MenuItem item){
+        item.setChecked(true);
+        Fragment next = null;
 
-    private void selectItem(int position) {
-        // Update the main content by replacing fragments
-        nextFragment = new Fragment();
-        nextFragmentAvailable = true;
-
-        switch(position) {
-            case 0:
-                nextFragment = new Overview();
+        switch (item.getItemId()) {
+            case R.id.item_overview:
+                next = new Overview();
                 break;
-            case 1:
-                nextFragment = new ManageZones();
+            case R.id.item_zones:
+                next = new ManageZones();
                 break;
-            case 2:
-                nextFragment = new MapLive();
+            case R.id.item_maplive:
+                next = new MapLive();
                 break;
-            case 4:
-                nextFragment = new Statistics();
+            case R.id.item_statistics:
+                next = new Statistics();
                 break;
-            case 5:
-                nextFragment = new Settings();
+            case R.id.item_settings:
+                next = new Settings();
                 break;
-            case 6:
-                nextFragment = new About();
+            case R.id.item_about:
+                next = new About();
                 break;
+            /*default:
+                next = new Overview();*/
         }
 
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            // User selected other fragment from drawer.
-            // new fragment is loaded in onDrawerClosed()
-            drawerLayout.closeDrawer(leftDrawer);
-        } else {
-            // Display initial fragment after app start
-            replaceFragment(nextFragment, false);
+        if(next != null){
+            replaceFragment(next, false);
+            setTitle(item.getTitle());
+            drawerLayout.closeDrawers();
         }
     }
+    /* // onOptionsItemSelected when you don't use an ActionBarDrawerToggle (here: drawerToggle as variable)
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // The action bar home/up action should open or close the drawer.
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }*/
 
     @Override
-    public void setTitle(CharSequence title) {
-        this.title = title;
-        getSupportActionBar().setTitle(title);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -401,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         // Close navigation drawer if it's open. If not, go back to previous fragment if there is one
         // on the back-stack.
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            drawerLayout.closeDrawer(leftDrawer);
+            drawerLayout.closeDrawers();
         } else if (getFragmentManager().getBackStackEntryCount() > 0){
             getFragmentManager().popBackStack();
             if(getFragmentManager().getBackStackEntryCount() > 0){
@@ -444,7 +456,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        // Pass any configuration change to the drawer toggls
+        // Pass any configuration change to the drawer toggle
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
@@ -473,15 +485,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             if(receivedMessage.equals("opened")){
                 Snackbar.make(that.coordinatorLayout, getString(R.string.timeslot_opened), Snackbar.LENGTH_LONG)
                         .show();
-                //if (newTimeslotEventListener != null) {
-                //    newTimeslotEventListener.onNewTimeslot(intent.getIntExtra("id", 0)); // Why need to provide default value?
-                //}
             } else if(receivedMessage.equals("closed")){
                 Snackbar.make(that.coordinatorLayout, getString(R.string.timeslot_closed), Snackbar.LENGTH_LONG)
                         .show();
-                //if (newTimeslotEventListener != null) {
-                //   newTimeslotEventListener.onTimeslotSealed(intent.getIntExtra("id", 0));
-                //}
             }
         }
     };
@@ -495,7 +501,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             boolean isRealUpdate = intent.getBooleanExtra("isRealUpdate", true);
             Loc newLocation = new Loc(lat, lng, accuracy);
             newLocation.setIsRealUpdate(isRealUpdate);
-            //locs.add(newLocation);
 
             if (newLocationListener != null) {
                 newLocationListener.onNewLocation(newLocation);
@@ -535,67 +540,14 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //  adds items to the toolbar
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // The action bar home/up action should open or close the drawer.
-        // ActionBarDrawerToggle will take care of this.
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
-        switch(item.getItemId()) {
-            /*case R.id.action_settings:
-                return true;*/
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
-        // save locations before screen rotation in order to recover map markers after
-        // convert circularFifoQueue to ArrayList
-        /*
-        for(Loc e : locs) {
-            locsTmp.add(e);
-        }
-        // add ArrayList to instance state
-        outState.putParcelableArrayList("locs", locsTmp);
-        */
         super.onSaveInstanceState(outState);
-    }
-
-    private ArrayList<String> getListItems(){
-        ArrayList<String> list = new ArrayList<>();
-        /*list.add(new NavigationDrawerItem(true, "Overview"));
-        list.add(new NavigationDrawerItem(true, "Manage TLAs"));
-        list.add(new NavigationDrawerItem(true, "MapLive"));
-        list.add(new NavigationDrawerItem(true, "Location Service"));
-        list.add(new NavigationDrawerItem(true, "About"));*/
-        list.add("Overview");
-        list.add("Zones");
-        list.add("Live Map");
-        list.add("---------------"); // list[3] now hardcoded as separator (only hardcoded possible I think)
-        list.add("Statistics");
-        list.add("Settings");
-        list.add("About");
-        return list;
     }
 
     public static interface ClickListener {
         public void onClick(View view, int position);
         public void onLongClick(View view, int position);
     }
-
-
-
-
 
     static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
         private GestureDetector gestureDetector;

@@ -180,7 +180,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         } else if(holder.getItemViewType() == VIEWTYPE_SERVICEINFO){
             ViewHolderInfoItem ivh = (ViewHolderInfoItem) holder;
-            ivh.infoText.setText(context.getString(R.string.overview_end_pending));
+            ivh.infoText.setText(context.getString(R.string.service_not_running));
         } else if(holder.getItemViewType() == VIEWTYPE_NOENTRYINFO){
             ViewHolderInfoItem ivh = (ViewHolderInfoItem) holder;
             ivh.infoText.setText(context.getString(R.string.overview_no_entries));

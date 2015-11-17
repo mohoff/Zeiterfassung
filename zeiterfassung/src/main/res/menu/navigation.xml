@@ -1,0 +1,37 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".MainActivity">
+
+    <group android:checkableBehavior="single">
+        <!--<group android:id="@+id/main">-->
+            <item
+                android:id="@+id/item_overview"
+                android:icon="@drawable/ic_overview"
+                android:title="@string/nav_item_1_overview" />
+            <item
+                android:id="@+id/item_zones"
+                android:icon="@drawable/ic_zones"
+                android:title="@string/nav_item_2_zones" />
+            <item
+                android:id="@+id/item_maplive"
+                android:icon="@drawable/ic_map"
+                android:title="@string/nav_item_3_maplive" />
+        <!--</group>
+        TODO: There is a bug which doesn't check items (visually) when they are contained in nested groups. So here only one group (checkableBehaviour=single) is allowed
+        <group android:id="@+id/other">-->
+            <item
+                android:id="@+id/item_statistics"
+                android:icon="@drawable/ic_statistics"
+                android:title="@string/nav_item_4_statistics" />
+            <item
+                android:id="@+id/item_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="@string/nav_item_5_settings" />
+            <item
+                android:id="@+id/item_about"
+                android:icon="@drawable/ic_about"
+                android:title="@string/nav_item_6_about" />
+        <!--</group>-->
+    </group>
+</menu>

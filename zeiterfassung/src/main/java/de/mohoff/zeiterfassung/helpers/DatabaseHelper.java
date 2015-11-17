@@ -411,8 +411,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         } catch (Exception e){
             // (SQLException | IndexOutOfBoundsException e)
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public List<Zone> getAllZones(){

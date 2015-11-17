@@ -5,7 +5,8 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    tools:context=".MainActivity">
 
     <!--<LinearLayout
         android:layout_width="match_parent"
@@ -32,7 +33,6 @@
         android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity"
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.AppBarLayout
@@ -70,68 +70,15 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <!-- Navigation Drawer -->
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:id="@+id/left_drawer"
-                    android:layout_width="240dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="start"
-                    android:background="@color/navigation_drawer_bg">
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigationView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/navigation_header"
+        app:menu="@menu/navigation"
+        app:itemIconTint="@color/drawer_item"
+        app:itemTextColor="@color/drawer_item"
+        app:itemBackground="@drawable/drawer_item_background"/>
 
-        <RelativeLayout
-            android:id="@+id/nav_header_container"
-            android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:layout_alignParentTop="true"
-            android:background="@color/navigation_drawer_top_bg">
-
-            <ImageView
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:src="@drawable/ic_location_on_black_48dp"
-                android:tint="@color/white"
-                android:layout_centerHorizontal="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="80dp"
-                android:layout_centerInParent="true" />
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:orientation="horizontal"
-                android:layout_alignParentBottom="true"
-                android:layout_gravity="center_vertical"
-                android:gravity="center"
-                android:weightSum="6"
-                android:paddingBottom="10dp">
-
-                <Button
-                    android:id="@+id/buttonStartService"
-                    style="@style/Button.ServiceControl.Start"
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:text="@string/servicecontrol_start"
-                    android:layout_weight="2"
-                    />
-                <Button
-                    android:id="@+id/buttonStopService"
-                    style="@style/Button.ServiceControl.Stop"
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:text="@string/servicecontrol_stop"
-                    android:layout_weight="2"
-                    />
-            </LinearLayout>
-        </RelativeLayout>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/drawerList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/nav_header_container"
-            android:layout_marginTop="15dp"
-            android:scrollbars="vertical"/>
-
-    </RelativeLayout>
 </android.support.v4.widget.DrawerLayout>
