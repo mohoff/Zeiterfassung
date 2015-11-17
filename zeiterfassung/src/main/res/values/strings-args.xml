@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="arg_activity">activityName</string>
     <string name="arg_location">locationName</string>
     <string name="arg_color">color</string>
     <string name="arg_zone_id">zoneId</string>
+
 </resources>

@@ -43,7 +43,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private Dao<Timeslot, Integer> timeslotDAO = null;
     private RuntimeExceptionDao<Timeslot, Integer> timeslotREDAO = null;
     private Dao<Zone, Integer> targetareasDAO = null;
-    private RuntimeExceptionDao<Zone, Integer> targetareasREDAO = null;
+    private RuntimeExceptionDao<Zone, Integer> zonesREDAO = null;
     private Dao<Loc, Integer> locDAO = null;
     private RuntimeExceptionDao<Loc, Integer> locREDAO = null;
     private Dao<Stat, Integer> statDAO = null;
@@ -114,7 +114,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     public int updateZoneLocationName(int id, String newLocationName){
-        UpdateBuilder<Zone, Integer> updateBuilder = targetareasREDAO.updateBuilder();
+        UpdateBuilder<Zone, Integer> updateBuilder = zonesREDAO.updateBuilder();
         try {
             updateBuilder.updateColumnValue("locationName", newLocationName);
             updateBuilder.where().eq("_id", id);
@@ -127,7 +127,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     public int updateZoneActivityName(String oldActivityName, String newActivityName){
-        UpdateBuilder<Zone, Integer> updateBuilder = targetareasREDAO.updateBuilder();
+        UpdateBuilder<Zone, Integer> updateBuilder = zonesREDAO.updateBuilder();
         try {
             updateBuilder.updateColumnValue("activityName", newActivityName);
             updateBuilder.where().eq("activityName", oldActivityName);
@@ -139,12 +139,17 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
+    public int updateZone(Zone zone) {
+        getTimeslotREDAO();
+        return zonesREDAO.update(zone);
+    }
+
     public Zone getZoneById(int id){
-        QueryBuilder<Zone, Integer> queryBuilder = targetareasREDAO.queryBuilder();
+        QueryBuilder<Zone, Integer> queryBuilder = zonesREDAO.queryBuilder();
         try{
             queryBuilder.where().eq("_id", id);
             PreparedQuery<Zone> preparedQuery = queryBuilder.prepare();
-            return targetareasREDAO.query(preparedQuery).get(0);
+            return zonesREDAO.query(preparedQuery).get(0);
         } catch (SQLException e){
             e.printStackTrace();
             return null;
@@ -152,7 +157,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     public int deleteZone(String activity, String location){
-        DeleteBuilder<Zone, Integer> deleteBuilder = targetareasREDAO.deleteBuilder();
+        DeleteBuilder<Zone, Integer> deleteBuilder = zonesREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("activityName", activity).and().eq("locationName", location);
             deleteBuilder.delete();
@@ -164,7 +169,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     public int deleteZoneById(int id){
-        DeleteBuilder<Zone, Integer> deleteBuilder = targetareasREDAO.deleteBuilder();
+        DeleteBuilder<Zone, Integer> deleteBuilder = zonesREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("_id", id);
             deleteBuilder.delete();
@@ -176,7 +181,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     public int deleteZonesByActivity(String activity){
-        DeleteBuilder<Zone, Integer> deleteBuilder = targetareasREDAO.deleteBuilder();
+        DeleteBuilder<Zone, Integer> deleteBuilder = zonesREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("activityName", activity);
             deleteBuilder.delete();
@@ -345,10 +350,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return timeslotREDAO;
     }
     public RuntimeExceptionDao<Zone, Integer> getTargetLocationAreaREDAO() {
-        if (targetareasREDAO == null) {
-            targetareasREDAO = getRuntimeExceptionDao(Zone.class);
+        if (zonesREDAO == null) {
+            zonesREDAO = getRuntimeExceptionDao(Zone.class);
         }
-        return targetareasREDAO;
+        return zonesREDAO;
     }
     public RuntimeExceptionDao<Loc, Integer> getLocREDAO() {
         if (locREDAO == null) {
@@ -371,7 +376,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         timeslotDAO = null;
         timeslotREDAO = null;
         targetareasDAO = null;
-        targetareasREDAO = null;
+        zonesREDAO = null;
         locDAO = null;
         locREDAO = null;
         statDAO = null;
@@ -414,7 +419,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         getTargetLocationAreaREDAO();
 
         try {
-            return targetareasREDAO.queryForAll();
+            return zonesREDAO.queryForAll();
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -528,7 +533,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public Cursor getCursorForZones(){
         Cursor c = null;
-        QueryBuilder<Zone, Integer> queryBuilder = targetareasREDAO.queryBuilder();
+        QueryBuilder<Zone, Integer> queryBuilder = zonesREDAO.queryBuilder();
         //qb.where()...;
 
         try {
@@ -548,7 +553,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         getTargetLocationAreaREDAO();
         List<String> activities = new ArrayList<String>();
 
-        QueryBuilder<Zone, Integer> queryBuilder = targetareasREDAO.queryBuilder();
+        QueryBuilder<Zone, Integer> queryBuilder = zonesREDAO.queryBuilder();
         try{
             List<Zone> matches = queryBuilder.distinct().selectColumns("activityName").query();
             for(Zone zone : matches){

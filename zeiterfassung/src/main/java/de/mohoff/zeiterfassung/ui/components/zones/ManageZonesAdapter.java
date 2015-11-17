@@ -28,6 +28,7 @@ import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
+import de.mohoff.zeiterfassung.ui.colorpicker.ExtraColorPicker;
 
 /**
  * Created by moo on 8/17/15.
@@ -152,7 +153,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 @Override
                                 public void onClick(DialogInterface dialog, int i) {
                                     if (et.getText().toString().equals(actHolder.activityName.getText().toString())) {
-                                        Snackbar.make(context.coordinatorLayout, context.getString(R.string.error_input_name_equal), Snackbar.LENGTH_LONG)
+                                        Snackbar.make(context.coordinatorLayout, context.getString(R.string.error_input_name_color_equal), Snackbar.LENGTH_LONG)
                                                 .show();
                                     } else {
                                         // Execute update on DB
@@ -268,11 +269,13 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         List<Zone> relevantZones;
         AdapterManageZoneInner innerAdapter = this;
         ManageZonesAdapter outerAdapter;
+        LayoutInflater inflater;
 
         public AdapterManageZoneInner(ManageZonesAdapter outerAdapter, MainActivity context, List<Zone> relevantZones) {
             this.outerAdapter = outerAdapter;
             this.context = context;
             this.relevantZones = relevantZones;
+            this.inflater = context.getLayoutInflater();
         }
 
         @Override
@@ -307,20 +310,26 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     @Override
                     public boolean onLongClick(View v) {
                         // TODO: add color picker in alertDialog to edit color in it as well.
-                        final EditText et = new EditText(context);
+                        View dialogView = inflater.inflate(R.layout.alert_dialog_zone_location, null);
+                        final EditText et = (EditText) dialogView.findViewById(R.id.editText);
+                        et.setText(zone.getLocationName());
+                        final ExtraColorPicker colorPicker = (ExtraColorPicker) dialogView.findViewById(R.id.colorPicker);
+                        colorPicker.setSelectedColor(zone.getColor());
+
                         AlertDialog alertDialog = new AlertDialog.Builder(context)
                                 .setPositiveButton(context.getString(R.string.dialog_save), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
-                                        if(et.getText().toString().equals(locHolder.locationName.getText().toString())){
-                                            Snackbar.make(context.coordinatorLayout, context.getString(R.string.error_input_name_equal), Snackbar.LENGTH_LONG)
+                                        if(et.getText().toString().equals(locHolder.locationName.getText().toString()) &&
+                                                colorPicker.getSelectedColor() == zone.getColor()){
+                                            Snackbar.make(context.coordinatorLayout, context.getString(R.string.error_input_name_color_equal), Snackbar.LENGTH_LONG)
                                                     .show();
                                         } else {
-                                            // Execute update on DB
-                                            int result = dbHelper.updateZoneLocationName(relevantZones.get(position).get_id(), et.getText().toString());
-                                            if(result == 1){
+                                            zone.setLocationName(et.getText().toString());
+                                            zone.setColor(colorPicker.getSelectedColor());
+                                            if(dbHelper.updateZone(zone) == 1){
                                                 // Directly update the adapter's model, so we can avoid a new DB query
-                                                relevantZones.get(position).setLocationName(et.getText().toString());
+                                                relevantZones.set(position, zone);
                                                 innerAdapter.notifyDataSetChanged();
                                                 Snackbar.make(context.coordinatorLayout, context.getString(R.string.update_zone_success), Snackbar.LENGTH_LONG)
                                                         .show();
@@ -340,15 +349,15 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                     }
                                 })
                                 .setTitle(context.getString(R.string.alert_title_update_zone_location))
-                                .setMessage(context.getString(R.string.alert_msg_update_zone))
-                                .setView(GeneralHelper.getAlertDialogEditTextContainer(context, et, locHolder.locationName.getText().toString()))
+                                //.setMessage(context.getString(R.string.alert_msg_update_zone))
+                                //.setView(GeneralHelper.getAlertDialogEditTextContainer(context, et, locHolder.locationName.getText().toString()))
+                                .setView(dialogView)
                                 .create();
                         // TODO: add app icon to the alertDialog.
                         alertDialog.show();
                         return true;
                     }
                 });
-                //locHolder.locationName.setOnTouchListener(null);
 
                 locHolder.repinButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -370,7 +379,6 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 .setPositiveButton(context.getString(R.string.dialog_delete), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
-                                        // Delete action
                                         if (dbHelper.deleteZoneById(zone.get_id()) == 1) {
                                             Snackbar.make(context.coordinatorLayout, context.getString(R.string.delete_zone_success), Snackbar.LENGTH_LONG)
                                                     .show();
@@ -385,7 +393,6 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 .setNegativeButton(context.getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
-                                        // Cancel action
                                         dialog.dismiss();
                                     }
                                 })
@@ -419,7 +426,6 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         @Override
         public int getItemViewType(int position) {
-            // if position is last index
             if (position == getItemCount()-1) {
                 return VIEWTYPE_ADD;
             } else {

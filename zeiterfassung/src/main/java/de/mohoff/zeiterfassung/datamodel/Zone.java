@@ -101,7 +101,10 @@ public class Zone {
     public void setColor(int color) {
         this.color = color;
     }
-    //float dataQuality; // indicator for accuracy ratings over time in this target location area
+
+    public LatLng getLatLng(){
+        return new LatLng(latitude, longitude);
+    }
 
 
 

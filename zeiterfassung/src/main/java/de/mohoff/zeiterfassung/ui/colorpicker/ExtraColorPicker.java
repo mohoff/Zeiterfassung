@@ -13,7 +13,6 @@ import de.mohoff.zeiterfassung.R;
  */
 public class ExtraColorPicker extends ColorPicker {
     int mExtraColor;
-    int cellSizeY;
 
     public ExtraColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -77,6 +76,16 @@ public class ExtraColorPicker extends ColorPicker {
             return super.getSelectedColor();
         }
     }
+
+    @Override
+    public void setSelectedColor(int color) {
+        if(mExtraColor == color){
+            mSelectedIndex = -2;
+        } else {
+            super.setSelectedColor(color);
+        }
+    }
+
 
     @Override
     public boolean isColorSelected(){

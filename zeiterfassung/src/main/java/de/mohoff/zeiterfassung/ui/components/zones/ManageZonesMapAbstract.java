@@ -1,9 +1,9 @@
 package de.mohoff.zeiterfassung.ui.components.zones;
 
+import android.app.Fragment;
 import android.graphics.Color;
 import android.location.Address;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,8 +26,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import de.mohoff.zeiterfassung.datamodel.Loc;
-import de.mohoff.zeiterfassung.datamodel.Timeslot;
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.ui.components.MapAbstract;
@@ -43,7 +41,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
     Marker candidateMarker = null;
     Circle candidateCircle = null;
     int candidateColor;
-    int radius = 50;
+    int newRadius = 50;
 
     EditText radiusValue, addressValue;
     ImageButton searchButton;
@@ -87,25 +85,25 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         colorButtonEnabled = getResources().getColor(R.color.greenish);
 
         radiusValue = (EditText) view.findViewById(R.id.radiusValue);
-        radiusValue.setText(String.valueOf(radius));
+        radiusValue.setText(String.valueOf(newRadius));
         radiusValue.addTextChangedListener(new TextWatcher() {
             public void afterTextChanged(Editable s) {
                 String inputString = radiusValue.getText().toString();
                 try {
-                    radius = Integer.valueOf(inputString);
+                    newRadius = Integer.valueOf(inputString);
                 } catch (Exception e) {
-                    //radiusValue.setText(String.valueOf(radius));
-                    Snackbar.make(parentActivity.coordinatorLayout, "Input isn't a number.", Snackbar.LENGTH_LONG)
-                            .show();
+                    Snackbar.make(
+                            parentActivity.coordinatorLayout,
+                            parentActivity.getString(R.string.error_input_no_number),
+                            Snackbar.LENGTH_LONG)
+                    .show();
                 }
                 if (candidateCircle != null) {
-                    candidateCircle.setRadius(radius);
+                    candidateCircle.setRadius(newRadius);
                 }
             }
-
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
@@ -115,34 +113,45 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
             @Override
             public void onClick(View v) {
                 if (addressValue.getText() == null) {
-                    Snackbar.make(parentActivity.coordinatorLayout, "Please fill in address or place.", Snackbar.LENGTH_LONG)
-                            .show();
+                    Snackbar.make(
+                            parentActivity.coordinatorLayout,
+                            parentActivity.getString(R.string.error_input_geolookup_empty),
+                            Snackbar.LENGTH_LONG)
+                    .show();
                 } else {
                     try {
                         // Do the lookup
-                        Address lookupResult = geocoder.getFromLocationName(addressValue.getText().toString(), 1).get(0); // isRunning(0) can cause IndexOutOfBoundException
+                        Address lookupResult = geocoder.getFromLocationName(addressValue.getText().toString(), 1)
+                                                       .get(0); // isRunning(0) can cause IndexOutOfBoundException
                         lookupLatLng = new LatLng(lookupResult.getLatitude(), lookupResult.getLongitude());
                         MarkerOptions markerOptions = new MarkerOptions()
                                 .position(lookupLatLng)
                                 .draggable(true)
-                                .title("New Zone")
+                                .title(parentActivity.getString(R.string.map_new_zone))
                                         // TODO: use custom marker with Zone's color
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                                ;
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+
                         // Add marker and circle for the lookup position to the map
                         candidateMarker = map.addMarker(markerOptions);
 
                         candidateCircle = map.addCircle(
-                                createCircleOptions(Color.argb(100, 81, 112, 226)).center(lookupLatLng).radius(radius)
+                                createCircleOptions(Color.argb(100, 81, 112, 226)).center(lookupLatLng).radius(newRadius)
                         );
+
                         // Move camera to lookup position
                         centerMapTo(lookupLatLng, 0);
                     } catch (IOException e) {
-                        Snackbar.make(parentActivity.coordinatorLayout, "Lookup failed. Do you have internet?", Snackbar.LENGTH_LONG)
-                                .show();
+                        Snackbar.make(
+                                parentActivity.coordinatorLayout,
+                                parentActivity.getString(R.string.error_geolookup),
+                                Snackbar.LENGTH_LONG)
+                        .show();
                     } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
-                        Snackbar.make(parentActivity.coordinatorLayout, "Lookup failed. Please enter valid address or place.", Snackbar.LENGTH_LONG)
-                                .show();
+                        Snackbar.make(
+                                parentActivity.coordinatorLayout,
+                                parentActivity.getString(R.string.error_input_geolookup_invalid),
+                                Snackbar.LENGTH_LONG)
+                        .show();
                     }
                 }
             }
@@ -219,12 +228,12 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                 candidateMarker = map.addMarker(new MarkerOptions()
                                 .position(point)
                                 .draggable(true)
-                                .title("New Zone")
+                                .title(parentActivity.getString(R.string.map_new_zone))
                                 // TODO: use custom marker with Zone's color
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 );
                 candidateCircle = map.addCircle(
-                        createCircleOptions(Color.argb(100, 81, 112, 226)).center(point).radius(radius)
+                        createCircleOptions(Color.argb(100, 81, 112, 226)).center(point).radius(newRadius)
                 );
             }
         });
@@ -246,5 +255,13 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         optionsCandidateCircle = createCircleOptions(
                 Color.HSVToColor(100, new float[]{BitmapDescriptorFactory.HUE_RED, 1, 1})
         );
+    }
+
+    protected void goBackToManageZones(){
+        // Clear back stack because we're done with adding or editing a Zone.
+        GeneralHelper.clearBackStack(parentActivity);
+        // Go back to ManageZones fragment with clean back stack
+        Fragment nextFragment = new ManageZones();
+        parentActivity.replaceFragment(nextFragment, false);
     }
 }

@@ -135,7 +135,8 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ViewHolderItem vh = (ViewHolderItem) holder;
             Timeslot timeslot = data.get(position);
 
-            if(timeslot.getReadableEndTime().equals("pending") && timeslot.getReadableEndDate().equals("pending")){
+            if(timeslot.getReadableEndTime(context).equals(context.getString(R.string.overview_end_pending)) &&
+                    timeslot.getReadableEndDate(context).equals(context.getString(R.string.overview_end_pending))){
                 vh.endTime.setTypeface(null, Typeface.ITALIC);
                 vh.endDate.setTypeface(null, Typeface.ITALIC);
             } else {
@@ -152,8 +153,8 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             vh.location.setText(timeslot.getZone().getLocationName());
             vh.startTime.setText(timeslot.getReadableStartTime());
             vh.startDate.setText(timeslot.getReadableStartDate());
-            vh.endTime.setText(timeslot.getReadableEndTime());
-            vh.endDate.setText(timeslot.getReadableEndDate());
+            vh.endTime.setText(timeslot.getReadableEndTime(context));
+            vh.endDate.setText(timeslot.getReadableEndDate(context));
             vh.duration.setText(timeslot.getReadableDuration()); // e.g. "1d 2h 14min"
 
             /*// Show or hide top connector part of that view
@@ -179,10 +180,10 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         } else if(holder.getItemViewType() == VIEWTYPE_SERVICEINFO){
             ViewHolderInfoItem ivh = (ViewHolderInfoItem) holder;
-            ivh.infoText.setText("Service is not running...");
+            ivh.infoText.setText(context.getString(R.string.overview_end_pending));
         } else if(holder.getItemViewType() == VIEWTYPE_NOENTRYINFO){
             ViewHolderInfoItem ivh = (ViewHolderInfoItem) holder;
-            ivh.infoText.setText("No entries yet");
+            ivh.infoText.setText(context.getString(R.string.overview_no_entries));
         }
     }
 

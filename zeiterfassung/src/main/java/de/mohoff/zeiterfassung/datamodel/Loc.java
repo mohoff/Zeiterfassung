@@ -145,6 +145,10 @@ public class Loc implements Parcelable{
         return result;
     }
 
+    public boolean isNotOlderThan(long millisInPast){
+        return System.currentTimeMillis()-millisInPast <= getTimestampInMillis();
+    }
+
     public double getLatitude() {
         return latitude;
     }

@@ -48,7 +48,8 @@ import de.mohoff.zeiterfassung.ui.MainActivity;
  * Created by moo on 8/16/15.
  */
 public class MapAbstract extends Fragment implements OnMapReadyCallback {
-    private int DEFAULT_ZOOM_LEVEL = 17;
+    private static int DEFAULT_ZOOM_LEVEL = 17;
+    private static int MARKER_VIEWPORT_PADDING = 200; // px
 
     protected MainActivity parentActivity;
     protected static View view;
@@ -259,14 +260,14 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 .strokeColor(Color.TRANSPARENT);
     }
 
-    public static CameraUpdate getMapViewport(ArrayList<LatLng> latLngList, int padding){
+    public static CameraUpdate getMapViewport(ArrayList<LatLng> latLngList){
         LatLngBounds.Builder boundBilder = LatLngBounds.builder();
         for(LatLng latLng : latLngList){
             boundBilder.include(latLng);
         }
         LatLngBounds bounds = boundBilder.build();
 
-        return CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        return CameraUpdateFactory.newLatLngBounds(bounds, MARKER_VIEWPORT_PADDING);
     }
 
     protected DatabaseHelper getDbHelper(Context context) {

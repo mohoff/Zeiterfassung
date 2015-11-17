@@ -12,7 +12,6 @@ import com.google.android.gms.maps.model.Marker;
 
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.Zone;
-import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 
 /**
  * Created by moo on 8/16/15.
@@ -23,9 +22,6 @@ public class EditZonesMap extends ManageZonesMapAbstract {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // TODO: Does parentActivity reference work in onCreateView? (usually only in onActivityCreated()...)
-        candidateZoneId = getArguments().getInt(parentActivity.getString(R.string.arg_zone_id));
-
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -33,33 +29,51 @@ public class EditZonesMap extends ManageZonesMapAbstract {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        candidateZoneId = getArguments().getInt(parentActivity.getString(R.string.arg_zone_id));
         editZone = dbHelper.getZoneById(candidateZoneId);
         candidateColor = editZone.getColor();
-        radius = editZone.getRadius();
-        radiusValue.setText(String.valueOf(radius));
+        newRadius = editZone.getRadius();
+        radiusValue.setText(String.valueOf(newRadius));
 
         parentActivity.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (radius < Zone.MIN_RADIUS) {
-                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_radius_min, Zone.MIN_RADIUS), Snackbar.LENGTH_LONG)
-                            .show();
-                } else if (candidateMarker == null) {
-                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_no_pin), Snackbar.LENGTH_LONG)
-                            .show();
+                if (newRadius < Zone.MIN_RADIUS) {
+                    Snackbar.make(
+                            parentActivity.coordinatorLayout,
+                            getString(R.string.error_input_radius_min,Zone.MIN_RADIUS),
+                            Snackbar.LENGTH_LONG)
+                    .show();
+                } else if(candidateMarker == null) {
+                    Snackbar.make(
+                            parentActivity.coordinatorLayout,
+                            getString(R.string.error_input_no_pin),
+                            Snackbar.LENGTH_LONG)
+                    .show();
+                } else if(candidateMarker.getPosition().equals(editZone.getLatLng()) &&
+                        newRadius == editZone.getRadius()) {
+                    Snackbar.make(
+                            parentActivity.coordinatorLayout,
+                            getString(R.string.error_input_pin_equal),
+                            Snackbar.LENGTH_LONG)
+                    .show();
                 } else {
-                    // TODO: check if oldPos == newPos here. If so, showSnack "Position already saved"
-                    if (radius == editZone.getRadius()) {
-                        Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_radius_equal), Snackbar.LENGTH_LONG)
-                                .show();
+                    // TODO: Check if entered newRadius is not near other Zones.
+                    editZone.setRadius(newRadius);
+                    editZone.setRadius((int) candidateCircle.getRadius());
+                    if(dbHelper.updateZone(editZone) == 1){
+                        Snackbar.make(
+                                parentActivity.coordinatorLayout,
+                                parentActivity.getString(R.string.update_zone_success),
+                                Snackbar.LENGTH_LONG)
+                        .show();
+                        goBackToManageZones();
                     } else {
-                        // TODO: Check if entered radius is valid (> 50m && not near other Zones).
-                        // TODO: execute save action on DB
-                        Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.update_zone_success), Snackbar.LENGTH_LONG)
-                                .show();
-                        // TODO: Make use of:
-                        Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.update_zone_failure), Snackbar.LENGTH_LONG)
-                                .show();
+                        Snackbar.make(
+                                parentActivity.coordinatorLayout,
+                                parentActivity.getString(R.string.update_zone_failure),
+                                Snackbar.LENGTH_LONG)
+                        .show();
                     }
                 }
             }
@@ -101,8 +115,8 @@ public class EditZonesMap extends ManageZonesMapAbstract {
 
         // TODO: rework this
 
-        // Provide color feedback. Disable button if radius hasn't changed.
-        /*if (radius == editZone.getRadius()) {
+        // Provide color feedback. Disable button if newRadius hasn't changed.
+        /*if (newRadius == editZone.getRadius()) {
             saveButton.setColorFilter(colorButtonDisabled);
             //saveButton.setClickable(false);
         } else {

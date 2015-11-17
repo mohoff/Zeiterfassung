@@ -44,28 +44,40 @@ public class AddZoneMap extends ManageZonesMapAbstract {
         parentActivity.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (radius < Zone.MIN_RADIUS) {
-                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_radius_min, Zone.MIN_RADIUS), Snackbar.LENGTH_LONG)
-                            .show();
-                    // Cancel save process
+                if (newRadius < Zone.MIN_RADIUS) {
+                    Snackbar.make(
+                            parentActivity.coordinatorLayout,
+                            getString(R.string.error_input_radius_min, Zone.MIN_RADIUS),
+                            Snackbar.LENGTH_LONG)
+                    .show();
                 } else if (candidateMarker == null) {
-                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_no_pin), Snackbar.LENGTH_LONG)
-                            .show();
+                    Snackbar.make(
+                            parentActivity.coordinatorLayout,
+                            getString(R.string.error_input_no_pin),
+                            Snackbar.LENGTH_LONG)
+                    .show();
                 } else {
-                    // TODO: Check if entered radius is not near other Zones.
+                    // TODO: Check if entered newRadius is not near other Zones.
                     LatLng pos = candidateMarker.getPosition();
-                    int result = dbHelper.createNewZone(pos.latitude, pos.longitude, radius, activityName, locationName, candidateColor);
-                    if (result != 1) {
-                        Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.create_zone_failure), Snackbar.LENGTH_LONG)
-                                .show();
+                    if (1 == dbHelper.createNewZone(
+                            pos.latitude,
+                            pos.longitude,
+                            newRadius,
+                            activityName,
+                            locationName,
+                            candidateColor)) {
+                        Snackbar.make(
+                                parentActivity.coordinatorLayout,
+                                getString(R.string.create_zone_success),
+                                Snackbar.LENGTH_LONG)
+                        .show();
+                        goBackToManageZones();
                     } else {
-                        Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.create_zone_success), Snackbar.LENGTH_LONG)
-                                .show();
-                        // Clear back stack because add-operation succeeded.
-                        GeneralHelper.clearBackStack(getActivity());
-                        // Go back to ManageZones fragment with clean back stack
-                        Fragment nextFragment = new ManageZones();
-                        parentActivity.replaceFragment(nextFragment, false);
+                        Snackbar.make(
+                                parentActivity.coordinatorLayout,
+                                getString(R.string.create_zone_failure),
+                                Snackbar.LENGTH_LONG)
+                        .show();
                     }
                 }
             }
@@ -94,7 +106,6 @@ public class AddZoneMap extends ManageZonesMapAbstract {
             fixMarkers.add(marker);
             fixCircles.add(circle);
         }
-
-        centerMapTo(MapAbstract.getMapViewport(latLngList, 100));
+        centerMapTo(MapAbstract.getMapViewport(latLngList));
     }
 }

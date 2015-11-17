@@ -23,8 +23,6 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
     RecyclerView recList;
     LinearLayoutManager llm;
 
-    Snackbar snackbar;
-
     public Overview() {
         // Required empty public constructor
     }
@@ -84,6 +82,14 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
     public void onResume() {
         super.onResume();
 
+        if(!parentActivity.serviceStatus.isRunning()){
+            Snackbar.make(
+                    parentActivity.coordinatorLayout,
+                    getString(R.string.service_not_running),
+                    Snackbar.LENGTH_LONG)
+                    .show();
+        }
+
         // Set listeners
         parentActivity.setOnTimeslotEventListener(this);
         parentActivity.serviceStatus.addListener(this);
@@ -93,11 +99,6 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         adapter.notifyDataSetChanged();
         // Scroll to top
         recList.scrollToPosition(adapter.getItemCount()-1);
-
-        snackbar = Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.service_not_running), Snackbar.LENGTH_LONG);
-        if(!parentActivity.serviceStatus.isRunning()){
-            snackbar.show();
-        }
     }
 
     @Override

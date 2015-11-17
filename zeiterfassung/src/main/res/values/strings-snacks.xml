@@ -11,6 +11,7 @@
     <!-- Map -->
 
     <string name="error_no_data">Currently no location data available.</string>
+    <string name="error_no_recent_data">Currently no recent location data available.</string>
     <string name="error_no_init">Map not initialized.</string>
 
 
@@ -18,11 +19,16 @@
 
     <string name="error_input_names">Please fill in both names.</string>
     <string name="error_input_name_exists">Zone already exists.</string>
-    <string name="error_input_name_equal">Name hasn\'t changed.</string>
+    <string name="error_input_name_color_equal">Name and color haven\'t changed.</string>
     <string name="error_input_color">Please pick a color.</string>
     <string name="error_input_radius_min">Input must be >= %1$d meters.</string>
     <string name="error_input_radius_equal">Radius already saved.</string>
     <string name="error_input_no_pin">Please pin area on map.</string>
+    <string name="error_input_pin_equal">Pin and radius haven\'t changed.</string>
+    <string name="error_input_no_number">Input is not a number.</string>
+    <string name="error_input_geolookup_empty">Please fill in address or place.</string>
+    <string name="error_input_geolookup_invalid">Address or place not found. Please try again.</string>
+    <string name="error_geolookup">Lookup failed. Do you have internet?</string>
     <!-- Create/Add Zone/s -->
     <string name="create_zone_failure">Couldn\'t add Zone. Does it already exist?</string>
     <string name="create_zone_success">Zone added.</string>

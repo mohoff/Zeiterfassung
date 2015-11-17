@@ -9,6 +9,9 @@
     <string name="servicecontrol_start">START</string>
     <string name="servicecontrol_stop">STOP</string>
 
+    <string name="overview_end_pending">pending</string>
+    <string name="overview_no_entries">No entries yet.</string>
+
 
 
     <!-- Colors -->

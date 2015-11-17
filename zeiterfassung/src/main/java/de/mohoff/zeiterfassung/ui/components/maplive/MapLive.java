@@ -21,6 +21,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.util.Property;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -75,6 +78,8 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     // markerAccurate||markerInaccurate||markerNoConnection
     Bitmap markerCurrentLocation;
 
+    private static boolean FOLLOW_MAP_UPDATES = true;
+    private static int CURRENT_LOC_MAX_AGE = 1000 * 60 * 5; // 5 min
     private static int MARKER_DIM = 50; // px
     private static int MARKER_ANIMATION_DURATION = 1000; // ms
 
@@ -83,6 +88,8 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         markers = new ArrayList<Marker>(LocationCache.getInstance().getPassiveCacheMaxSize());
+        setHasOptionsMenu(true);
+
         super.onCreate(savedInstanceState);
     }
 
@@ -112,6 +119,18 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             public void onClick(View v) {
                 if(currentLocation != null){
                     centerMapTo(currentLocation.getPosition());
+                } else if(markers == null || markers.isEmpty()){
+                    Snackbar.make(
+                            parentActivity.coordinatorLayout,
+                            getString(R.string.error_no_data),
+                            Snackbar.LENGTH_LONG)
+                    .show();
+                } else {
+                    Snackbar.make(
+                            parentActivity.coordinatorLayout,
+                            getString(R.string.error_no_recent_data),
+                            Snackbar.LENGTH_LONG)
+                    .show();
                 }
             }
         });
@@ -140,9 +159,8 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         // Add bottom padding of 25px
         int bottomPadding = 25; // px
         Bitmap result = Bitmap.createBitmap(resized.getWidth(), resized.getHeight() + bottomPadding, Bitmap.Config.ARGB_8888);
-        Canvas can = new Canvas(result);
-        //can.drawARGB(FF,FF,FF,FF); //This represents White color
-        can.drawBitmap(resized, 0, 0, null);
+        Canvas canvas = new Canvas(result);
+        canvas.drawBitmap(resized, 0, 0, null);
 
         return result;
     }
@@ -164,15 +182,6 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
 
     @Override
     public void onResume() {
-        // setIsRunning newest fixMarkers
-
-        // Get most recent locations from MainActivity and convert to LatLngs (google map objects)
-        //CircularFifoQueue<Loc> userLocs = parentActivity.getLocs();
-        //for(Loc loc : userLocs){
-        //    userLatLngs.add(GeneralHelper.convertLocToLatLng(loc));
-        //}
-        //userLocs = parentActivity.getLocs();
-
         parentActivity.setOnNewLocationListener(this); // setIsRunning listener
         super.onResume();
     }
@@ -199,6 +208,29 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.maplive, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.follow_updates:
+                // TODO: In order to make check/uncheck with icon, we need to replace it each time (swapping between 100% and 50% opacity for example)
+                FOLLOW_MAP_UPDATES = !item.isChecked();
+                item.setChecked(FOLLOW_MAP_UPDATES);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         super.onMapReady(googleMap);
         CircularFifoQueue<Loc> cache = LocationCache.getInstance().getPassiveCache();
@@ -208,6 +240,9 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                 Loc loc = cache.get(i);
                 MarkerOptions markerOptions = createMarkerOptions(loc, LocationService.ACCURACY_TRESHOLD);
                 addMarkerToMap(map, markers, markerOptions);
+                if((i == cache.size()-1) && loc.isNotOlderThan(CURRENT_LOC_MAX_AGE)){
+                    updateCurrentLocationMarker(map, loc);
+                }
             }
             currentPolyline = addPolylineToMap(map, cache);
             followWithCamera(markers);
@@ -351,7 +386,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         } catch (Exception e){
             // .isRunning(1) failed because it's not yet filled.
         }
-        centerMapTo(getMapViewport(respectedLatLngs, 200));
+        centerMapTo(getMapViewport(respectedLatLngs));
     }
 
     public void onNewLocation(Loc loc) {
@@ -361,8 +396,9 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             updateCurrentLocationMarker(map, loc);
             // Move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow location updates on the map"
             // Really reset zoomLevel each call to 17?
-            followWithCamera(markers);
-
+            if(FOLLOW_MAP_UPDATES){
+                followWithCamera(markers);
+            }
 
             // Update polyline
             if(currentPolyline != null){
@@ -384,7 +420,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                             //.icon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
                     .icon(BitmapDescriptorFactory.fromBitmap(markerCurrentLocation))
                     //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                    .title("Current location"))
+                    .title(parentActivity.getString(R.string.map_current_location)))
                     ;
         } else {
             animateMarker(currentLocation, loc.getLatLng());

@@ -16,10 +16,14 @@
              colorControlHighlight & colorSwitchThumbNormal. -->
 
         <item name="colorButtonNormal">@color/greenish</item>
+        <item name="colorControlNormal">@color/greenish</item>
+        <item name="colorControlActivated">@color/greenish</item>
         <item name="android:imageButtonStyle">@color/transparent</item> <!-- in order to make ImageButton background transparent -->
 
         <!--<item name="android:windowActionBar">false</item>--> <!-- not needed anymore, because we inherit from NoActionBar -->
         <item name="alertDialogTheme">@style/AlertDialog</item>
+
+
 
     </style>
 

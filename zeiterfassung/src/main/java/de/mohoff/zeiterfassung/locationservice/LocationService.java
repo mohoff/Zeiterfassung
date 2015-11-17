@@ -183,6 +183,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         startForeground(1337, notification);
 
         stats = dbHelper.getAllStats();
+        inboundZone = dbHelper.getOpenTimeslot().getZone();
     }
 
     private void updateNumericStat(String identifier, int deltaToAdd){
@@ -198,7 +199,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             }
         }
     }
-
 
     @Override
     public void onDestroy() {
@@ -224,7 +224,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         super.onDestroy();
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

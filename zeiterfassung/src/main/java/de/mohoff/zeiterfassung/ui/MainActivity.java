@@ -51,6 +51,7 @@ import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 
 import java.util.ArrayList;
 
+// TODO: add lite version of google maps to lower area of navigation drawer and maybe 'About' page
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerListener {
     public static FragmentManager fragM;
@@ -64,12 +65,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     private RelativeLayout leftDrawer;
     private RecyclerView recyclerView;
     private NavigationDrawerListener drawerListener;
-
-    /*public CircularFifoQueue<Loc> getLocs() {
-        return locs;
-    }*/
-    //private CircularFifoQueue<Loc> locs = new CircularFifoQueue<>(MainActivity.LOC_QUEUE_SIZE);
-    //private ArrayList<Loc> locsTmp = new ArrayList<>();
 
     private DrawerLayout drawerLayout;
     private NavigationDrawerAdapter drawerAdapter;
@@ -119,10 +114,10 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        //toolbar.setTitle("Zeiterfassung");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
         title = getSupportActionBar().getTitle();
         //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#025167")));

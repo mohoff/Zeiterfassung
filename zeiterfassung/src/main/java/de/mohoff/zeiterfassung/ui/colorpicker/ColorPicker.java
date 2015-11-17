@@ -239,6 +239,15 @@ public class ColorPicker extends View {
         }
     }
 
+    public void setSelectedColor(int color) {
+        for(int i=0; i<mNumberOfFields; i++){
+            if(mUsedPalette[i] == color){
+                mSelectedIndex = i;
+            }
+        }
+        mSelectedIndex = -1;
+    }
+
     protected int getSelectedPaletteIndex() {
         return mSelectedIndex;
     }

@@ -18,5 +18,4 @@
     <string name="alert_title_delete_zone_multiple">Delete Zones</string>
     <string name="alert_msg_delete_zone_multiple">Delete Zone(s) with Activity \"%1$s\" and its related Location(s)?</string>
 
-
 </resources>

@@ -1,11 +1,15 @@
 package de.mohoff.zeiterfassung.datamodel;
 
+import android.content.Context;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import de.mohoff.zeiterfassung.R;
 
 
 @DatabaseTable(tableName = "timeslots")
@@ -89,19 +93,19 @@ public class Timeslot {
         return getReadableTime(this.starttime);
     }
 
-    public String getReadableEndDate(){
+    public String getReadableEndDate(Context ctx){
         if(endtime != 0){
             return getReadableDate(this.endtime);
         } else {
-            return "pending";
+            return ctx.getString(R.string.overview_end_pending);
         }
     }
 
-    public String getReadableEndTime(){
+    public String getReadableEndTime(Context ctx){
         if(endtime != 0){
             return getReadableTime(this.endtime);
         } else {
-            return "pending";
+            return ctx.getString(R.string.overview_end_pending);
         }
     }
 
