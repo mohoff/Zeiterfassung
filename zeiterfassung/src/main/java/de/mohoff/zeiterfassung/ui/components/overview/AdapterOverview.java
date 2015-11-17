@@ -147,7 +147,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             vh.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
             // In order to draw outside of cardView with clipChildren and clipToParent, we have to
             // setIsRunning setClipToOutline(false). This sadly is v21+.
-            vh.container.setClipToOutline(false);
+            //vh.container.setClipToOutline(false);
             vh.icon.setImageResource(R.drawable.ic_action_edit_location);
             vh.activity.setText(timeslot.getZone().getActivityName());
             vh.location.setText(timeslot.getZone().getLocationName());

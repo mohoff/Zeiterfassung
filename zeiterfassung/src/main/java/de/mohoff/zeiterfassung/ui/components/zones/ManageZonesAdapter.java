@@ -413,7 +413,6 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         args.putString(context.getString(R.string.arg_activity), relevantZones.get(0).getActivityName());
                         nextFragment.setArguments(args);
                         context.replaceFragment(nextFragment, true);
-                        // TODO: Also provide this action in top menubar with "+"-icon. Or by placing the round red bottom right button (see material design)
                     }
                 });
             }

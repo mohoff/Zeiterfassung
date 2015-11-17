@@ -7,7 +7,6 @@
     card_view:cardCornerRadius="4dp"
     card_view:cardElevation="2dp"
     card_view:cardUseCompatPadding="true"
-
     android:layout_marginTop="2dp"
     android:layout_marginBottom="2dp"
     android:layout_marginLeft="5dp"
@@ -15,6 +14,16 @@
     android:padding="0dp"
     android:clickable="true"
     android:foreground="@drawable/selector_overview">
+    <!-- In order to clip children to cardview rounded corners, set
+        card_view:cardPreventCornerOverlap="false". Workaround is better
+        because this attribute is "expensive" -->
+
+    <!-- color flag (preliminary placement -->
+    <!--<View
+        android:id="@+id/colorBar"
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:background="@color/greenish"/>-->
 
     <!-- 70% width for activity, location, etc.
          30% width for starttime, duration, endtime -->
@@ -23,27 +32,47 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:weightSum="1.0">
+        <RelativeLayout
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.1"
+            android:layout_marginBottom="60dp">
+            <View
+                android:id="@+id/colorBar"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:background="@drawable/gradient_overview"/>
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:scaleX="0.6"
+                android:scaleY="0.6"
+                android:scaleType="fitXY"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/ic_location_on_black_18dp"
+                android:tint="@color/white"/>
+        </RelativeLayout>
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.7">
-            <RelativeLayout
+            android:layout_weight="0.6"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp">
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:gravity="center_vertical"
-                android:paddingBottom="20dp"
-                android:paddingTop="20dp"
+                android:orientation="vertical"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:paddingLeft="10dp"
                 android:id="@+id/leftPart">
-                <ImageView
-                    android:id="@+id/icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_location_on_black_24dp"
-                    android:tint="#22000000"/>
                 <TextView
                     android:id="@+id/activity"
                     android:layout_width="wrap_content"
@@ -52,10 +81,7 @@
                     android:text="ACTIVITY NAME"
                     android:maxWidth="200dp"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@id/icon"
-                    android:layout_toEndOf="@id/icon"/>
+                    android:textStyle="bold"/>
                 <TextView
                     android:id="@+id/location"
                     android:layout_width="wrap_content"
@@ -66,37 +92,21 @@
                     android:gravity="center_vertical"
                     android:layout_below="@id/activity"
                     android:layout_alignLeft="@+id/activity"/>
-            </RelativeLayout>
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginBottom="20dp"
-                android:layout_marginTop="-20dp">
-                <ImageView
-                    android:id="@+id/icon2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="invisible"
-                    android:src="@drawable/ic_action_discard"/>
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/grey_05"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="40dp"
-                    android:layout_toRightOf="@id/icon2"/>
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"/>
                 <TextView
                     android:id="@+id/textToday"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingTop="8dp"
-                    android:layout_marginLeft="10dp"
                     android:text="Today: 4h 23min"
                     android:textSize="12sp"
-                    android:layout_toRightOf="@id/icon2"
-                    android:textColor="@color/grey_25"/>
-            </RelativeLayout>
+                    android:textColor="@color/grey_40"/>
+            </LinearLayout>
+
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"

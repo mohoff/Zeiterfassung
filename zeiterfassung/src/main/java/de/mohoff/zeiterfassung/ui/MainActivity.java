@@ -128,7 +128,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         navigationView.getMenu().getItem(0).setChecked(true);
         navigationView.getMenu().performIdentifierAction(R.id.item_overview, 0);
 
-
         drawerToggle = new ActionBarDrawerToggle(
                 this,                  // host Activity
                 drawerLayout,          // DrawerLayout object
