@@ -2,7 +2,11 @@ package de.mohoff.zeiterfassung.ui.components.overview;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -43,6 +47,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public Context context;
         // each data item is just a string in this case
         public CardView container;
+        public View colorBar;
         public ImageView icon;
         public TextView activity;
         public TextView location;
@@ -58,7 +63,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             super(v);
             this.context = context;
             this.container = (CardView) v.findViewById(R.id.card_view);
-            //this.container.setOnLongClickListener(this);
+            this.colorBar = v.findViewById(R.id.colorBar);
 
             this.icon = (ImageView) v.findViewById(R.id.icon);
             this.activity = (TextView) v.findViewById(R.id.activity);
@@ -145,6 +150,8 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             vh.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
+            vh.colorBar.setBackground(null);
+            vh.colorBar.setBackgroundColor(timeslot.getZone().getColor());
             // In order to draw outside of cardView with clipChildren and clipToParent, we have to
             // setIsRunning setClipToOutline(false). This sadly is v21+.
             //vh.container.setClipToOutline(false);
@@ -229,7 +236,6 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-
         if (showServiceNotRunningInfo() && position == getItemCount()-1) {
             return VIEWTYPE_SERVICEINFO;
         } else if (data.size() == 0 &&

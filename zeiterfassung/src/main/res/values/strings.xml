@@ -22,7 +22,7 @@
 
 
     <!-- Colors -->
-    <color name="transparent">#00000000</color>
+    <color name="transparent">#00FFFFFF</color>
     <color name="white">#FFFFFFFF</color>
     <color name="white_90">#EEFFFFFF</color>
     <color name="black">#FF000000</color>
@@ -67,6 +67,8 @@
     <color name="greenish_15">#26025167</color>
     <color name="greenish_10">#1A025167</color>
     <color name="greenish_5">#0D025167</color>
+
+    <color name="cardview_background">#FFF9F9F9</color>
 
 <!-- TODO: REWORK
     <color name="navigation_drawer_bg">@color/white</color>

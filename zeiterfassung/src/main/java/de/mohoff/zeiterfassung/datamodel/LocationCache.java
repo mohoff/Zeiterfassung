@@ -124,11 +124,27 @@ public class LocationCache {
     public void addLocationUpdate(Loc newLoc){
         // Handle activeCache.
         if(newLoc.getAccuracy() < LocationService.ACCURACY_TRESHOLD){
+            // Add Loc to activeCache if it suffices the accuracy minimum defined by
+            // ACCURACY_TRESHOLD.
             activeCache.add(newLoc);
 
             // !!! Interpolated positions are not used right now !!!
             // Compute interpolated position and update activeInterpolatedCache.
-            computeInterpolatedPosition();
+            //computeInterpolatedPosition();
+        } else {
+            // When an inaccurate Loc is received: If there is at least on Loc inside activeCache,
+            // take the most recent Loc from activeCache and add a duplicate of it into activeCache.
+            // By doing this, LocationService's algorithm ('algorithm' in this comment) responsible
+            // for detecting enter- and leave-events, will trigger an event earlier when there are
+            // series of received inaccurate Locs.
+            // Example: Zone is some bar underground with bad to no connectivity which only leads to
+            // inaccurate Locs when inside. Therefore, after entering the bar an actual enter-event
+            // is never triggered since LocationService's algorithm only accepts accurate updates. Now,
+            // by repeating the most recent accurate Loc (hopefully within the Zone of the bar), the
+            // missing enter-event is triggered properly by the algorithm.
+            if(!activeCache.isEmpty()){
+                activeCache.add(activeCache.get(activeCache.size()-1));
+            }
         }
 
         // Handle passiveCache.
@@ -140,7 +156,6 @@ public class LocationCache {
         if(newLoc.isRealUpdate() || passiveCache.get(0).isRealUpdate()){
             passiveCache.add(newLoc);
         }
-
     }
 
     public boolean isActiveCacheFull(){

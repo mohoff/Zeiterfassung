@@ -284,16 +284,17 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             return true;
         }
         // 'False' indicates the calling function that no change was detected.
-        // Neither an enter- nor a leave-event happened.
+        // Neither an enter- nor a leave-event has happened.
         return false;
     }
 
     public void updateTimeslots() {
         Timeslot openTimeslot = dbHelper.getOpenTimeslot();
 
-        // Close openTimeslot
-        // TODO: Check if it makes sense to add in if-statement: && isInbound(interpolatedPosition)
-        if(openTimeslot != null && inboundZone == null){
+        // Close openTimeslot: If either there is a regular leave-event OR there is still a openTimeslot
+        // while user already moved into next Zone, so inboundZone is set again.
+        if((openTimeslot != null && inboundZone == null) ||
+                (openTimeslot != null && openTimeslot.getZone().get_id() != inboundZone.get_id())){
             // TODO: Check for serviceRunningTime.isServiceRunningLongterm() and apply 'endtimeIsVague = true' flag.
             if (dbHelper.closeTimeslotById(openTimeslot.get_id(), getEventTimestamp()) == 1) {
                 sendTimeslotEventViaBroadcast("closed");
@@ -301,8 +302,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         }
 
         // Start new Timeslot
-        // TODO: Check if it makes sense to add in if-statement: && isOutbound(interpolatedPosition)
-        if(openTimeslot == null && inboundZone != null){
+        if(inboundZone != null){
             // TODO: Check for serviceRunningTime.isServiceRunningLongterm() and apply 'starttimeIsVague = true' flag.
             if (dbHelper.startNewTimeslot(getEventTimestamp(), inboundZone) == 1) {
                 sendTimeslotEventViaBroadcast("opened");

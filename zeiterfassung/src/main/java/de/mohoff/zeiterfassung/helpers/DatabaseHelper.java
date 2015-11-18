@@ -470,6 +470,30 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return 1;
     }
 
+    public HashMap<String, HashMap<String, Long>> getTimeSpentForEachZone(){
+        HashMap<String, HashMap<String, Long>> map = new HashMap<>();
+        List<Timeslot> allTimeslots = getAllTimeslots();
+
+        // Iterate over all Timeslots and add durations for equal Zones
+        for(Timeslot t : allTimeslots){
+            String activity = t.getZone().getActivityName();
+            String location = t.getZone().getLocationName();
+            Long time = Long.valueOf(0);
+            HashMap inner = map.get(activity);
+
+            if(inner == null){
+                inner = new HashMap<>();
+            } else if(inner.get(location) != null){
+                time = (Long)inner.get(location);
+            }
+
+            time += t.getDuration();
+            inner.put(location, time);
+            map.put(activity, inner);
+        }
+        return map;
+    }
+
     private void checkForStat(String identifier){
         Stat result = null;
         try{

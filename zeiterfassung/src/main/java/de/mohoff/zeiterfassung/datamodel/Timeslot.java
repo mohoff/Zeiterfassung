@@ -177,6 +177,14 @@ public class Timeslot {
         return getReadableDuration(diff, ignoreSeconds, multiLine);
     }
 
+    public long getDuration(){
+        if(endtime == 0){
+            return System.currentTimeMillis() - starttime;
+        } else {
+            return endtime - starttime;
+        }
+    }
+
     public static boolean isSameDay(long timestamp1, long timestamp2){
         Date startDate = new Date(timestamp1);
         Date endDate = new Date(timestamp2);
