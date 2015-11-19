@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Appearance -->
+    <PreferenceCategory android:title="Appearance"
+                        android:key="@string/setting_cat_appearance">
+
+        <SwitchPreference android:title="Color Indicator"
+                          android:summary="Show Color Indicator per Timeslot (top left) in 'Overview'"
+                          android:defaultValue="true"
+                          android:key="@string/setting_appearance_color_indicator"/>
+        <CheckBoxPreference android:title="Label Order"
+                            android:summaryOn="Print bold: Location"
+                            android:summaryOff="Print bold: Activity"
+                            android:defaultValue="true"
+                            android:key="@string/setting_appearance_label_order"/>
+        <CheckBoxPreference android:title="Timeslot Extra Info"
+                          android:summary="Show daily/weekly/... Information per Timeslot in 'Overview'"
+                          android:defaultValue="true"
+                          android:key="@string/setting_appearance_extra_info"/>
+        <ListPreference
+            android:entries="@array/extraInfoEntries"
+            android:entryValues="@array/extraInfoEntryValues"
+            android:key="@string/setting_appearance_extra_info_detail"
+            android:title="Specific Time Info"
+            android:dependency="@string/setting_appearance_extra_info"/>
+
+    </PreferenceCategory>
+
+    <!-- Zones -->
+    <PreferenceCategory android:title="Zones"
+                        android:key="@string/setting_cat_zones">
+
+        <EditTextPreference android:title="Default Zone Radius"
+                            android:defaultValue="50"
+                            android:dialogTitle="Default Zone Radius"
+                            android:key="@string/setting_zones_default_radius"/>
+    </PreferenceCategory>
+
+    <!-- Map -->
+    <PreferenceCategory android:title="Map"
+                        android:key="@string/setting_cat_map">
+
+        <EditTextPreference android:title="Default Zoom Level"
+                            android:defaultValue="17"
+                            android:dialogTitle="Default Zoom Level"
+                            android:key="@string/setting_map_default_zoom"/>
+        <SwitchPreference android:title="Follow Location Updates"
+                          android:summary="Center map to new Locations when received"
+                          android:defaultValue="true"
+                          android:key="@string/setting_map_follow_updates"/>
+    </PreferenceCategory>
+
+    <!-- OTHER -->
+    <SwitchPreference android:title="Crashlog reports"
+                      android:summary="Send Crashlogs to developer"
+                      android:defaultValue="true"
+                      android:key="@string/setting_crashlog_report"/>
+
+    <!-- Danger Zone -->
+    <de.mohoff.zeiterfassung.ui.components.settings.PreferenceCategoryDangerZone
+        android:title="@string/setting_cat_danger_zone">
+
+        <Preference android:title="Delete all Timeslots"
+                    android:summary=""
+                    android:key="@string/setting_delete_timeslots"/>
+        <Preference android:title="Delete all Zones"
+                    android:summary=""
+                    android:key="@string/setting_delete_zones"/>
+        <Preference android:title="Clean map"
+                    android:summary="Remove all markers and paths from 'Live Map'"
+                    android:key="@string/setting_clean_map"/>
+
+    </de.mohoff.zeiterfassung.ui.components.settings.PreferenceCategoryDangerZone>
+
+    <!--
+     <CheckBoxPreference
+            android:key="checkbox_preference"
+            android:title="@string/title_checkbox_preference"
+            android:summary="@string/summary_checkbox_preference" />
+
+     <EditTextPreference
+            android:key="edittext_preference"
+            android:title="@string/title_edittext_preference"
+            android:summary="@string/summary_edittext_preference"
+            android:dialogTitle="@string/dialog_title_edittext_preference" />
+
+     <ListPreference
+            android:key="list_preference"
+            android:title="@string/title_list_preference"
+            android:summary="@string/summary_list_preference"
+            android:entries="@array/entries_list_preference"
+            android:entryValues="@array/entryvalues_list_preference"
+            android:dialogTitle="@string/dialog_title_list_preference" />
+
+     <PreferenceScreen
+            android:title="@string/title_intent_preference"
+            android:summary="@string/summary_intent_preference">
+
+            <intent android:action="android.intent.action.VIEW"
+                    android:data="http://www.android.com" />
+      </PreferenceScreen>
+    -->
+
+</PreferenceScreen>

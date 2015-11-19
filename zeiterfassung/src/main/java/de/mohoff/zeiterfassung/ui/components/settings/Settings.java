@@ -1,65 +1,54 @@
 package de.mohoff.zeiterfassung.ui.components.settings;
 
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.preference.Preference;
+import android.preference.PreferenceFragment;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
-import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
-public class Settings extends Fragment {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class Settings extends PreferenceFragment {
     MainActivity context;
     DatabaseHelper dbHelper;
 
-    Button deleteAllTimeslotsButton, deleteAllZonesButton, deleteAllMarkersButton;
+    Preference deleteAllTimeslots, deleteAllZones, cleanMap;
 
     public Settings() {
-        // Required empty public constructor
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
+        addPreferencesFromResource(R.xml.preferences);
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+        deleteAllTimeslots = findPreference(getString(R.string.setting_delete_timeslots));
+        deleteAllZones = findPreference(getString(R.string.setting_delete_zones));
+        cleanMap = findPreference(getString(R.string.setting_clean_map));
 
-        deleteAllTimeslotsButton = (Button) view.findViewById(R.id.deleteAllTimeslotsButton);
-        deleteAllZonesButton = (Button) view.findViewById(R.id.deleteAllZonesButton);
-        deleteAllMarkersButton = (Button) view.findViewById(R.id.deleteAllMarkersButton);
-
-        return view;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        context = (MainActivity) getActivity();
-        getDbHelper(context);
-        context.fab.hide();
-
-        deleteAllTimeslotsButton.setOnClickListener(new View.OnClickListener() {
+        deleteAllTimeslots.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onPreferenceClick(Preference preference) {
                 AlertDialog alertDialog = new AlertDialog.Builder(context)
                         .setPositiveButton(getString(R.string.dialog_delete), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
-                                // Execute delete on DB
                                 if (dbHelper.deleteAllTimeslots() == 1) {
                                     Snackbar.make(context.coordinatorLayout, getString(R.string.settings_delete_entries_success), Snackbar.LENGTH_LONG)
                                             .show();
@@ -79,17 +68,17 @@ public class Settings extends Fragment {
                         .setMessage(getString(R.string.settings_alert_msg_delete_entries))
                         .create();
                 alertDialog.show();
+                return true;
             }
         });
 
-        deleteAllZonesButton.setOnClickListener(new View.OnClickListener() {
+        deleteAllZones.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onPreferenceClick(Preference preference) {
                 AlertDialog alertDialog = new AlertDialog.Builder(context)
                         .setPositiveButton(getString(R.string.dialog_delete), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
-                                // Execute delete on DB
                                 if(dbHelper.deleteAllZones() == 1){
                                     Snackbar.make(context.coordinatorLayout, getString(R.string.settings_delete_zones_success), Snackbar.LENGTH_LONG)
                                             .show();
@@ -109,12 +98,13 @@ public class Settings extends Fragment {
                         .setMessage(getString(R.string.settings_alert_msg_delete_zones))
                         .create();
                 alertDialog.show();
+                return true;
             }
         });
 
-        deleteAllMarkersButton.setOnClickListener(new View.OnClickListener() {
+        cleanMap.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onPreferenceClick(Preference preference) {
                 AlertDialog alertDialog = new AlertDialog.Builder(context)
                         .setPositiveButton(getString(R.string.dialog_delete), new DialogInterface.OnClickListener() {
                             @Override
@@ -137,12 +127,34 @@ public class Settings extends Fragment {
                                 dialog.dismiss();
                             }
                         })
-                                //.setTitle("Delete all Zones")
                         .setMessage(getString(R.string.settings_alert_msg_clean_map))
                         .create();
                 alertDialog.show();
+                return true;
             }
         });
+
+
+        // Use Settings elsewhere:
+        /*
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+        String strUserName = SP.getString("username", "NA");
+        boolean bAppUpdates = SP.getBoolean("applicationUpdates",false);
+        String downloadType = SP.getString("downloadType","1");
+        */
+
+        // Saved in path:
+        /*
+        data/data/packagename/shared_prefs/packagename_preferences.xml.
+         */
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        context = (MainActivity) getActivity();
+        getDbHelper(context);
     }
 
     private DatabaseHelper getDbHelper(Context context) {

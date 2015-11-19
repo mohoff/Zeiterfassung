@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Appearance (cattegory) -->
+    <string name="setting_cat_appearance">Appearance</string>
+    <string name="setting_appearance_color_indicator">showTimeslotColorIndicator</string>
+    <string name="setting_appearance_label_order">labelOrderTimeslotLocationFirst</string>
+    <string name="setting_appearance_extra_info">showTimeslotExtraInfo</string>
+    <string name="setting_appearance_extra_info_detail">showTimeslotExtraInfoDetail</string>
+    <array name="extraInfoEntries">
+        <item>Today</item>
+        <item>Yesterday</item>
+        <item>This Week</item>
+        <item>Last 10 Days</item>
+        <item>This Month</item>
+        <item>This Year</item>
+        <item>Alltime</item>
+    </array>
+    <array name="extraInfoEntryValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </array>
+
+
+    <!-- Zones -->
+    <string name="setting_cat_zones">Zones</string>
+    <string name="setting_zones_default_radius">zoneDefaultRadius</string>
+
+
+    <!-- Map (Live Map) -->
+    <string name="setting_cat_map">Map</string>
+    <string name="setting_map_default_zoom">mapDefaultZoom</string>
+    <string name="setting_map_follow_updates">mapFollowLocationUpdates</string>
+
+
+    <!-- OTHER -->
+    <string name="setting_crashlog_report">reportCrashlogs</string>
+
+    <!-- Danger Zone (category) -->
+    <string name="setting_cat_danger_zone">Danger Zone</string>
+    <string name="setting_delete_timeslots">deleteAllTimeslots</string>
+    <string name="setting_delete_zones">deleteAllZones</string>
+    <string name="setting_clean_map">cleanMap</string>
+</resources>
