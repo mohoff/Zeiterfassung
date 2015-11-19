@@ -6,6 +6,17 @@
               android:padding="10dp"
               tools:context="de.mohoff.zeiterfassung.ui.components.settings.Settings">
 
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="25dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:textStyle="bold"
+        android:textColor="@color/red"
+        android:text="Danger Zone"/>
+
     <!-- Delete all tracking entries -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,7 +43,7 @@
             android:layout_weight="0.3">
             <Button
                 android:id="@+id/deleteAllTimeslotsButton"
-                style="@style/Button"
+                style="@style/Button.Red"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="DELETE"
@@ -65,7 +76,7 @@
             android:layout_weight="0.3">
             <Button
                 android:id="@+id/deleteAllZonesButton"
-                style="@style/Button"
+                style="@style/Button.Red"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="DELETE"
@@ -91,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                android:text="Delete all saved Zones"/>
+                android:text="Clean all markers in 'Live Map'"/>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="0dp"
@@ -99,10 +110,10 @@
             android:layout_weight="0.3">
             <Button
                 android:id="@+id/deleteAllMarkersButton"
-                style="@style/Button"
+                style="@style/Button.Red"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DELETE"
+                android:text="CLEAN"
                 android:layout_centerInParent="true"/>
         </RelativeLayout>
     </LinearLayout>

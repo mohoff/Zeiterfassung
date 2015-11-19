@@ -2,6 +2,8 @@ package de.mohoff.zeiterfassung.ui.colorpicker;
 
 import android.graphics.Color;
 
+import de.mohoff.zeiterfassung.R;
+
 /**
  * Created by moo on 11/13/15.
  */
@@ -9,6 +11,7 @@ public class ColorPalette {
     public static int[] ULTRALIGHT;
     public static int[] LIGHT;
     public static int[] NORMAL;
+    public static int[] GREENISH;
 
 
     public static int getIndexForColor(int[] palette, int color){
@@ -79,6 +82,24 @@ public class ColorPalette {
                 Color.parseColor("#795548"),    // brown
         };
 
+        // Shades of 'greenish' - ranging from 255 to 80 alpha-channel (opacity).
+        GREENISH = new int[] {
+                Color.parseColor("#FF025167"),    // lime
+                Color.parseColor("#FF1A6478"),    // yellow         #1A6478
+                Color.parseColor("#FF347587"),    // amber          #347587
+                Color.parseColor("#FF4D8695"),    // orange         #4D8695
+                Color.parseColor("#FF6797A5"),    // deep orange    #6797A5
+                Color.parseColor("#FF80A8B3"),    // brown          #80A8B3
+        };
+
+        /*
+                Color.parseColor("#FF025167"),      #FF025167
+                Color.parseColor("#DC025167"),      #FF036682
+                Color.parseColor("#B9025167"),      #FF037a9b
+                Color.parseColor("#96025167"),      #FF048eb4
+                Color.parseColor("#73025167"),      #FF04a1cd
+                Color.parseColor("#50025167"),      #FF05b5e6
+        */
     }
 }
 

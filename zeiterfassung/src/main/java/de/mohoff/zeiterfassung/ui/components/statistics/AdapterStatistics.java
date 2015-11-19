@@ -134,14 +134,12 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
         if(holder.getItemViewType() == VIEWTYPE_CHART) {
             StatChart statHolder = (StatChart) holder;
             statHolder.headline.setText(stat.getDisplayString());
-            statHolder.chart.setNoDataTextDescription("No tracking entries available yet.");
+
             statHolder.chart.setData(getInitialChartData());
-
-
-
+            statHolder.chart.setNoDataTextDescription("No tracking information available yet.");
             statHolder.chart.setUsePercentValues(false); // true
             statHolder.chart.setDescription("");
-            statHolder.chart.setExtraOffsets(10, 20, 10, 10);
+            statHolder.chart.setExtraOffsets(10, 20, 10, 5); // left, top, right, bottom
             statHolder.chart.setDragDecelerationFrictionCoef(0.95f);
             statHolder.chart.setDrawHoleEnabled(true);
             statHolder.chart.setHoleColorTransparent(true);
@@ -151,15 +149,16 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
             statHolder.chart.setHoleRadius(0f);
             statHolder.chart.setCenterTextSize(14f);
 
-            statHolder.chart.setDrawCenterText(true);
+            statHolder.chart.setDrawCenterText(false); // true
             statHolder.chart.setRotationAngle(-90);
             // enable rotation of the chart by touch
             statHolder.chart.setRotationEnabled(false); // true
             statHolder.chart.setHighlightPerTapEnabled(true);
             statHolder.chart.animateY(1400, Easing.EasingOption.EaseInOutQuad);
+            statHolder.chart.getLegend().setEnabled(false);
 
-            Legend l = statHolder.chart.getLegend();
-            l.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
+            //Legend l = statHolder.chart.getLegend();
+            //l.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
 
             //Paint info = statHolder.chart.getPaint(Chart.PAINT_LEGEND_LABEL);
             //info.setColor(0xFFFFFFFF);
@@ -218,9 +217,18 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         List<String> activities = new ArrayList<>(map.keySet());
         PieDataSet dataSet = new PieDataSet(timesData, "");
-        dataSet.setColors(ColorPalette.NORMAL);
+        // Add colors from ColorPalette.GREENISH. If more colors need than there are in the array,
+        // start repeating colors.
+
+        int[] colors = new int[timesData.size()];
+        for(int j=0; j<timesData.size(); j++){
+            colors[j] = ColorPalette.GREENISH[j%(ColorPalette.GREENISH.length)];
+            //dataSet.addColor(ColorPalette.GREENISH[j%(ColorPalette.GREENISH.length)]);
+        }
+        dataSet.setColors(colors);
         dataSet.setSliceSpace(0f);
         dataSet.setSelectionShift(6f);
+        dataSet.setLabel("hallo");
 
         return new PieData(activities, dataSet);
     }

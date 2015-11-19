@@ -26,11 +26,10 @@
         <item name="android:statusBarColor">#00000000</item>
     </style>
 
-    <!--
-    <style name="Button">
-        <item name="android:colorButtonNormal">@color/greenish</item>
+
+    <style name="Button.Red">
+        <item name="android:backgroundTint">@color/red</item>
     </style>
-    -->
 
     <style name="ImageButton" parent="android:style/Widget.Material.ImageButton">
         <item name="android:tint">@color/greenish</item>

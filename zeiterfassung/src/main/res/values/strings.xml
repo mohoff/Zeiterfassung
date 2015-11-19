@@ -29,13 +29,14 @@
     <color name="almost_black">#FF111111</color>
     <color name="almost_white">#FFEEEEEE</color>
     <color name="yellow">#F3BB25</color>
+    <color name="red">#FFF32A25</color>
 
     <color name="marker_accurate">@color/greenish</color>
     <color name="marker_accurate_border">@color/greenish_light</color>
     <color name="marker_inaccurate">@color/greenish_lighter</color>
     <color name="marker_inaccurate_border">@color/greenish_almost_white</color>
     <color name="marker_no_connection">#FF880B08</color>
-    <color name="marker_no_connection_border">#FFF32A25</color>
+    <color name="marker_no_connection_border">@color/red</color>
 
     <color name="grey_05">#FFF2F2F2</color>
     <color name="grey_10">#FFE6E6E6</color>
@@ -67,6 +68,13 @@
     <color name="greenish_15">#26025167</color>
     <color name="greenish_10">#1A025167</color>
     <color name="greenish_5">#0D025167</color>
+
+    <color name="greenish_shade_1">@color/greenish_100</color>
+    <color name="greenish_shade_2">#E6025167</color>
+    <color name="greenish_shade_3">#CD025167</color>
+    <color name="greenish_shade_4">#B4025167</color>
+    <color name="greenish_shade_5">#9B025167</color>
+    <color name="greenish_shade_6">#82025167</color>
 
     <color name="cardview_background">#FFF9F9F9</color>
 

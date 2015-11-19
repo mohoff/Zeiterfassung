@@ -19,6 +19,7 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 22
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
     }
@@ -43,5 +44,6 @@ dependencies {
     compile 'com.j256.ormlite:ormlite-core:4.48'
     compile 'com.j256.ormlite:ormlite-android:4.48'
     compile 'com.github.PhilJay:MPAndroidChart:v2.1.6'
+    compile "ch.acra:acra:4.6.2"
     //compile 'com.github.amlcurran.showcaseview:library:5.3.0'
 }
