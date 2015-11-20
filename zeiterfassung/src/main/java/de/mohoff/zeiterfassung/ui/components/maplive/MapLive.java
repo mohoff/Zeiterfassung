@@ -111,26 +111,26 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
 
         markerCurrentLocation = createCurrentLocationBitmap(parentActivity, "markers/marker1.png");
 
+        // TODO: For some reason, FAB doesn't show when LocationService is not running and when switch from some other fragment to this one ('MapLive').
         // Set FAB icon and click listener
-
         parentActivity.fab.setImageBitmap(markerCurrentLocation);
         parentActivity.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(currentLocation != null){
+                if (currentLocation != null) {
                     centerMapTo(currentLocation.getPosition());
-                } else if(markers == null || markers.isEmpty()){
+                } else if (markers == null || markers.isEmpty()) {
                     Snackbar.make(
                             parentActivity.coordinatorLayout,
                             getString(R.string.error_no_data),
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
                 } else {
                     Snackbar.make(
                             parentActivity.coordinatorLayout,
                             getString(R.string.error_no_recent_data),
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
                 }
             }
         });

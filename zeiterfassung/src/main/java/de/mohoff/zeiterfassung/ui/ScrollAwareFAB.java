@@ -34,7 +34,9 @@ public class ScrollAwareFAB extends FloatingActionButton.Behavior {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
         //Log.v("ScrollAwareFAB: ", String.valueOf(target.getWidth()) + " " + String.valueOf(target.getHeight()));
 
-        // Hide FAB if we are in 'Statistics'-fragment (contains R.id.recList)
+        // Although fab.hide() is called in onCreate of 'Statistics', the FAB will appear when user
+        // starts scrolling because of this method. Thus, we check here explicitly for R.id.recList
+        // which triggers this class to keep FAB hidden for 'Statistics'.
         if(target.getId() != R.id.recList){
             if (dyConsumed > 0 && child.getVisibility() == View.VISIBLE) {
                 // User scrolled down and the FAB is currently visible -> hide the FAB

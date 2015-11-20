@@ -2,11 +2,26 @@
 <resources>
 
     <!-- Appearance (cattegory) -->
-    <string name="setting_cat_appearance">Appearance</string>
+    <string name="setting_cat_appearance_title">Appearance</string>
+    <string name="setting_cat_appearance">appearance</string>
+
     <string name="setting_appearance_color_indicator">showTimeslotColorIndicator</string>
+    <string name="setting_appearance_color_indicator_title">Color Indicator</string>
+    <string name="setting_appearance_color_indicator_summary_on">Show Color Indicators</string>
+    <string name="setting_appearance_color_indicator_summary_off">Hide Color Indicators</string>
+
     <string name="setting_appearance_label_order">labelOrderTimeslotLocationFirst</string>
-    <string name="setting_appearance_extra_info">showTimeslotExtraInfo</string>
-    <string name="setting_appearance_extra_info_detail">showTimeslotExtraInfoDetail</string>
+    <string name="setting_appearance_label_order_title">Label Order</string>
+    <string name="setting_appearance_label_order_summary_on">Print bold: Location</string>
+    <string name="setting_appearance_label_order_summary_off">Print bold: Activity</string>
+
+    <string name="setting_appearance_extra_info">showTimeslotContextInfo</string>
+    <string name="setting_appearance_extra_info_title">Timeslot Context Info</string>
+    <string name="setting_appearance_extra_info_summary_on">Show summed up Time</string>
+    <string name="setting_appearance_extra_info_summary_off">Hide summed up Time</string>
+
+    <string name="setting_appearance_extra_info_detail">showTimeslotContextInfoInterval</string>
+    <string name="setting_appearance_extra_info_detail_title">Time Interval</string>
     <array name="extraInfoEntries">
         <item>Today</item>
         <item>Yesterday</item>
@@ -16,34 +31,56 @@
         <item>This Year</item>
         <item>Alltime</item>
     </array>
-    <array name="extraInfoEntryValues">
+    <string-array name="extraInfoEntryValues">
         <item>0</item>
         <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-    </array>
+        <item>7</item>
+        <item>10</item>
+        <item>30</item>
+        <item>365</item>
+        <item>1000</item>
+    </string-array>
 
 
     <!-- Zones -->
-    <string name="setting_cat_zones">Zones</string>
+    <string name="setting_cat_zones">zones</string>
+    <string name="setting_cat_zones_title">Zones</string>
+
     <string name="setting_zones_default_radius">zoneDefaultRadius</string>
+    <string name="setting_zones_default_radius_title">Default Zone Radius</string>
+    <string name="setting_zones_default_radius_default_value">50</string>
 
 
     <!-- Map (Live Map) -->
-    <string name="setting_cat_map">Map</string>
+    <string name="setting_cat_map">map</string>
+    <string name="setting_cat_map_title">Map</string>
+
     <string name="setting_map_default_zoom">mapDefaultZoom</string>
+    <string name="setting_map_default_zoom_title">Default Zoom Level</string>
+    <string name="setting_map_default_zoom_dialog_message">Please enter a value between 1 and 15 (Maximum Zoom)</string>
+    <string name="setting_map_default_zoom_default_value">17</string>
+
     <string name="setting_map_follow_updates">mapFollowLocationUpdates</string>
+    <string name="setting_map_follow_updates_title">Follow Location Updates</string>
+    <string name="setting_map_follow_updates_summary">Center map to new Locations when received</string>
 
 
     <!-- OTHER -->
     <string name="setting_crashlog_report">reportCrashlogs</string>
+    <string name="setting_crashlog_report_title">Crashlog Reports</string>
+    <string name="setting_crashlog_report_summary">Send Crashlogs to Developer</string>
 
     <!-- Danger Zone (category) -->
-    <string name="setting_cat_danger_zone">Danger Zone</string>
+    <string name="setting_cat_danger_zone">dangerZone</string>
+    <string name="setting_cat_danger_zone_title">Danger Zone</string>
+
     <string name="setting_delete_timeslots">deleteAllTimeslots</string>
+    <string name="setting_delete_timeslots_title">Delete all Timeslots</string>
+
     <string name="setting_delete_zones">deleteAllZones</string>
+    <string name="setting_delete_zones_title">Delete all Zones</string>
+
     <string name="setting_clean_map">cleanMap</string>
+    <string name="setting_clean_map_title">Clean Map</string>
+    <string name="setting_clean_map_summary">Remove all Markers and Paths from Map</string>
 </resources>
