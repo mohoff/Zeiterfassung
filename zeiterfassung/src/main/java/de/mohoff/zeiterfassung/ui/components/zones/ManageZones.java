@@ -52,7 +52,7 @@ public class ManageZones extends Fragment {
         adapter = new ManageZonesAdapter(parentActivity);
         recyclerView.setAdapter(adapter);
 
-        // Set FAB icon and click listener
+        // Set FAB colorBarIcon and click listener
         parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_white_24dp));
         parentActivity.fab.setOnClickListener(new View.OnClickListener() {
             @Override

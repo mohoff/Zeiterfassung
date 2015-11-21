@@ -25,6 +25,7 @@ import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
 
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.*;
 
 
@@ -415,6 +416,53 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
+    public HashMap<String, String> getSummedTimeForActivities(List<Timeslot> data, long frameStart, long frameEnd){
+        HashMap<String, String> result = new HashMap<>();
+        HashMap<String, Long> map = new HashMap<>();
+        long duration;
+        for(Timeslot t : data){
+            duration = 0;
+            // Timeslot started in search frame but has not ended until now.
+            if(t.getStarttime() >= frameStart && t.getStarttime() < frameEnd && t.getEndtime() == 0){
+                duration = frameEnd - t.getStarttime();
+            }
+            // Timeslot completely contained within search frame
+            else if(t.getStarttime() >= frameStart && t.getStarttime() < frameEnd && t.getEndtime() <= frameEnd) {
+                duration = t.getDuration();
+            }
+            // Timeslot started before search frame and has not ended until now.
+            else if(t.getStarttime() < frameStart && t.getEndtime() == 0){
+                duration = frameEnd - frameStart;
+            }
+            // Timeslot started before search frame but has ended in search frame.
+            else if(t.getStarttime() < frameStart && frameStart < t.getEndtime() && t.getEndtime() <= frameEnd){
+                duration = t.getEndtime() - frameStart;
+            }
+
+
+            // Add duration to map
+            Long old = map.get(t.getZone().getActivityName());
+            map.put(t.getZone().getActivityName(), old == null ? duration : old + duration);
+        }
+
+        // Iterate over map and take durations in order to transform them into human readable format
+        // and store string in result.
+        Iterator it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();         // pair.getKey(), pair.getValue()
+            String readableDuration;
+            if(((Long) pair.getValue()).longValue() == 0){
+                readableDuration = "Nothing.";
+            } else {
+                readableDuration = Timeslot.getReadableDuration(((Long) pair.getValue()).longValue(), true, false);
+            }
+            result.put((String)pair.getKey(), readableDuration);
+            it.remove();
+        }
+
+        return result;
+    }
+
     public List<Zone> getAllZones(){
         getTargetLocationAreaREDAO();
 
@@ -595,7 +643,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
         QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
         try{
-            queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime).and().eq("activity", activityName);
+            queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime).and().eq("firstLine", activityName);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
             timeslots = timeslotREDAO.query(preparedQuery);
         } catch (SQLException e){
@@ -611,7 +659,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
         QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
         try{
-            queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime).and().eq("location", locationName);
+            queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime).and().eq("secondLine", locationName);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
             timeslots = timeslotREDAO.query(preparedQuery);
         } catch (SQLException e){
@@ -627,7 +675,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
         QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
         try{
-            queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime).and().eq("activity", activityName).and().eq("location", locationName);
+            queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime).and().eq("firstLine", activityName).and().eq("secondLine", locationName);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
             timeslots = timeslotREDAO.query(preparedQuery);
         } catch (SQLException e){

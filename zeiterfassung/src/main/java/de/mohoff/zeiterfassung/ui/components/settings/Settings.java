@@ -13,6 +13,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
+import android.preference.SwitchPreference;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -21,6 +22,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
@@ -36,6 +40,7 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
 
     Preference deleteAllTimeslots, deleteAllZones, cleanMap;
     Preference mapDefaultZoomLevel;
+    Preference sendCrashlogs;
 
     public Settings() {
     }
@@ -52,6 +57,7 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
         deleteAllZones = findPreference(getString(R.string.setting_delete_zones));
         cleanMap = findPreference(getString(R.string.setting_clean_map));
         mapDefaultZoomLevel = findPreference(getString(R.string.setting_map_default_zoom));
+        sendCrashlogs = findPreference(getString(R.string.setting_crashlog_report));
 
         deleteAllTimeslots.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -141,6 +147,22 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                         .setMessage(getString(R.string.settings_alert_msg_clean_map))
                         .create();
                 alertDialog.show();
+                return true;
+            }
+        });
+
+        sendCrashlogs.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                SwitchPreference pref = (SwitchPreference) preference;
+                boolean isEnabled = (boolean) newValue;
+                if(!isEnabled){
+                    //pref.setChecked(true);
+                    // TODO: Yeah.. rework that later on ;)
+                    Snackbar.make(context.coordinatorLayout, "Fuck you.", Snackbar.LENGTH_LONG)
+                            .show();
+                    return false;
+                }
                 return true;
             }
         });
@@ -248,5 +270,60 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
         if(realZoom > 21) return 21;
         if(realZoom < 7) return 7;
         return realZoom;
+    }
+
+    public static long getTimeInPastForArrayIndex(Context context, int i){
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        /*
+        <item>0</item>
+        <item>1</item>
+        <item>7</item>
+        <item>10</item>
+        <item>30</item>
+        <item>365</item>
+        <item>1000</item>
+         */
+
+        switch (i){
+            case 0:
+                // Today
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                return cal.getTimeInMillis();
+            case 1:
+                // Yesterday
+                // By using 'Yesterday', the calling method needs to call this method again with i=0.
+                // Then the time interval of the last day will be computed correctly.
+                // First call: yesterdayStarttime, Second call: yesterdayEndtime
+                cal.add(Calendar.DATE, -1);
+                return cal.getTimeInMillis();
+            case 2:
+                // This week
+                cal.add(Calendar.DATE, -7);
+                return cal.getTimeInMillis();
+            case 3:
+                // Last 10 days
+                // TODO: Check locale calendars and when Monday not considered first day of week
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                return cal.getTimeInMillis();
+            case 4:
+                // This month
+                cal.set(Calendar.DAY_OF_MONTH, 1);
+                return cal.getTimeInMillis();
+            case 5:
+                // This year
+                cal.set(Calendar.DAY_OF_YEAR, 1);
+                return cal.getTimeInMillis();
+            case 6:
+                // Alltime
+                return 0;
+            default:
+                // index not found
+                return -1;
+        }
     }
 }

@@ -56,9 +56,9 @@ import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 
 
 // TODO: Eventually add Cluster/ClusterManager. Also add polylines (how to compute polyline dots in cluster center?)
-// TODO: replace marker icon with greenish dot
-// TODO: Maintain two caches: One which represents activeCache, so location that are used for in/outbound computations. And a cache which holds all location updates. Show both on map, first with 100% opacity, second with 20% or similar.
-// TODO: Integrate "connection lost" icon
+// TODO: replace marker colorBarIcon with greenish dot
+// TODO: Maintain two caches: One which represents activeCache, so secondLine that are used for in/outbound computations. And a cache which holds all secondLine updates. Show both on map, first with 100% opacity, second with 20% or similar.
+// TODO: Integrate "connection lost" colorBarIcon
 
 
 public class MapLive extends MapAbstract implements LocationChangeListener{
@@ -74,7 +74,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     // Bitmap for Markers which will be displayed with a number on them.
     // While generating this Bitmap, the number will be printed on of the 3 templates above.
     Bitmap markerWithNumbers;
-    // Bitmap for Marker which shows most recent user location on top of
+    // Bitmap for Marker which shows most recent user secondLine on top of
     // markerAccurate||markerInaccurate||markerNoConnection
     Bitmap markerCurrentLocation;
 
@@ -112,7 +112,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         markerCurrentLocation = createCurrentLocationBitmap(parentActivity, "markers/marker1.png");
 
         // TODO: For some reason, FAB doesn't show when LocationService is not running and when switch from some other fragment to this one ('MapLive').
-        // Set FAB icon and click listener
+        // Set FAB colorBarIcon and click listener
         parentActivity.fab.setImageBitmap(markerCurrentLocation);
         parentActivity.fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -222,7 +222,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.follow_updates:
-                // TODO: In order to make check/uncheck with icon, we need to replace it each time (swapping between 100% and 50% opacity for example)
+                // TODO: In order to make check/uncheck with colorBarIcon, we need to replace it each time (swapping between 100% and 50% opacity for example)
                 FOLLOW_MAP_UPDATES = !item.isChecked();
                 item.setChecked(FOLLOW_MAP_UPDATES);
                 return true;
@@ -259,7 +259,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                 .position(latLng)
                 .draggable(false)
                 //.alpha(GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()))
-                .anchor(0.5f, 0.5f) // anchor in the very center of the marker icon
+                .anchor(0.5f, 0.5f) // anchor in the very center of the marker colorBarIcon
                 .title("Location")
                 .snippet("A:" + loc.getAccuracy() +
                                 "\n O:" + GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()) +
@@ -394,7 +394,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             MarkerOptions markerOptions = createMarkerOptions(loc, LocationService.ACCURACY_TRESHOLD);
             addMarkerToMap(map, markers, markerOptions);
             updateCurrentLocationMarker(map, loc);
-            // Move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow location updates on the map"
+            // Move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow secondLine updates on the map"
             // Really reset zoomLevel each call to 17?
             if(FOLLOW_MAP_UPDATES){
                 followWithCamera(markers);
@@ -417,9 +417,9 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             currentLocation = map.addMarker(new MarkerOptions()
                     .position(loc.getLatLng())
                     .draggable(false)
-                            //.icon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
+                            //.colorBarIcon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
                     .icon(BitmapDescriptorFactory.fromBitmap(markerCurrentLocation))
-                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                    //.colorBarIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title(parentActivity.getString(R.string.map_current_location)))
                     ;
         } else {
@@ -427,7 +427,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         }
     }
 
-    // Following snippet allows marker animations from start to end location.
+    // Following snippet allows marker animations from start to end secondLine.
     // Code taken from https://gist.github.com/broady/6314689
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private void animateMarker(Marker marker, LatLng finalPosition) {
@@ -492,7 +492,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                     //addMarkerToMap(map, markers, GeneralHelper.convertLocToLatLng(loc), 1);
                 }
             } else {
-                //GeneralHelper.showToast(parentActivity, "no location data available.");
+                //GeneralHelper.showToast(parentActivity, "no secondLine data available.");
             }
             return null;
         }
@@ -502,7 +502,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             // hide spinner
             progressBar.setVisibility(View.GONE);
             if(!this.markersAdded){
-                //Snackbar.make(parentActivity.coordinatorLayout, "Currently no location data available.", Snackbar.LENGTH_LONG)
+                //Snackbar.make(parentActivity.coordinatorLayout, "Currently no secondLine data available.", Snackbar.LENGTH_LONG)
                 //        .show();
             }
         }

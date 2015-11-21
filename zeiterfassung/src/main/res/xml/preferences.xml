@@ -8,17 +8,17 @@
         <SwitchPreference android:title="@string/setting_appearance_label_order_title"
                             android:summaryOn="@string/setting_appearance_label_order_summary_on"
                             android:summaryOff="@string/setting_appearance_label_order_summary_off"
-                            android:defaultValue="true"
+                            android:defaultValue="@string/setting_appearance_label_order_default_value"
                             android:key="@string/setting_appearance_label_order"/>
         <SwitchPreference android:title="@string/setting_appearance_color_indicator_title"
                           android:summaryOn="@string/setting_appearance_color_indicator_summary_on"
                           android:summaryOff="@string/setting_appearance_color_indicator_summary_off"
-                          android:defaultValue="true"
+                          android:defaultValue="@string/setting_appearance_color_indicator_default_value"
                           android:key="@string/setting_appearance_color_indicator"/>
         <CheckBoxPreference android:title="@string/setting_appearance_extra_info_title"
                           android:summaryOn="@string/setting_appearance_extra_info_summary_on"
                           android:summaryOff="@string/setting_appearance_extra_info_summary_off"
-                          android:defaultValue="true"
+                          android:defaultValue="@string/setting_appearance_extra_info_default_value"
                           android:key="@string/setting_appearance_extra_info"/>
         <ListPreference
             android:entries="@array/extraInfoEntries"
@@ -27,7 +27,7 @@
             android:title="@string/setting_appearance_extra_info_detail_title"
             android:dependency="@string/setting_appearance_extra_info"
             android:summary="%s"
-            android:defaultValue="7"/>
+            android:defaultValue="@string/setting_appearance_extra_info_detail_default_value"/>
 
     </PreferenceCategory>
 
@@ -55,15 +55,20 @@
                             android:key="@string/setting_map_default_zoom"/>
         <SwitchPreference android:title="@string/setting_map_follow_updates_title"
                           android:summary="@string/setting_map_follow_updates_summary"
-                          android:defaultValue="true"
+                          android:defaultValue="@string/setting_map_follow_updates_default_value"
                           android:key="@string/setting_map_follow_updates"/>
+        <SwitchPreference android:title="@string/setting_map_zoomin_title"
+                          android:summaryOn="@string/setting_map_zoomin_summary_on"
+                          android:summaryOff="@string/setting_map_zoomin_summary_off"
+                          android:defaultValue="@string/setting_map_zoomin_default_value"
+                          android:key="@string/setting_map_zoomin"/>
     </PreferenceCategory>
 
 
     <!-- OTHER -->
     <SwitchPreference android:title="@string/setting_crashlog_report_title"
                       android:summary="@string/setting_crashlog_report_summary"
-                      android:defaultValue="true"
+                      android:defaultValue="@string/setting_crashlog_report_default_value"
                       android:key="@string/setting_crashlog_report"/>
 
 

@@ -216,7 +216,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                             .setTitle(context.getString(R.string.alert_title_delete_zone_multiple))
                             .setMessage(context.getString(R.string.alert_msg_delete_zone_multiple, activity))
                                     .create();
-                    // TODO: add app icon to the alertDialog.
+                    // TODO: add app colorBarIcon to the alertDialog.
                     alertDialog.show();
                 }
             });
@@ -353,7 +353,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 //.setView(GeneralHelper.getAlertDialogEditTextContainer(context, et, locHolder.locationName.getText().toString()))
                                 .setView(dialogView)
                                 .create();
-                        // TODO: add app icon to the alertDialog.
+                        // TODO: add app colorBarIcon to the alertDialog.
                         alertDialog.show();
                         return true;
                     }
@@ -399,7 +399,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 .setTitle(context.getString(R.string.alert_title_delete_zone))
                                 .setMessage(context.getString(R.string.alert_msg_delete_zone, zone.getLocationName()))
                                 .create();
-                                // TODO: add app icon to the alertDialog.
+                                // TODO: add app colorBarIcon to the alertDialog.
                         alertDialog.show();
                     }
                 });

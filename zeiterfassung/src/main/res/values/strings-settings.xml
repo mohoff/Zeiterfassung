@@ -5,23 +5,27 @@
     <string name="setting_cat_appearance_title">Appearance</string>
     <string name="setting_cat_appearance">appearance</string>
 
+    <string name="setting_appearance_label_order">labelOrderTimeslotLocationFirst</string>
+    <string name="setting_appearance_label_order_title">Label Order</string>
+    <string name="setting_appearance_label_order_summary_on">First Line: Name of Location</string>
+    <string name="setting_appearance_label_order_summary_off">First Line: Name of Activity</string>
+    <string name="setting_appearance_label_order_default_value">true</string>
+
     <string name="setting_appearance_color_indicator">showTimeslotColorIndicator</string>
     <string name="setting_appearance_color_indicator_title">Color Indicator</string>
     <string name="setting_appearance_color_indicator_summary_on">Show Color Indicators</string>
     <string name="setting_appearance_color_indicator_summary_off">Hide Color Indicators</string>
-
-    <string name="setting_appearance_label_order">labelOrderTimeslotLocationFirst</string>
-    <string name="setting_appearance_label_order_title">Label Order</string>
-    <string name="setting_appearance_label_order_summary_on">Print bold: Location</string>
-    <string name="setting_appearance_label_order_summary_off">Print bold: Activity</string>
+    <string name="setting_appearance_color_indicator_default_value">true</string>
 
     <string name="setting_appearance_extra_info">showTimeslotContextInfo</string>
     <string name="setting_appearance_extra_info_title">Timeslot Context Info</string>
     <string name="setting_appearance_extra_info_summary_on">Show summed up Time</string>
     <string name="setting_appearance_extra_info_summary_off">Hide summed up Time</string>
+    <string name="setting_appearance_extra_info_default_value">true</string>
 
     <string name="setting_appearance_extra_info_detail">showTimeslotContextInfoInterval</string>
     <string name="setting_appearance_extra_info_detail_title">Time Interval</string>
+    <string name="setting_appearance_extra_info_detail_default_value">7</string>
     <array name="extraInfoEntries">
         <item>Today</item>
         <item>Yesterday</item>
@@ -34,11 +38,11 @@
     <string-array name="extraInfoEntryValues">
         <item>0</item>
         <item>1</item>
-        <item>7</item>
-        <item>10</item>
-        <item>30</item>
-        <item>365</item>
-        <item>1000</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
     </string-array>
 
 
@@ -63,12 +67,20 @@
     <string name="setting_map_follow_updates">mapFollowLocationUpdates</string>
     <string name="setting_map_follow_updates_title">Follow Location Updates</string>
     <string name="setting_map_follow_updates_summary">Center map to new Locations when received</string>
+    <string name="setting_map_follow_updates_default_value">true</string>
+
+    <string name="setting_map_zoomin">mapZoomIn</string>
+    <string name="setting_map_zoomin_title">Zoom In Animation</string>
+    <string name="setting_map_zoomin_summary_on">Zoom In Animation enabled</string>
+    <string name="setting_map_zoomin_summary_off">Zoom In Animation disabled</string>
+    <string name="setting_map_zoomin_default_value">true</string>
 
 
     <!-- OTHER -->
     <string name="setting_crashlog_report">reportCrashlogs</string>
     <string name="setting_crashlog_report_title">Crashlog Reports</string>
     <string name="setting_crashlog_report_summary">Send Crashlogs to Developer</string>
+    <string name="setting_crashlog_report_default_value">true</string>
 
     <!-- Danger Zone (category) -->
     <string name="setting_cat_danger_zone">dangerZone</string>

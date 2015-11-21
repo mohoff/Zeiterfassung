@@ -15,7 +15,7 @@ public class LocationCache {
     // activeInterpolatedCache should be as big as activeCache and holds all interpolated locations
     // which were computed from activeCache
     private CircularFifoQueue<Loc> activeInterpolatedCache;
-    // passiveCache serves as a bigger location cache which provides its data to maps for drawing markers.
+    // passiveCache serves as a bigger secondLine cache which provides its data to maps for drawing markers.
     // For users it might be interesting to see a wider range covered by map markers compared to the
     // amount of locations in activeCache.
     private CircularFifoQueue<Loc> passiveCache;
@@ -209,7 +209,7 @@ public class LocationCache {
         /*
         //long millisInPast = currentTime - loc.getTimestampInMillis();
         int optimalTimeInCache = LocationService.ACTIVE_CACHE_SIZE * LocationService.REGULAR_UPDATE_INTERVAL; // ms
-        double ageMultiplier = 0; // default. If more than 15min in past, don't weight this location/timestamp anymore
+        double ageMultiplier = 0; // default. If more than 15min in past, don't weight this secondLine/timestamp anymore
 
         long tresholdTimeToScoreOfZero = LocationService.ACTIVE_CACHE_SIZE * LocationService.REGULAR_UPDATE_INTERVAL * 3; // 3 for 3*5=15min in past is treshold
         double slopeOfRegression = 1.5 / (double) tresholdTimeToScoreOfZero;

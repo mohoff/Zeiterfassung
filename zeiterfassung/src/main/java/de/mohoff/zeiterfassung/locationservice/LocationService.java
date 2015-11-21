@@ -40,7 +40,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     private static final String TAG = LocationService.class.getSimpleName();
     // Flag to store the service status
     public static boolean IS_SERVICE_RUNNING = false;
-    // Indicates if location update interval exceeded (REGULAR_UPDATE_INTERVAL + 10s) since the last real update
+    // Indicates if secondLine update interval exceeded (REGULAR_UPDATE_INTERVAL + 10s) since the last real update
     public static boolean NO_CONNECTION = false;
     // Holds the accumulated distance that the user travelled during this service session, so since he
     // last started this service. While user is inbound a Zone SESSION_DISTANCE remains constant.
@@ -54,12 +54,12 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     public static long SESSION_STARTTIME = 0; // milliseconds
 
     // TODO: What to do when service is started? We really need to wait ~ REGULAR_UPDATE_INTERVAL * ACTIVE_CACHE_SIZE until activeCache is full in order to perform first createNewTimeslot? Can we do better?
-    // Time interval after which a new location update is retrieved periodically
+    // Time interval after which a new secondLine update is retrieved periodically
     // In milliseconds. Used values so far:  60 * 1000, 150 * 1000, 120 * 1000
     public static int REGULAR_UPDATE_INTERVAL = 60 * 1000;
-    // Time interval after which a new location update is accepted at the earliest from other applications' requests
+    // Time interval after which a new secondLine update is accepted at the earliest from other applications' requests
     public static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
-    // Ignore location updates for activeCache which have accuracy > 300m
+    // Ignore secondLine updates for activeCache which have accuracy > 300m
     public static double ACCURACY_TRESHOLD = 300.0;
     // Determines the ratio of inbound locations in activeCache to trigger an enter-event
     public static int NO_CONNECTION_INTERVAL = REGULAR_UPDATE_INTERVAL + 1000 * 30; // wait extra 30sec
@@ -67,7 +67,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     public static float OUTBOUND_TRESHOLD = 1 - INBOUND_TRESHOLD;
     // Size of cache that is used to determine inbound and outbound events
     public static int ACTIVE_CACHE_SIZE = 5;
-    // Size of cache that is used to display location markers on maps
+    // Size of cache that is used to display secondLine markers on maps
     public static int PASSIVE_CACHE_SIZE = 50; // 50
 
     private int numberOfUpdates = 0;
@@ -359,7 +359,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             Loc mostRecentLoc = LocationCache.getInstance().getMostRecentActiveLoc();
             int distanceInMeters = loc.distanceTo(mostRecentLoc);
             // Only add distance to distanceTravelled when it's greater than some value in order to
-            // prevent fluctuations which occur due to the inaccurate nature of used location service.
+            // prevent fluctuations which occur due to the inaccurate nature of used secondLine service.
             if(distanceInMeters > SESSION_DISTANCE_IGNORE_TRESHOLD){
                 // TODO: Maybe add correction factor of 0.9 or similar.
                 SESSION_DISTANCE += loc.distanceTo(mostRecentLoc);

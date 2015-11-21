@@ -61,7 +61,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         recList.setAdapter(adapter);
         recList.setLayoutManager(llm);
 
-        // Set FAB icon and click listener
+        // Set FAB colorBarIcon and click listener
         parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_search_black_24dp));
         parentActivity.fab.show();
         /*parentActivity.fab.setOnClickListener(new View.OnClickListener() {

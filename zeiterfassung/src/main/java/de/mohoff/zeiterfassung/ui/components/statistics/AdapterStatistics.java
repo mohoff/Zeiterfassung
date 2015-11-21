@@ -223,14 +223,21 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
         int[] colors = new int[timesData.size()];
         for(int j=0; j<timesData.size(); j++){
             colors[j] = ColorPalette.GREENISH[j%(ColorPalette.GREENISH.length)];
-            //dataSet.addColor(ColorPalette.GREENISH[j%(ColorPalette.GREENISH.length)]);
+            //dataSet.addColor(ColorPalett
+            //
+            //
+            //
+            // e.GREENISH[j%(ColorPalette.GREENISH.length)]);
         }
         dataSet.setColors(colors);
         dataSet.setSliceSpace(0f);
         dataSet.setSelectionShift(6f);
         dataSet.setLabel("hallo");
 
-        return new PieData(activities, dataSet);
+        PieData data = new PieData(activities, dataSet);
+        data.setValueTextColor(Color.WHITE);
+        data.setValueTextSize(12f);
+        return data;
     }
 
     private void cancelTextViewUpdater(){

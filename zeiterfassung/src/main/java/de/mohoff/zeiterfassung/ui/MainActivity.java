@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         /*
         // TODO: remove "locs" from savedInstanceState when MapLive-fragment is destroyed?!
         if(savedInstanceState != null){
-            // restore location marker data after screen rotation
+            // restore secondLine marker data after screen rotation
             if (savedInstanceState.containsKey("locs")) {
                 locsTmp = savedInstanceState.getParcelableArrayList("locs");
                 for (Loc e : locsTmp) {
@@ -312,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             buttonStopService.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // stop location service
+                    // stop secondLine service
                     StopButtonClicked();
                     //if (navDrawerListener != null) {
                     //  navDrawerListener.StopButtonClicked();
@@ -326,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             buttonStartService.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // start and connect to location service
+                    // start and connect to secondLine service
                     StartButtonClicked();
                     //if (navDrawerListener != null) {
                     //    navDrawerListener.StartButtonClicked();

@@ -89,7 +89,7 @@ public class AddZoneMap extends ManageZonesMapAbstract {
         super.drawExistingZones();
 
         // TODO: provide appropriate colors: gray (uneditable) and greenish (editable)
-        // TODO: we want gray markers (custom markers) and gray fill colors to show that. Via .icon() ?
+        // TODO: we want gray markers (custom markers) and gray fill colors to show that. Via .colorBarIcon() ?
 
         ArrayList<LatLng> latLngList = new ArrayList<>();
 

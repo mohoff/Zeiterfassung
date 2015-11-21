@@ -59,7 +59,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     protected GoogleMap map;
     protected Geocoder geocoder;
     // Should be replaced with "greenish_50" in onCreateView().
-    // Work around for "fragment not attached to activity" error.
+    // Work around for "fragment not attached to firstLine" error.
 
 
     protected DatabaseHelper dbHelper = null;
@@ -182,7 +182,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         this.map = googleMap;
         // Disable "Navigation" and "GPS Pointer" buttons whiche are visible by default
         map.getUiSettings().setMapToolbarEnabled(false);
-        // Enables "Show my location" button which shows current location with bearing on the map
+        // Enables "Show my secondLine" button which shows current secondLine with bearing on the map
         // map.getUiSettings().setMyLocationButtonEnabled(true);
 
         progressBar.setVisibility(View.GONE);
@@ -194,8 +194,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 .draggable(false)
                 .alpha(opacity)
                 .anchor(0.5f, 0.5f)
-                //.icon(BitmapDescriptorFactory.fromBitmap(markerBitmap))
-                //.icon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
+                //.colorBarIcon(BitmapDescriptorFactory.fromBitmap(markerBitmap))
+                //.colorBarIcon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
                 .icon(BitmapDescriptorFactory.defaultMarker(193))      // BitmapDescriptorFactory.HUE_MAGENTA
                 .title(title)
                 .snippet(snippet)
@@ -212,7 +212,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
             if(markers.size() > 1){
                 // Change color for old marker
                 markers.get(markers.size()-2).setIcon(BitmapDescriptorFactory.defaultMarker(0)); // BitmapDescriptorFactory.HUE_VIOLET
-                // Move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow location updates on the map"
+                // Move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow secondLine updates on the map"
                 // Really reset zoomLevel each call to 17?
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
             } else {
@@ -249,7 +249,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 .draggable(isDraggable)
                 .title(title)
                 .snippet(snippet)
-                .icon(bitmapDescriptor);
+                .colorBarIcon(bitmapDescriptor);
     }*/
 
     protected CircleOptions createCircleOptions(int fillColor){

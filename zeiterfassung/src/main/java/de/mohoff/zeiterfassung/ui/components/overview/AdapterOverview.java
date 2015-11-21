@@ -2,11 +2,9 @@ package de.mohoff.zeiterfassung.ui.components.overview;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -16,28 +14,35 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
 import de.mohoff.zeiterfassung.ui.MainActivity;
+import de.mohoff.zeiterfassung.ui.components.settings.Settings;
 
 public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private DatabaseHelper dbHelper = null;
     private ArrayList<Timeslot> data = new ArrayList<Timeslot>();
     private int lastPosition = 99999;
     private MainActivity context;
-    //private boolean isServiceRunning = false;
+    private HashMap<String, String> summedTime; // Activity --> readableTime
+
+    SharedPreferences sp;
+    private boolean showActivityFirst, showColorIndicator, showTimeContextInfo;
+    private String timeContextInfoInterval;
 
     private final static int VIEWTYPE_NORMAL = 1;
     private final static int VIEWTYPE_SERVICEINFO = 2;
     private final static int VIEWTYPE_NOENTRYINFO = 3;
-
 
 
     // Provide a reference to the views for each data item
@@ -47,13 +52,18 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public Context context;
         // each data item is just a string in this case
         public CardView container;
+
         public View colorBar;
-        public ImageView icon;
-        public TextView activity;
-        public TextView location;
+        public RelativeLayout colorBarContainer;
+        public ImageView colorBarIcon;
+
+        public TextView timeContextInfo;
+        public LinearLayout timeContextInfoWrapper;
+
+        public TextView firstLine, secondLine;
         public TextView startTime, startDate;
-        public TextView duration;
         public TextView endTime, endDate;
+        public TextView duration;
         //public LongClickListener longClickListener;
 
         //public RelativeLayout topConnectorPart, bottomConnectorPart;
@@ -63,11 +73,16 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             super(v);
             this.context = context;
             this.container = (CardView) v.findViewById(R.id.card_view);
-            this.colorBar = v.findViewById(R.id.colorBar);
 
-            this.icon = (ImageView) v.findViewById(R.id.icon);
-            this.activity = (TextView) v.findViewById(R.id.activity);
-            this.location = (TextView) v.findViewById(R.id.location);
+            this.colorBar = v.findViewById(R.id.colorBar);
+            this.colorBarContainer = (RelativeLayout) v.findViewById(R.id.colorBarContainer);
+            this.colorBarIcon = (ImageView) v.findViewById(R.id.colorBarIcon);
+
+            this.timeContextInfo = (TextView) v.findViewById(R.id.timeContextInfo);
+            this.timeContextInfoWrapper = (LinearLayout) v.findViewById(R.id.timeContextInfoWrapper);
+
+            this.firstLine = (TextView) v.findViewById(R.id.firstLine);
+            this.secondLine = (TextView) v.findViewById(R.id.secondLine);
             this.startTime = (TextView) v.findViewById(R.id.startTime);
             this.startDate = (TextView) v.findViewById(R.id.startDate);
             this.duration = (TextView) v.findViewById(R.id.duration);
@@ -109,6 +124,32 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.data.add(new Timeslot(1416224002267L, 1416728002267L, "activity5", "act5, location1"));
         */
         data.addAll(dbHelper.getAllTimeslots());
+        sp = PreferenceManager.getDefaultSharedPreferences(context);
+        showActivityFirst = sp.getBoolean(
+                context.getString(R.string.setting_appearance_label_order),
+                Boolean.valueOf(context.getString(R.string.setting_appearance_label_order_default_value))
+        );
+        showColorIndicator = sp.getBoolean(
+                context.getString(R.string.setting_appearance_color_indicator),
+                Boolean.valueOf(context.getString(R.string.setting_appearance_color_indicator_default_value))
+        );
+        showTimeContextInfo = sp.getBoolean(
+                context.getString(R.string.setting_appearance_extra_info),
+                Boolean.valueOf(context.getString(R.string.setting_appearance_extra_info_default_value))
+        );
+        if(showTimeContextInfo){
+            int index = Integer.parseInt(sp.getString(
+                    context.getString(R.string.setting_appearance_extra_info_detail),
+                    String.valueOf(context.getString(R.string.setting_appearance_extra_info_detail_default_value))
+            ));
+            timeContextInfoInterval = context.getResources().getStringArray(R.array.extraInfoEntries)[index];
+            long starttime = Settings.getTimeInPastForArrayIndex(context, index);
+            // When user selected 'Yesterday', endtime is not System.currentTimeMillis() and we need
+            // to assign an appropriate endtime.
+            long endtime = index == 1 ? Settings.getTimeInPastForArrayIndex(context, 0) : System.currentTimeMillis();
+            summedTime = dbHelper.getSummedTimeForActivities(data, starttime, endtime);
+        }
+
     }
 
     public void updateData(){
@@ -140,6 +181,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ViewHolderItem vh = (ViewHolderItem) holder;
             Timeslot timeslot = data.get(position);
 
+            vh.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
             if(timeslot.getReadableEndTime(context).equals(context.getString(R.string.overview_end_pending)) &&
                     timeslot.getReadableEndDate(context).equals(context.getString(R.string.overview_end_pending))){
                 vh.endTime.setTypeface(null, Typeface.ITALIC);
@@ -149,15 +191,40 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 vh.endDate.setTypeface(null, Typeface.NORMAL);
             }
 
-            vh.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
-            vh.colorBar.setBackground(null);
-            vh.colorBar.setBackgroundColor(timeslot.getZone().getColor());
+            // Handle setting 'Color Indicator'
+            if(showColorIndicator){
+                vh.colorBarContainer.setVisibility(View.VISIBLE);
+                vh.colorBar.setBackground(null);
+                vh.colorBar.setBackgroundColor(timeslot.getZone().getColor());
+                vh.colorBarIcon.setImageResource(R.drawable.ic_action_edit_location);
+            } else {
+                // Set View.INVISIBLE here so layout remains the same withouth the color indicator.
+                vh.colorBarContainer.setVisibility(View.INVISIBLE);
+            }
+
+            // Handle setting 'Timeslot Context Info'
+            if(showTimeContextInfo){
+                vh.timeContextInfoWrapper.setVisibility(View.VISIBLE);
+                String extraInfo = timeContextInfoInterval + ": " + summedTime.get(timeslot.getZone().getActivityName());
+                vh.timeContextInfo.setText(extraInfo);
+            } else {
+                // Set View.GONE here so space can be used by other views.
+                vh.timeContextInfoWrapper.setVisibility(View.GONE);
+            }
+
+            // Handle setting 'Label Order'
+            if(showActivityFirst){
+                vh.firstLine.setText(timeslot.getZone().getActivityName());
+                vh.secondLine.setText(timeslot.getZone().getLocationName());
+            } else {
+                vh.firstLine.setText(timeslot.getZone().getLocationName());
+                vh.secondLine.setText(timeslot.getZone().getActivityName());
+            }
+
             // In order to draw outside of cardView with clipChildren and clipToParent, we have to
             // setIsRunning setClipToOutline(false). This sadly is v21+.
             //vh.container.setClipToOutline(false);
-            vh.icon.setImageResource(R.drawable.ic_action_edit_location);
-            vh.activity.setText(timeslot.getZone().getActivityName());
-            vh.location.setText(timeslot.getZone().getLocationName());
+
             vh.startTime.setText(timeslot.getReadableStartTime());
             vh.startDate.setText(timeslot.getReadableStartDate());
             vh.endTime.setText(timeslot.getReadableEndTime(context));

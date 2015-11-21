@@ -45,7 +45,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
 
     EditText radiusValue, addressValue;
     ImageButton searchButton;
-    // TODO: Replace button with appropriate SAVE icon
+    // TODO: Replace button with appropriate SAVE colorBarIcon
 
     int colorButtonEnabled, colorButtonDisabled;
 
@@ -77,7 +77,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         //MainActivity main = (MainActivity) getActivity();
         parentActivity.getDrawerToggle().setDrawerIndicatorEnabled(false);
         parentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        // Set FAB icon and click listener
+        // Set FAB colorBarIcon and click listener
         parentActivity.fab.show();
         parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_save_black_24dp));
 

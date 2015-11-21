@@ -23,7 +23,7 @@
         android:layout_marginRight="5dp"
         android:padding="0dp">
 
-        <!-- 70% width for activity, location, etc.
+        <!-- 70% width for firstLine, secondLine, etc.
              30% width for starttime, duration, endtime -->
         <LinearLayout
             android:id="@+id/linLayout"
@@ -45,14 +45,14 @@
                     android:paddingTop="20dp"
                     android:id="@+id/leftPart">
                     <ImageView
-                        android:id="@+id/icon"
+                        android:id="@+id/colorBarIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:src="@drawable/ic_location_on_black_24dp"
                         android:tint="#22000000"/>
                     <TextView
-                        android:id="@+id/activity"
+                        android:id="@+id/firstLine"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
@@ -61,18 +61,18 @@
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:layout_marginLeft="10dp"
-                        android:layout_toRightOf="@id/icon"
-                        android:layout_toEndOf="@id/icon"/>
+                        android:layout_toRightOf="@id/colorBarIcon"
+                        android:layout_toEndOf="@id/colorBarIcon"/>
                     <TextView
-                        android:id="@+id/location"
+                        android:id="@+id/secondLine"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="LOCATION"
                         android:textSize="12sp"
                         android:maxWidth="200dp"
                         android:gravity="center_vertical"
-                        android:layout_below="@id/activity"
-                        android:layout_alignLeft="@+id/activity"/>
+                        android:layout_below="@id/firstLine"
+                        android:layout_alignLeft="@+id/firstLine"/>
                 </RelativeLayout>
                 <RelativeLayout
                     android:layout_width="wrap_content"

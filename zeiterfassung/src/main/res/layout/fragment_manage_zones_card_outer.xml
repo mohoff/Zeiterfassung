@@ -32,7 +32,7 @@
                 android:gravity="center_vertical"
                 android:id="@+id/activityWrapperLeft">
 
-                <!-- activity name -->
+                <!-- firstLine name -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
                     android:textStyle="bold"
                     android:layout_centerVertical="true"
                     android:maxLength="100"/>
-                <!-- activity icon/color -->
+                <!-- firstLine colorBarIcon/color -->
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

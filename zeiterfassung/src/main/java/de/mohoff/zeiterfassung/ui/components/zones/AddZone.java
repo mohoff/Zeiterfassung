@@ -108,7 +108,7 @@ public class AddZone extends Fragment {
             }
         });
 
-        // Set FAB icon and click listener
+        // Set FAB colorBarIcon and click listener
         parentActivity.fab.show();
         parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_chevron_right_white_24dp));
         parentActivity.fab.setOnClickListener(new View.OnClickListener() {
