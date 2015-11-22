@@ -37,7 +37,8 @@ public class ScrollAwareFAB extends FloatingActionButton.Behavior {
         // Although fab.hide() is called in onCreate of 'Statistics', the FAB will appear when user
         // starts scrolling because of this method. Thus, we check here explicitly for R.id.recList
         // which triggers this class to keep FAB hidden for 'Statistics'.
-        if(target.getId() != R.id.recList){
+        // TODO: Add search filter in 'Overview'. Then enable following if-statement
+        if(target.getId() == R.id.cardList && false){
             if (dyConsumed > 0 && child.getVisibility() == View.VISIBLE) {
                 // User scrolled down and the FAB is currently visible -> hide the FAB
                 child.hide();

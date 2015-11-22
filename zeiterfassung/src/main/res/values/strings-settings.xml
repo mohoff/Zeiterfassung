@@ -25,7 +25,7 @@
 
     <string name="setting_appearance_extra_info_detail">showTimeslotContextInfoInterval</string>
     <string name="setting_appearance_extra_info_detail_title">Time Interval</string>
-    <string name="setting_appearance_extra_info_detail_default_value">7</string>
+    <string name="setting_appearance_extra_info_detail_default_value">2</string>
     <array name="extraInfoEntries">
         <item>Today</item>
         <item>Yesterday</item>
@@ -52,6 +52,7 @@
 
     <string name="setting_zones_default_radius">zoneDefaultRadius</string>
     <string name="setting_zones_default_radius_title">Default Zone Radius</string>
+    <string name="setting_zones_default_radius_message">Radius must be at least 30 meters.</string>
     <string name="setting_zones_default_radius_default_value">50</string>
 
 
@@ -61,8 +62,8 @@
 
     <string name="setting_map_default_zoom">mapDefaultZoom</string>
     <string name="setting_map_default_zoom_title">Default Zoom Level</string>
-    <string name="setting_map_default_zoom_dialog_message">Please enter a value between 1 and 15 (Maximum Zoom)</string>
-    <string name="setting_map_default_zoom_default_value">17</string>
+    <string name="setting_map_default_zoom_dialog_message">Please enter a value between 1 and 15.\nMinimum Zoom: 1\nMaximum Zoom: 15\nRecommended: 11</string>
+    <string name="setting_map_default_zoom_default_value">11</string>
 
     <string name="setting_map_follow_updates">mapFollowLocationUpdates</string>
     <string name="setting_map_follow_updates_title">Follow Location Updates</string>
@@ -71,8 +72,8 @@
 
     <string name="setting_map_zoomin">mapZoomIn</string>
     <string name="setting_map_zoomin_title">Zoom In Animation</string>
-    <string name="setting_map_zoomin_summary_on">Zoom In Animation enabled</string>
-    <string name="setting_map_zoomin_summary_off">Zoom In Animation disabled</string>
+    <string name="setting_map_zoomin_summary_on">Show Zoom In Animations</string>
+    <string name="setting_map_zoomin_summary_off">Don\'t show Zoom In Animations</string>
     <string name="setting_map_zoomin_default_value">true</string>
 
 
@@ -95,4 +96,9 @@
     <string name="setting_clean_map">cleanMap</string>
     <string name="setting_clean_map_title">Clean Map</string>
     <string name="setting_clean_map_summary">Remove all Markers and Paths from Map</string>
+
+    <string name="setting_reset_settings">resetSettings</string>
+    <string name="setting_reset_settings_title">Reset Settings</string>
+    <string name="setting_reset_settings_summary">Restore default Settings</string>
+
 </resources>

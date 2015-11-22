@@ -109,11 +109,11 @@ public class Timeslot {
         }
     }
 
-    public String getReadableDuration(){
+    public String getReadableDuration(boolean ignoreSeconds, boolean multiLine){
         if(this.endtime == 0){
-            return getReadableDuration(this.starttime, System.currentTimeMillis(), true, true);
+            return getReadableDuration(this.starttime, System.currentTimeMillis(), ignoreSeconds, multiLine);
         } else {
-            return getReadableDuration(this.starttime,  this.endtime, true, true);
+            return getReadableDuration(this.starttime,  this.endtime, ignoreSeconds, multiLine);
         }
     }
 

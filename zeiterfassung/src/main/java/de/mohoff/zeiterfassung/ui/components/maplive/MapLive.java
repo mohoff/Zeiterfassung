@@ -78,7 +78,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     // markerAccurate||markerInaccurate||markerNoConnection
     Bitmap markerCurrentLocation;
 
-    private static boolean FOLLOW_MAP_UPDATES = true;
+    private static boolean FOLLOW_MAP_UPDATES;
     private static int CURRENT_LOC_MAX_AGE = 1000 * 60 * 5; // 5 min
     private static int MARKER_DIM = 50; // px
     private static int MARKER_ANIMATION_DURATION = 1000; // ms
@@ -88,7 +88,6 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         markers = new ArrayList<Marker>(LocationCache.getInstance().getPassiveCacheMaxSize());
-        setHasOptionsMenu(true);
 
         super.onCreate(savedInstanceState);
     }
@@ -103,44 +102,48 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         polylineColor = getResources().getColor(R.color.greenish_50);
-        //parentActivity.toolbar.setVisibility(View.GONE);
+        //context.toolbar.setVisibility(View.GONE);
 
         markerAccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_accurate, true);
         markerInaccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_inaccurate, true);
         markerNoConnection = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_noconnection, true);
+        markerCurrentLocation = createCurrentLocationBitmap(context, "markers/marker1.png");
 
-        markerCurrentLocation = createCurrentLocationBitmap(parentActivity, "markers/marker1.png");
+        FOLLOW_MAP_UPDATES = sp.getBoolean(
+                context.getString(R.string.setting_map_follow_updates),
+                Boolean.valueOf(context.getString(R.string.setting_map_follow_updates_default_value))
+        );
 
-        // TODO: For some reason, FAB doesn't show when LocationService is not running and when switch from some other fragment to this one ('MapLive').
         // Set FAB colorBarIcon and click listener
-        parentActivity.fab.setImageBitmap(markerCurrentLocation);
-        parentActivity.fab.setOnClickListener(new View.OnClickListener() {
+        context.fab.setImageBitmap(markerCurrentLocation);
+        context.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (currentLocation != null) {
-                    centerMapTo(currentLocation.getPosition());
+                    // Only change camera center, do not change zoom level here.
+                    centerMapTo(currentLocation.getPosition(), (int) map.getCameraPosition().zoom, true);
                 } else if (markers == null || markers.isEmpty()) {
                     Snackbar.make(
-                            parentActivity.coordinatorLayout,
+                            context.coordinatorLayout,
                             getString(R.string.error_no_data),
                             Snackbar.LENGTH_LONG)
                             .show();
                 } else {
                     Snackbar.make(
-                            parentActivity.coordinatorLayout,
+                            context.coordinatorLayout,
                             getString(R.string.error_no_recent_data),
                             Snackbar.LENGTH_LONG)
                             .show();
                 }
             }
         });
-        parentActivity.fab.show();
+        context.fab.show();
     }
 
     private Bitmap createBitmapFromDrawable(int dim, int drawable, boolean fullOpacity){
         Bitmap b = Bitmap.createBitmap(dim, dim, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(b);
-        Drawable shape = ContextCompat.getDrawable(parentActivity, drawable);
+        Drawable shape = ContextCompat.getDrawable(context, drawable);
         shape.setAlpha(fullOpacity ? 255 : 150);
         shape.setBounds(0, 0, b.getWidth(), b.getHeight());
         shape.draw(canvas);
@@ -182,13 +185,13 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
 
     @Override
     public void onResume() {
-        parentActivity.setOnNewLocationListener(this); // setIsRunning listener
+        context.setOnNewLocationListener(this); // setIsRunning listener
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        //parentActivity.setOnNewLocationListener(null); // remove listener
+        //context.setOnNewLocationListener(null); // remove listener
         super.onPause();
     }
 
@@ -208,29 +211,6 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.maplive, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.follow_updates:
-                // TODO: In order to make check/uncheck with colorBarIcon, we need to replace it each time (swapping between 100% and 50% opacity for example)
-                FOLLOW_MAP_UPDATES = !item.isChecked();
-                item.setChecked(FOLLOW_MAP_UPDATES);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onMapReady(GoogleMap googleMap) {
         super.onMapReady(googleMap);
         CircularFifoQueue<Loc> cache = LocationCache.getInstance().getPassiveCache();
@@ -245,9 +225,9 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                 }
             }
             currentPolyline = addPolylineToMap(map, cache);
-            followWithCamera(markers);
+            followWithCamera(markers, SHOW_MAP_ANIMATIONS);
         } else {
-            Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_no_data), Snackbar.LENGTH_LONG)
+            Snackbar.make(context.coordinatorLayout, getString(R.string.error_no_data), Snackbar.LENGTH_LONG)
                     .show();
         }
     }
@@ -378,7 +358,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         return map.addPolyline(options);
     }
 
-    private void followWithCamera(List<Marker> markers){
+    private void followWithCamera(List<Marker> markers, boolean showAnimation){
         ArrayList<LatLng> respectedLatLngs = new ArrayList<>();
         try {
             respectedLatLngs.add(markers.get(0).getPosition());
@@ -386,7 +366,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         } catch (Exception e){
             // .isRunning(1) failed because it's not yet filled.
         }
-        centerMapTo(getMapViewport(respectedLatLngs));
+        centerMapTo(getMapViewport(respectedLatLngs), showAnimation);
     }
 
     public void onNewLocation(Loc loc) {
@@ -397,7 +377,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             // Move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow secondLine updates on the map"
             // Really reset zoomLevel each call to 17?
             if(FOLLOW_MAP_UPDATES){
-                followWithCamera(markers);
+                followWithCamera(markers, true);
             }
 
             // Update polyline
@@ -406,7 +386,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             }
             currentPolyline = addPolylineToMap(map, LocationCache.getInstance().getPassiveCache());
         } else {
-            Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_no_init), Snackbar.LENGTH_LONG)
+            Snackbar.make(context.coordinatorLayout, getString(R.string.error_no_init), Snackbar.LENGTH_LONG)
                     .show();
         }
         timestampPreviousMarker = loc.getTimestampInMillis();
@@ -420,7 +400,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                             //.colorBarIcon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
                     .icon(BitmapDescriptorFactory.fromBitmap(markerCurrentLocation))
                     //.colorBarIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                    .title(parentActivity.getString(R.string.map_current_location)))
+                    .title(context.getString(R.string.map_current_location)))
                     ;
         } else {
             animateMarker(currentLocation, loc.getLatLng());
@@ -492,7 +472,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                     //addMarkerToMap(map, markers, GeneralHelper.convertLocToLatLng(loc), 1);
                 }
             } else {
-                //GeneralHelper.showToast(parentActivity, "no secondLine data available.");
+                //GeneralHelper.showToast(context, "no secondLine data available.");
             }
             return null;
         }
@@ -502,7 +482,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             // hide spinner
             progressBar.setVisibility(View.GONE);
             if(!this.markersAdded){
-                //Snackbar.make(parentActivity.coordinatorLayout, "Currently no secondLine data available.", Snackbar.LENGTH_LONG)
+                //Snackbar.make(context.coordinatorLayout, "Currently no secondLine data available.", Snackbar.LENGTH_LONG)
                 //        .show();
             }
         }

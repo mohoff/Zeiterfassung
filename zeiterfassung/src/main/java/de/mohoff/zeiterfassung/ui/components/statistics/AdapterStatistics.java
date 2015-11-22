@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,9 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import java.util.ArrayList;
@@ -39,7 +43,7 @@ import de.mohoff.zeiterfassung.ui.colorpicker.ColorPalette;
 /**
  * Created by moo on 11/1/15.
  */
-public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ServiceChangeListener{
+public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ServiceChangeListener, OnChartValueSelectedListener{
     private static int VIEWTYPE_BASIC = 0;
     private static int VIEWTYPE_CHART = 1;
 
@@ -137,7 +141,7 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             statHolder.chart.setData(getInitialChartData());
             statHolder.chart.setNoDataTextDescription("No tracking information available yet.");
-            statHolder.chart.setUsePercentValues(false); // true
+            statHolder.chart.setUsePercentValues(true); // true
             statHolder.chart.setDescription("");
             statHolder.chart.setExtraOffsets(10, 20, 10, 5); // left, top, right, bottom
             statHolder.chart.setDragDecelerationFrictionCoef(0.95f);
@@ -148,48 +152,36 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
             statHolder.chart.setTransparentCircleAlpha(0); // 110
             statHolder.chart.setHoleRadius(0f);
             statHolder.chart.setCenterTextSize(14f);
-
             statHolder.chart.setDrawCenterText(false); // true
             statHolder.chart.setRotationAngle(-90);
-            // enable rotation of the chart by touch
-            statHolder.chart.setRotationEnabled(false); // true
+
+            statHolder.chart.setRotationEnabled(false); // Enables rotation of the chart by touch
             statHolder.chart.setHighlightPerTapEnabled(true);
-            statHolder.chart.animateY(1400, Easing.EasingOption.EaseInOutQuad);
+            statHolder.chart.animateY(1400, Easing.EasingOption.EaseInOutQuad); // Shows loading animation
             statHolder.chart.getLegend().setEnabled(false);
-
-            //Legend l = statHolder.chart.getLegend();
-            //l.setPosition(Legend.LegendPosition.RIGHT_OF_CHART);
-
-            //Paint info = statHolder.chart.getPaint(Chart.PAINT_LEGEND_LABEL);
-            //info.setColor(0xFFFFFFFF);
-            //info.setTextSize(16);
-
-
-            /*XAxis xAxis = statHolder.chart.ge
-            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-            xAxis.setTextSize(10f);
-            xAxis.setTextColor(Color.RED);*/
-
             statHolder.chart.highlightValues(null);
+            statHolder.chart.setOnChartValueSelectedListener(this);
 
             statHolder.chart.invalidate();
-
-
-            /*// Some PieChart methods:
-            invalidate()                        Refresh/redraw
-            notifyDataSetChanged()              Underlying data changed. Needed when adding data dynamically
-            setLogEnabled(boolean)              Enables logging
-            setMaxVisibleValueCount(int)        Sets the number of maximum visible drawn value-labels on the chart. This only takes affect when setDrawValues() is enabled.
-
-            /* // PieDataSet methods:
-            setSliceSpace(float degrees): Sets the space that is left out between the piechart-slices, default: 0° --> no space, maximum 45, minimum 0 (no space)
-            setSelectionShift(float shift): Sets the distance the highlighted piechart-slice of this DataSet is "shifted" away from the center of the chart, default 12f
-
-             */
-
-
-
         }
+    }
+
+    @Override
+    public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+        // Timeslot.getReadableDuration takes millis as argument. Thus we first need to convert
+        // Entry's minutes to milliseconds.
+        String readableDuration = Timeslot.getReadableDuration(((long) e.getVal()) * 60 * 1000, true, false);
+        String activity = e.getData().toString();
+        Snackbar.make(
+                context.coordinatorLayout,
+                activity + ": " + readableDuration,
+                Snackbar.LENGTH_LONG)
+        .show();
+    }
+
+    @Override
+    public void onNothingSelected() {
+
     }
 
     private PieData getInitialChartData(){
@@ -209,30 +201,29 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         List<Entry> timesData = new ArrayList<Entry>();
         int i = 0;
-        for (Long timePerActivity : mapSum.values()) {
+
+        for (Map.Entry<String, Long> entry : mapSum.entrySet()) {
             // Divide by (1000*60), so Entry only needs to stores 'minutes' instead of milliseconds.
-            timesData.add(new Entry((float) timePerActivity/(1000*60), i++));
+            timesData.add(new Entry(
+                    (float) entry.getValue()/(1000*60),
+                    i++,
+                    entry.getKey()
+            ));
         }
-        //timesData.addAll(timesData);
 
         List<String> activities = new ArrayList<>(map.keySet());
         PieDataSet dataSet = new PieDataSet(timesData, "");
+
         // Add colors from ColorPalette.GREENISH. If more colors need than there are in the array,
         // start repeating colors.
-
         int[] colors = new int[timesData.size()];
         for(int j=0; j<timesData.size(); j++){
             colors[j] = ColorPalette.GREENISH[j%(ColorPalette.GREENISH.length)];
-            //dataSet.addColor(ColorPalett
-            //
-            //
-            //
-            // e.GREENISH[j%(ColorPalette.GREENISH.length)]);
         }
         dataSet.setColors(colors);
         dataSet.setSliceSpace(0f);
         dataSet.setSelectionShift(6f);
-        dataSet.setLabel("hallo");
+        dataSet.setValueFormatter(new PercentFormatter());
 
         PieData data = new PieData(activities, dataSet);
         data.setValueTextColor(Color.WHITE);

@@ -28,8 +28,10 @@ import java.util.GregorianCalendar;
 
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
+import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
+import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,8 +39,9 @@ import de.mohoff.zeiterfassung.ui.MainActivity;
 public class Settings extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     MainActivity context;
     DatabaseHelper dbHelper;
+    SharedPreferences sp;
 
-    Preference deleteAllTimeslots, deleteAllZones, cleanMap;
+    Preference cleanMap, deleteAllTimeslots, deleteAllZones, resetAllSettings;
     Preference mapDefaultZoomLevel;
     Preference sendCrashlogs;
 
@@ -49,13 +52,13 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-        //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         initSummaries(getPreferenceScreen());
 
         deleteAllTimeslots = findPreference(getString(R.string.setting_delete_timeslots));
         deleteAllZones = findPreference(getString(R.string.setting_delete_zones));
         cleanMap = findPreference(getString(R.string.setting_clean_map));
+        resetAllSettings = findPreference(getString(R.string.setting_reset_settings));
         mapDefaultZoomLevel = findPreference(getString(R.string.setting_map_default_zoom));
         sendCrashlogs = findPreference(getString(R.string.setting_crashlog_report));
 
@@ -67,12 +70,17 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 if (dbHelper.deleteAllTimeslots() == 1) {
-                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_delete_entries_success), Snackbar.LENGTH_LONG)
-                                            .show();
-                                    dialog.dismiss();
+                                    Snackbar.make(
+                                            context.coordinatorLayout,
+                                            getString(R.string.settings_delete_entries_success),
+                                            Snackbar.LENGTH_LONG)
+                                    .show();
                                 } else {
-                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_delete_entries_failure), Snackbar.LENGTH_LONG)
-                                            .show();
+                                    Snackbar.make(
+                                            context.coordinatorLayout,
+                                            getString(R.string.settings_delete_entries_failure),
+                                            Snackbar.LENGTH_LONG)
+                                    .show();
                                 }
                             }
                         })
@@ -97,12 +105,17 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 if(dbHelper.deleteAllZones() == 1){
-                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_delete_zones_success), Snackbar.LENGTH_LONG)
-                                            .show();
-                                    dialog.dismiss();
+                                    Snackbar.make(
+                                            context.coordinatorLayout,
+                                            getString(R.string.settings_delete_zones_success),
+                                            Snackbar.LENGTH_LONG)
+                                    .show();
                                 } else {
-                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_delete_zones_failure), Snackbar.LENGTH_LONG)
-                                            .show();
+                                    Snackbar.make(
+                                            context.coordinatorLayout,
+                                            getString(R.string.settings_delete_zones_failure),
+                                            Snackbar.LENGTH_LONG)
+                                    .show();
                                 }
                             }
                         })
@@ -129,12 +142,17 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                                 // Clear passiveCache in LocationCache singleton and execute delete on DB
                                 if(LocationCache.getInstance().clearPassiveCache() == 1
                                         && dbHelper.cleanLocs() == 1){
-                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_clean_map_success), Snackbar.LENGTH_LONG)
-                                            .show();
-                                    dialog.dismiss();
+                                    Snackbar.make(
+                                            context.coordinatorLayout,
+                                            getString(R.string.settings_clean_map_success),
+                                            Snackbar.LENGTH_LONG)
+                                    .show();
                                 } else {
-                                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_clean_map_failure), Snackbar.LENGTH_LONG)
-                                            .show();
+                                    Snackbar.make(
+                                            context.coordinatorLayout,
+                                            getString(R.string.settings_clean_map_failure),
+                                            Snackbar.LENGTH_LONG)
+                                    .show();
                                 }
                             }
                         })
@@ -151,6 +169,43 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
             }
         });
 
+        resetAllSettings.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                AlertDialog alertDialog = new AlertDialog.Builder(context)
+                        .setPositiveButton(getString(R.string.dialog_reset), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                if(sp.edit().clear().commit()){
+                                    setPreferenceScreen(null);
+                                    addPreferencesFromResource(R.xml.preferences);
+                                    Snackbar.make(
+                                            context.coordinatorLayout,
+                                            getString(R.string.settings_reset_settings_success),
+                                            Snackbar.LENGTH_LONG)
+                                    .show();
+                                } else {
+                                    Snackbar.make(
+                                            context.coordinatorLayout,
+                                            getString(R.string.settings_reset_settings_failure),
+                                            Snackbar.LENGTH_LONG)
+                                            .show();
+                                }
+                            }
+                        })
+                        .setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .setMessage(getString(R.string.settings_alert_msg_reset_settings))
+                        .create();
+                alertDialog.show();
+                return true;
+            }
+        });
+
         sendCrashlogs.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -159,7 +214,7 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                 if(!isEnabled){
                     //pref.setChecked(true);
                     // TODO: Yeah.. rework that later on ;)
-                    Snackbar.make(context.coordinatorLayout, "Fuck you.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(context.coordinatorLayout, getString(R.string.settings_report_crashlogs_block), Snackbar.LENGTH_LONG)
                             .show();
                     return false;
                 }
@@ -189,6 +244,8 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
         context = (MainActivity) getActivity();
         getDbHelper(context);
         context.fab.hide();
+
+        sp = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @Override
@@ -233,42 +290,52 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
         if (p instanceof EditTextPreference) {
             EditTextPreference editTextPref = (EditTextPreference) p;
             if(p.getKey().equals(getString(R.string.setting_zones_default_radius))){
+                int input = Integer.parseInt(editTextPref.getText());
+                if(input < Zone.MIN_RADIUS){
+                    editTextPref.setText(String.valueOf(Zone.MIN_RADIUS));
+                    Snackbar.make(
+                            context.coordinatorLayout,
+                            getString(R.string.settings_alert_msg_zones_default_radius_failure, Zone.MIN_RADIUS),
+                            Snackbar.LENGTH_LONG)
+                    .show();
+                }
                 p.setSummary(editTextPref.getText() + " meters");
             } else if(p.getKey().equals(getString(R.string.setting_map_default_zoom))){
                 // Clamp input to interval [1 ... 15]
-                int input = Integer.valueOf(editTextPref.getText());
-                if(input > 15) input = 15;
-                if(input < 1) input = 1;
+                int input = Integer.parseInt(editTextPref.getText());
+                if(input > (MapAbstract.MAX_ZOOM_LEVEL - MapAbstract.ZOOM_LEVEL_OFFSET_FOR_PREFS)){
+                    input = MapAbstract.MAX_ZOOM_LEVEL - MapAbstract.ZOOM_LEVEL_OFFSET_FOR_PREFS; // 21-6=15
+                    Snackbar.make(
+                            context.coordinatorLayout,
+                            getString(R.string.settings_alert_msg_map_default_zoom_toohigh, Zone.MIN_RADIUS),
+                            Snackbar.LENGTH_LONG)
+                            .show();
+                }
+                // Usually we need to compute treshold with MapAbstract.ZOOM_LEVEL_OFFSET_FOR_PREFS
+                // like it is done above. But both the lower hard limit and the lower pref limit
+                // are 1, we can just use MapAbstract.MIN_ZOOM_LEVEL here for comparison.
+                if(input < MapAbstract.MIN_ZOOM_LEVEL) {
+                    input = MapAbstract.MIN_ZOOM_LEVEL;
+                    Snackbar.make(
+                            context.coordinatorLayout,
+                            getString(R.string.settings_alert_msg_map_default_zoom_toolow, Zone.MIN_RADIUS),
+                            Snackbar.LENGTH_LONG)
+                            .show();
+                }
                 editTextPref.setText(String.valueOf(input));
                 editTextPref.setSummary(input + " (" + input*100/15+ "%)");
             } else {
                 p.setSummary(editTextPref.getText());
             }
-
-            /*if (p.getTitle().toString().contains("assword"))
-            {
-                p.setSummary("******");
-            } else {
-                p.setSummary(editTextPref.getText());
-            }*/
         }
-
-        /*if (p instanceof MultiSelectListPreference) {
-            EditTextPreference editTextPref = (EditTextPreference) p;
-            p.setSummary(editTextPref.getText());
-        }
-        if (p instanceof ListPreference) {
-            ListPreference listPref = (ListPreference) p;
-            p.setSummary(listPref.getEntry());
-        }*/
     }
 
     public static int getRealZoomLevel(int fromPref){
         // fromPref: [1 .. 15]
         // real zoom level values: [1 .. 21]
-        int realZoom = fromPref + 6;
-        if(realZoom > 21) return 21;
-        if(realZoom < 7) return 7;
+        int realZoom = fromPref + MapAbstract.ZOOM_LEVEL_OFFSET_FOR_PREFS;
+        if(realZoom > MapAbstract.MAX_ZOOM_LEVEL) return MapAbstract.MAX_ZOOM_LEVEL;
+        if(realZoom < MapAbstract.MIN_ZOOM_LEVEL) return MapAbstract.MIN_ZOOM_LEVEL;
         return realZoom;
     }
 
@@ -278,16 +345,6 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
-
-        /*
-        <item>0</item>
-        <item>1</item>
-        <item>7</item>
-        <item>10</item>
-        <item>30</item>
-        <item>365</item>
-        <item>1000</item>
-         */
 
         switch (i){
             case 0:
@@ -322,7 +379,7 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                 // Alltime
                 return 0;
             default:
-                // index not found
+                // index not found. Should not happen.
                 return -1;
         }
     }

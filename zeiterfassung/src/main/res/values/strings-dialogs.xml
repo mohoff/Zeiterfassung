@@ -6,6 +6,7 @@
     <string name="dialog_save">SAVE</string>
     <string name="dialog_delete">DELETE</string>
     <string name="dialog_cancel">@android:string/cancel</string>    <!-- CANCEL -->
+    <string name="dialog_reset">RESET</string>
 
 
     <!-- Update Zone/s -->

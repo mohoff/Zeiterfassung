@@ -1,6 +1,5 @@
 package de.mohoff.zeiterfassung.ui.components.zones;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.Zone;
-import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 
 /**
@@ -37,22 +35,22 @@ public class AddZoneMap extends ManageZonesMapAbstract {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) parentActivity.fab.getLayoutParams();
+        //CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) context.fab.getLayoutParams();
         //params.setAnchorId(R.id.topView);
-        //parentActivity.fab.setLayoutParams(params);
+        //context.fab.setLayoutParams(params);
 
-        parentActivity.fab.setOnClickListener(new View.OnClickListener() {
+        context.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (newRadius < Zone.MIN_RADIUS) {
                     Snackbar.make(
-                            parentActivity.coordinatorLayout,
+                            context.coordinatorLayout,
                             getString(R.string.error_input_radius_min, Zone.MIN_RADIUS),
                             Snackbar.LENGTH_LONG)
                     .show();
                 } else if (candidateMarker == null) {
                     Snackbar.make(
-                            parentActivity.coordinatorLayout,
+                            context.coordinatorLayout,
                             getString(R.string.error_input_no_pin),
                             Snackbar.LENGTH_LONG)
                     .show();
@@ -67,14 +65,14 @@ public class AddZoneMap extends ManageZonesMapAbstract {
                             locationName,
                             candidateColor)) {
                         Snackbar.make(
-                                parentActivity.coordinatorLayout,
+                                context.coordinatorLayout,
                                 getString(R.string.create_zone_success),
                                 Snackbar.LENGTH_LONG)
                         .show();
                         goBackToManageZones();
                     } else {
                         Snackbar.make(
-                                parentActivity.coordinatorLayout,
+                                context.coordinatorLayout,
                                 getString(R.string.create_zone_failure),
                                 Snackbar.LENGTH_LONG)
                         .show();
@@ -106,6 +104,6 @@ public class AddZoneMap extends ManageZonesMapAbstract {
             fixMarkers.add(marker);
             fixCircles.add(circle);
         }
-        centerMapTo(MapAbstract.getMapViewport(latLngList));
+        centerMapTo(MapAbstract.getMapViewport(latLngList), SHOW_MAP_ANIMATIONS);
     }
 }

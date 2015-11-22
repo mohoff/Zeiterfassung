@@ -7,6 +7,7 @@ import android.content.*;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -159,63 +160,16 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             }
         });
 
-        /*leftDrawer = (RelativeLayout) findViewById(R.id.left_drawer);
-        recyclerView = (RecyclerView) findViewById(R.id.drawerList);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        drawerAdapter = new NavigationDrawerAdapter(this, getListItems());
-        recyclerView.setAdapter(drawerAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(this, recyclerView, new ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                //drawerListener.onItemSelected(view, position); // leads to error...
-                selectItem(position);
-                NavigationDrawerAdapter.CURRENTLY_SELECTED = position;
-                recyclerView.getAdapter().notifyDataSetChanged();
-                drawerLayout.closeDrawer(leftDrawer);
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-            }
-        }));
-        */
-
         buttonStartService = (Button) findViewById(R.id.buttonStartService);
         buttonStopService = (Button) findViewById(R.id.buttonStopService);
 
-        /*
-        // TODO: remove "locs" from savedInstanceState when MapLive-fragment is destroyed?!
-        if(savedInstanceState != null){
-            // restore secondLine marker data after screen rotation
-            if (savedInstanceState.containsKey("locs")) {
-                locsTmp = savedInstanceState.getParcelableArrayList("locs");
-                for (Loc e : locsTmp) {
-                    locs.add(e); // --> MapFragment retrieves locs on onResume
-                }
-            }
-        } else {
-            // initial display of main fragment with id=0
-            selectItem(0);
-        }
-        */
-
         // Initializes LocationCache (singleton) and fills it with locations from DB if the
         // locations are not too old.
-        // TODO: Check if it also needs to be called in onCreate() of LocationService.
         GeneralHelper.setupLocationCache(dbHelper);
-
-        // Show overview at initial app start
-        //if(savedInstanceState == null){
-            //selectItem(NavigationDrawerAdapter.CURRENTLY_SELECTED);
-        //}
 
         // Initialize LocationServiceStatus and sync its state with the LocationService
         serviceStatus = new LocationServiceStatus();
         serviceStatus.setIsRunning(LocationService.IS_SERVICE_RUNNING);
-
-
 
         updateServiceButtons();
 
@@ -225,6 +179,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 new IntentFilter("locationServiceLocUpdateEvents"));
         LocalBroadcastManager.getInstance(this).registerReceiver(serviceEventReceiver,
                 new IntentFilter("serviceEventUpdate"));
+
+        // Load preferences' default values into SharedPreference.
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
     public void startAndBindToLocationService() {

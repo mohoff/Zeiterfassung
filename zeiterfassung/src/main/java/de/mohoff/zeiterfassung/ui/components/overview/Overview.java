@@ -64,7 +64,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         // Set FAB colorBarIcon and click listener
         parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_search_black_24dp));
         parentActivity.fab.show();
-        /*parentActivity.fab.setOnClickListener(new View.OnClickListener() {
+        /*context.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (currentLocation != null) {

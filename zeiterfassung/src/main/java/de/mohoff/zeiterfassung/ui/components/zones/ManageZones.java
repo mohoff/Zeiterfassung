@@ -13,7 +13,7 @@ import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class ManageZones extends Fragment {
-    private MainActivity parentActivity;
+    private MainActivity context;
     private DatabaseHelper dbHelper = null;
     private RecyclerView recyclerView;
     private LinearLayoutManager linLayoutManager;
@@ -41,33 +41,32 @@ public class ManageZones extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        parentActivity = (MainActivity) getActivity();
+        context = (MainActivity) getActivity();
 
         // use a linear layout manager
-        linLayoutManager = new LinearLayoutManager(parentActivity);
+        linLayoutManager = new LinearLayoutManager(context);
         linLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linLayoutManager);
 
         // specify an adapter (see also next example)
-        adapter = new ManageZonesAdapter(parentActivity);
+        adapter = new ManageZonesAdapter(context);
         recyclerView.setAdapter(adapter);
 
         // Set FAB colorBarIcon and click listener
-        parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_white_24dp));
-        parentActivity.fab.setOnClickListener(new View.OnClickListener() {
+        context.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_white_24dp));
+        context.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Fragment nextFragment = new AddZone();
-                parentActivity.replaceFragment(nextFragment, true);
+                context.replaceFragment(nextFragment, true);
             }
         });
-        parentActivity.fab.show();
+        context.fab.show();
     }
 
     @Override
     public void onResume() {
-        // TODO: What's up with that snippet? Still needed in NavigationView?
-        // TODO: current status: NEEDED!
+        // TODO: What's up with that snippet? Still needed in NavigationView? -- Current status: NEEDED!
         if(getFragmentManager().getBackStackEntryCount() > 0){
             ((MainActivity)getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(false);
         } else {

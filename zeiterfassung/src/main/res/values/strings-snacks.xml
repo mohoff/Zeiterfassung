@@ -51,17 +51,27 @@
 
 
     <!-- Settings -->
+    <string name="settings_alert_msg_zones_default_radius_failure">Radius must be at least %1$s meters.</string>
 
-    <string name="settings_alert_msg_clean_map">Clean map?</string>
-    <string name="settings_clean_map_success">Map cleaned.</string>
-    <string name="settings_clean_map_failure">Couldn\'t clean map.</string>
+    <string name="settings_alert_msg_map_default_zoom_toolow">Input was corrected to Minimum Zoom.</string>
+    <string name="settings_alert_msg_map_default_zoom_toohigh">Input was corrected to Maximum Zoom.</string>
 
-    <string name="settings_alert_msg_delete_entries">Delete all tracking entries?</string>
+    <string name="settings_report_crashlogs_block">Mehh.. let\'s keep that one enabled :P</string>
+
+    <string name="settings_alert_msg_delete_entries">Delete all Tracking Entries?</string>
     <string name="settings_delete_entries_success">Entries deleted.</string>
-    <string name="settings_delete_entries_failure">Couldn\'t delete entries.</string>
+    <string name="settings_delete_entries_failure">Couldn\'t delete Entries.</string>
 
     <string name="settings_alert_msg_delete_zones">Delete all Zones?</string>
     <string name="settings_delete_zones_success">Zones deleted.</string>
     <string name="settings_delete_zones_failure">Couldn\'t delete Zones.</string>
+
+    <string name="settings_alert_msg_clean_map">Clean Map?</string>
+    <string name="settings_clean_map_success">Map cleaned.</string>
+    <string name="settings_clean_map_failure">Couldn\'t clean Map.</string>
+
+    <string name="settings_alert_msg_reset_settings">Reset Settings and restore their default values?</string>
+    <string name="settings_reset_settings_success">Settings resetted.</string>
+    <string name="settings_reset_settings_failure">Couldn\'t reset Settings.</string>
 
 </resources>

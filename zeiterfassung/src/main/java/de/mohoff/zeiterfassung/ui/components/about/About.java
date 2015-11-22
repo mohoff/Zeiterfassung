@@ -4,15 +4,18 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.ui.MainActivity;
+import de.mohoff.zeiterfassung.ui.components.zones.AddZoneMap;
 
 public class About extends Fragment {
     MainActivity context;
-
+    Button sendFeedback;
 
     public About() {
         // Required empty public constructor
@@ -26,8 +29,10 @@ public class About extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_about, container, false);
+        View v = inflater.inflate(R.layout.fragment_about, container, false);
+        sendFeedback = (Button) v.findViewById(R.id.sendFeedback);
+
+        return v;
     }
 
     @Override
@@ -35,15 +40,24 @@ public class About extends Fragment {
         super.onActivityCreated(savedInstanceState);
         context = (MainActivity) getActivity();
         context.fab.hide();
+
+        sendFeedback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment nextFragment = new SendFeedback();
+                context.replaceFragment(nextFragment, true);
+            }
+        });
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onResume() {
+        // TODO: What's up with that snippet? Still needed in NavigationView? -- Current status: NEEDED!
+        if(getFragmentManager().getBackStackEntryCount() > 0){
+            ((MainActivity)getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(false);
+        } else {
+            ((MainActivity)getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(true);
+        }
+        super.onResume();
     }
 }

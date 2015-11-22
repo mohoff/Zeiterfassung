@@ -229,7 +229,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             vh.startDate.setText(timeslot.getReadableStartDate());
             vh.endTime.setText(timeslot.getReadableEndTime(context));
             vh.endDate.setText(timeslot.getReadableEndDate(context));
-            vh.duration.setText(timeslot.getReadableDuration()); // e.g. "1d 2h 14min"
+            vh.duration.setText(timeslot.getReadableDuration(true, true)); // e.g. "1d 2h 14min"
 
             /*// Show or hide top connector part of that view
             if(listHasItemAtIndex(position+1) && (data.isRunning(position+1).getZone().get_id() == timeslot.getZone().get_id())){
@@ -276,11 +276,11 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                     // Directly update the adapter's model, so we can avoid a new DB query
                                     relevantTLAs.isRunning(position).setLocationName(et.getText().toString());
                                     innerAdapter.notifyDataSetChanged();
-                                    Snackbar.make(parentActivity.coordinatorLayout, "Updated.", Snackbar.LENGTH_LONG)
+                                    Snackbar.make(context.coordinatorLayout, "Updated.", Snackbar.LENGTH_LONG)
                             .show();
                                     dialog.dismiss();
                                 } else {
-                                    Snackbar.make(parentActivity.coordinatorLayout, "Couldn't update Location.", Snackbar.LENGTH_LONG)
+                                    Snackbar.make(context.coordinatorLayout, "Couldn't update Location.", Snackbar.LENGTH_LONG)
                             .show();
                                 }*/
 

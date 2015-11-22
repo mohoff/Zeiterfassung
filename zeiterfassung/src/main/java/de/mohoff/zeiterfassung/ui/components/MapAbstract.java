@@ -4,13 +4,11 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
+import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
+import android.preference.PreferenceManager;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,46 +20,42 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
-
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
-import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.ui.MainActivity;
+import de.mohoff.zeiterfassung.ui.components.settings.Settings;
 
 /**
  * Created by moo on 8/16/15.
  */
 public class MapAbstract extends Fragment implements OnMapReadyCallback {
-    private static int DEFAULT_ZOOM_LEVEL = 17;
+    protected static boolean SHOW_MAP_ANIMATIONS;
+    protected static int DEFAULT_ZOOM_LEVEL = 17;
+    public static int MIN_ZOOM_LEVEL = 1;
+    public static int MAX_ZOOM_LEVEL = 21;
+    public static int ZOOM_LEVEL_OFFSET_FOR_PREFS = 6;
     private static int MARKER_VIEWPORT_PADDING = 200; // px
 
-    protected MainActivity parentActivity;
+    protected MainActivity context;
     protected static View view;
     protected ProgressBar progressBar;
 
     protected MapFragment mapFragment;
     protected GoogleMap map;
     protected Geocoder geocoder;
-    // Should be replaced with "greenish_50" in onCreateView().
-    // Work around for "fragment not attached to firstLine" error.
 
-
+    protected SharedPreferences sp;
     protected DatabaseHelper dbHelper = null;
 
     @Override
@@ -123,9 +117,23 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        parentActivity = (MainActivity) getActivity();
+        context = (MainActivity) getActivity();
         geocoder = new Geocoder(getActivity());
-        dbHelper = getDbHelper(parentActivity);
+        dbHelper = getDbHelper(context);
+        sp = PreferenceManager.getDefaultSharedPreferences(context);
+
+        // Handle setting 'Default Zoom Level'
+        DEFAULT_ZOOM_LEVEL = Settings.getRealZoomLevel(
+                Integer.parseInt(sp.getString(
+                        context.getString(R.string.setting_map_default_zoom),
+                        String.valueOf(context.getString(R.string.setting_map_default_zoom_default_value))
+                ))
+        );
+        // Handle setting 'Zoom In Animation'
+        SHOW_MAP_ANIMATIONS = sp.getBoolean(
+                context.getString(R.string.setting_map_zoomin),
+                Boolean.valueOf(context.getString(R.string.setting_map_zoomin_default_value))
+        );
     }
 
     @Override
@@ -188,7 +196,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         progressBar.setVisibility(View.GONE);
     }
 
-    protected void addMarkerToMap(GoogleMap map, List<Marker> markers, LatLng latLng, float opacity, String title, String snippet, boolean isRealUpdate){
+    // It is easier to implement this method in non-abstract classes
+    /*protected void addMarkerToMap(GoogleMap map, List<Marker> markers, LatLng latLng, float opacity, String title, String snippet, boolean isRealUpdate){
         MarkerOptions markerOptions = new MarkerOptions()
                 .position(latLng)
                 .draggable(false)
@@ -214,33 +223,33 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 markers.get(markers.size()-2).setIcon(BitmapDescriptorFactory.defaultMarker(0)); // BitmapDescriptorFactory.HUE_VIOLET
                 // Move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow secondLine updates on the map"
                 // Really reset zoomLevel each call to 17?
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL));
             } else {
                 // Zoom map in to marker, if the marker is the first one on the map.
                 // Zoom level 17 turns out to be nice because its the lowest one in which you can
                 // see building outlines.
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM_LEVEL));
             }
         } else {
             // No list "markers" is passed, so we are in "Add new Zone".
             // Just move camera towards desired position without resetting the zoom level every time.
             map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         }
-    }
+    }*/
 
-    protected void centerMapTo(LatLng cameraCenter){
-        centerMapTo(CameraUpdateFactory.newLatLngZoom(cameraCenter, DEFAULT_ZOOM_LEVEL));
-    }
-
-    protected void centerMapTo(LatLng cameraCenter, int zoomLevel){
-        if(zoomLevel <= 0){
+    protected void centerMapTo(LatLng cameraCenter, int zoomLevel, boolean showAnimation){
+        if(zoomLevel < MIN_ZOOM_LEVEL || zoomLevel > MAX_ZOOM_LEVEL){
             zoomLevel = DEFAULT_ZOOM_LEVEL;
         }
-        centerMapTo(CameraUpdateFactory.newLatLngZoom(cameraCenter, zoomLevel));
+        centerMapTo(CameraUpdateFactory.newLatLngZoom(cameraCenter, zoomLevel), showAnimation);
     }
 
-    protected  void centerMapTo(CameraUpdate cu){
-        map.animateCamera(cu);
+    protected  void centerMapTo(CameraUpdate cu, boolean showAnimation){
+        if(showAnimation){
+            map.animateCamera(cu);
+        } else {
+            map.moveCamera(cu);
+        }
     }
 
     /*protected MarkerOptions createMarkerOptions(boolean isDraggable, String title, String snippet, BitmapDescriptor bitmapDescriptor){
@@ -266,6 +275,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
             boundBilder.include(latLng);
         }
         LatLngBounds bounds = boundBilder.build();
+
+        //CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, MARKER_VIEWPORT_PADDING);
 
         return CameraUpdateFactory.newLatLngBounds(bounds, MARKER_VIEWPORT_PADDING);
     }

@@ -78,6 +78,9 @@
 
     <color name="cardview_background">#FFF9F9F9</color>
 
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 <!-- TODO: REWORK
     <color name="navigation_drawer_bg">@color/white</color>
     <color name="navigation_drawer_top_bg">@color/greenish_10</color>

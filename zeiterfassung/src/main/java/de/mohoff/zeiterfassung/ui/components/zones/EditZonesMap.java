@@ -29,31 +29,33 @@ public class EditZonesMap extends ManageZonesMapAbstract {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        candidateZoneId = getArguments().getInt(parentActivity.getString(R.string.arg_zone_id));
+        candidateZoneId = getArguments().getInt(context.getString(R.string.arg_zone_id));
         editZone = dbHelper.getZoneById(candidateZoneId);
         candidateColor = editZone.getColor();
+        // Overwrite newRadius which was previously assigned in super.onActivityCreated with value
+        // from SharedPreferences.
         newRadius = editZone.getRadius();
         radiusValue.setText(String.valueOf(newRadius));
 
-        parentActivity.fab.setOnClickListener(new View.OnClickListener() {
+        context.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (newRadius < Zone.MIN_RADIUS) {
                     Snackbar.make(
-                            parentActivity.coordinatorLayout,
+                            context.coordinatorLayout,
                             getString(R.string.error_input_radius_min,Zone.MIN_RADIUS),
                             Snackbar.LENGTH_LONG)
                     .show();
                 } else if(candidateMarker == null) {
                     Snackbar.make(
-                            parentActivity.coordinatorLayout,
+                            context.coordinatorLayout,
                             getString(R.string.error_input_no_pin),
                             Snackbar.LENGTH_LONG)
                     .show();
                 } else if(candidateMarker.getPosition().equals(editZone.getLatLng()) &&
                         newRadius == editZone.getRadius()) {
                     Snackbar.make(
-                            parentActivity.coordinatorLayout,
+                            context.coordinatorLayout,
                             getString(R.string.error_input_pin_equal),
                             Snackbar.LENGTH_LONG)
                     .show();
@@ -63,15 +65,15 @@ public class EditZonesMap extends ManageZonesMapAbstract {
                     editZone.setRadius((int) candidateCircle.getRadius());
                     if(dbHelper.updateZone(editZone) == 1){
                         Snackbar.make(
-                                parentActivity.coordinatorLayout,
-                                parentActivity.getString(R.string.update_zone_success),
+                                context.coordinatorLayout,
+                                context.getString(R.string.update_zone_success),
                                 Snackbar.LENGTH_LONG)
                         .show();
                         goBackToManageZones();
                     } else {
                         Snackbar.make(
-                                parentActivity.coordinatorLayout,
-                                parentActivity.getString(R.string.update_zone_failure),
+                                context.coordinatorLayout,
+                                context.getString(R.string.update_zone_failure),
                                 Snackbar.LENGTH_LONG)
                         .show();
                     }
@@ -97,7 +99,7 @@ public class EditZonesMap extends ManageZonesMapAbstract {
                 );
                 candidateMarker = marker;
                 candidateCircle = circle;
-                centerMapTo(latLng, 0);
+                centerMapTo(latLng, 0, SHOW_MAP_ANIMATIONS);
             } else {
                 marker = map.addMarker(
                         optionsFixMarker.position(latLng)

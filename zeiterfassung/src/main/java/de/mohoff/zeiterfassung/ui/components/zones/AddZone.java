@@ -24,7 +24,7 @@ import de.mohoff.zeiterfassung.ui.MainActivity;
 import de.mohoff.zeiterfassung.ui.colorpicker.ColorPicker;
 
 public class AddZone extends Fragment {
-    private MainActivity parentActivity;
+    private MainActivity context;
     private DatabaseHelper dbHelper = null;
     private ArrayAdapter adapter;
     private AutoCompleteTextView autoCompleteTextView;
@@ -64,12 +64,12 @@ public class AddZone extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        context = (MainActivity) getActivity();
 
-        parentActivity = (MainActivity) getActivity();
-        parentActivity.getDrawerToggle().setDrawerIndicatorEnabled(false);
-        parentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        context.getDrawerToggle().setDrawerIndicatorEnabled(false);
+        context.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        dbHelper = getDbHelper(parentActivity);
+        dbHelper = getDbHelper(context);
         // Get distinct Activity names to suggest them while typing in AutoCompleteTextView
         List<String> activityList = dbHelper.getDistinctActivityNames();
         activityNames = activityList.toArray(new String[activityList.size()]);
@@ -91,7 +91,7 @@ public class AddZone extends Fragment {
                     AutoCompleteTextView tv = (AutoCompleteTextView) v;
                     if(!hasFocus) {
                         inputActivityName = tv.getText().toString();
-                        GeneralHelper.hideSoftKeyboardWithView(parentActivity, v);
+                        GeneralHelper.hideSoftKeyboardWithView(context, v);
                     }
                 }
             });
@@ -103,24 +103,24 @@ public class AddZone extends Fragment {
                 EditText et = (EditText) v;
                 if(!hasFocus) {
                     inputLocationName = et.getText().toString();
-                    GeneralHelper.hideSoftKeyboardWithView(parentActivity, v);
+                    GeneralHelper.hideSoftKeyboardWithView(context, v);
                 }
             }
         });
 
         // Set FAB colorBarIcon and click listener
-        parentActivity.fab.show();
-        parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_chevron_right_white_24dp));
-        parentActivity.fab.setOnClickListener(new View.OnClickListener() {
+        context.fab.show();
+        context.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_chevron_right_white_24dp));
+        context.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 autoCompleteTextView.clearFocus();
                 editText.clearFocus();
                 if (inputActivityName.equals("") || inputLocationName.equals("")) {
-                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_names), Snackbar.LENGTH_LONG)
+                    Snackbar.make(context.coordinatorLayout, getString(R.string.error_input_names), Snackbar.LENGTH_LONG)
                             .show();
                 } else if(!colorPicker.isColorSelected()){
-                    Snackbar.make(parentActivity.coordinatorLayout, getString(R.string.error_input_color), Snackbar.LENGTH_LONG)
+                    Snackbar.make(context.coordinatorLayout, getString(R.string.error_input_color), Snackbar.LENGTH_LONG)
                             .show();
                 } else {
                     Fragment nextFragment = new AddZoneMap();
@@ -131,7 +131,7 @@ public class AddZone extends Fragment {
                     args.putInt(getString(R.string.arg_color), colorPicker.getSelectedColor());
                     nextFragment.setArguments(args);
 
-                    parentActivity.replaceFragment(nextFragment, true);
+                    context.replaceFragment(nextFragment, true);
                 }
             }
         });

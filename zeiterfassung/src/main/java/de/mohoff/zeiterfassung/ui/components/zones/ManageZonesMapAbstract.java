@@ -1,9 +1,11 @@
 package de.mohoff.zeiterfassung.ui.components.zones;
 
 import android.app.Fragment;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Address;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -34,6 +36,10 @@ import de.mohoff.zeiterfassung.ui.components.MapAbstract;
  * Created by moo on 10/9/15.
  */
 public abstract class ManageZonesMapAbstract extends MapAbstract {
+    protected static boolean SHOW_MAP_ANIMATIONS;
+
+    SharedPreferences sp;
+
     ArrayList<Marker> fixMarkers = new ArrayList<Marker>();
     ArrayList<Circle> fixCircles = new ArrayList<Circle>();
     LatLng lookupLatLng;
@@ -41,7 +47,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
     Marker candidateMarker = null;
     Circle candidateCircle = null;
     int candidateColor;
-    int newRadius = 50;
+    int newRadius;
 
     EditText radiusValue, addressValue;
     ImageButton searchButton;
@@ -71,15 +77,22 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        MapsInitializer.initialize(parentActivity);
+        MapsInitializer.initialize(context);
 
-        // TODO: Do we have to add isAdded() here?
-        //MainActivity main = (MainActivity) getActivity();
-        parentActivity.getDrawerToggle().setDrawerIndicatorEnabled(false);
-        parentActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        sp = PreferenceManager.getDefaultSharedPreferences(context);
+
+        // Handle setting 'Default Zone Radius'
+        newRadius = Integer.parseInt(sp.getString(
+                context.getString(R.string.setting_zones_default_radius),
+                String.valueOf(context.getString(R.string.setting_zones_default_radius_default_value))
+        ));
+
+        context.getDrawerToggle().setDrawerIndicatorEnabled(false);
+        context.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         // Set FAB colorBarIcon and click listener
-        parentActivity.fab.show();
-        parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_save_black_24dp));
+        context.fab.show();
+        context.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_save_black_24dp));
 
         colorButtonDisabled = getResources().getColor(R.color.grey_25);
         colorButtonEnabled = getResources().getColor(R.color.greenish);
@@ -93,8 +106,8 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                     newRadius = Integer.valueOf(inputString);
                 } catch (Exception e) {
                     Snackbar.make(
-                            parentActivity.coordinatorLayout,
-                            parentActivity.getString(R.string.error_input_no_number),
+                            context.coordinatorLayout,
+                            context.getString(R.string.error_input_no_number),
                             Snackbar.LENGTH_LONG)
                     .show();
                 }
@@ -114,8 +127,8 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
             public void onClick(View v) {
                 if (addressValue.getText() == null) {
                     Snackbar.make(
-                            parentActivity.coordinatorLayout,
-                            parentActivity.getString(R.string.error_input_geolookup_empty),
+                            context.coordinatorLayout,
+                            context.getString(R.string.error_input_geolookup_empty),
                             Snackbar.LENGTH_LONG)
                     .show();
                 } else {
@@ -127,7 +140,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                         MarkerOptions markerOptions = new MarkerOptions()
                                 .position(lookupLatLng)
                                 .draggable(true)
-                                .title(parentActivity.getString(R.string.map_new_zone))
+                                .title(context.getString(R.string.map_new_zone))
                                         // TODO: use custom marker with Zone's color
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
@@ -139,17 +152,17 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                         );
 
                         // Move camera to lookup position
-                        centerMapTo(lookupLatLng, 0);
+                        centerMapTo(lookupLatLng, 0, SHOW_MAP_ANIMATIONS);
                     } catch (IOException e) {
                         Snackbar.make(
-                                parentActivity.coordinatorLayout,
-                                parentActivity.getString(R.string.error_geolookup),
+                                context.coordinatorLayout,
+                                context.getString(R.string.error_geolookup),
                                 Snackbar.LENGTH_LONG)
                         .show();
                     } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
                         Snackbar.make(
-                                parentActivity.coordinatorLayout,
-                                parentActivity.getString(R.string.error_input_geolookup_invalid),
+                                context.coordinatorLayout,
+                                context.getString(R.string.error_input_geolookup_invalid),
                                 Snackbar.LENGTH_LONG)
                         .show();
                     }
@@ -228,8 +241,8 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                 candidateMarker = map.addMarker(new MarkerOptions()
                                 .position(point)
                                 .draggable(true)
-                                .title(parentActivity.getString(R.string.map_new_zone))
-                                // TODO: use custom marker with Zone's color
+                                .title(context.getString(R.string.map_new_zone))
+                                        // TODO: use custom marker with Zone's color
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 );
                 candidateCircle = map.addCircle(
@@ -259,9 +272,9 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
 
     protected void goBackToManageZones(){
         // Clear back stack because we're done with adding or editing a Zone.
-        GeneralHelper.clearBackStack(parentActivity);
+        GeneralHelper.clearBackStack(context);
         // Go back to ManageZones fragment with clean back stack
         Fragment nextFragment = new ManageZones();
-        parentActivity.replaceFragment(nextFragment, false);
+        context.replaceFragment(nextFragment, false);
     }
 }

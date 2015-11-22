@@ -7,6 +7,8 @@ import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "zones")
 public class Zone {
+    // If you change MIN_RADIUS, also change hardcoded strings in 'strings-settings.xml' and
+    // 'strings-snacks.xml'.
     public static int MIN_RADIUS = 30; // m
 
     @DatabaseField(generatedId = true) // autoincrement primary key
