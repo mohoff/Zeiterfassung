@@ -41,32 +41,34 @@ public class EditZonesMap extends ManageZonesMapAbstract {
         context.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (candidateMarker == null) {
+                    Snackbar.make(
+                            context.coordinatorLayout,
+                            getString(R.string.error_input_no_pin),
+                            Snackbar.LENGTH_LONG)
+                    .show();
+                    return;
+                }
                 Loc newLoc = Loc.convertLatLngToLoc(candidateMarker.getPosition());
                 if (newRadius < Zone.MIN_RADIUS) {
                     Snackbar.make(
                             context.coordinatorLayout,
                             getString(R.string.error_input_radius_min, Zone.MIN_RADIUS),
                             Snackbar.LENGTH_LONG)
-                            .show();
-                } else if (candidateMarker == null) {
-                    Snackbar.make(
-                            context.coordinatorLayout,
-                            getString(R.string.error_input_no_pin),
-                            Snackbar.LENGTH_LONG)
-                            .show();
+                    .show();
                 } else if (candidateMarker.getPosition().equals(editZone.getLatLng()) &&
                         newRadius == editZone.getRadius()) {
                     Snackbar.make(
                             context.coordinatorLayout,
                             getString(R.string.error_input_pin_equal),
                             Snackbar.LENGTH_LONG)
-                            .show();
+                        .show();
                 } else if (dbHelper.isIntersectingOtherZone(newLoc, newRadius, candidateZoneId)) {
                     Snackbar.make(
                             context.coordinatorLayout,
                             getString(R.string.error_input_pin_intersect),
                             Snackbar.LENGTH_LONG)
-                            .show();
+                    .show();
                 } else {
                     editZone.setRadius(newRadius);
                     editZone.setRadius((int) candidateCircle.getRadius());
@@ -75,14 +77,14 @@ public class EditZonesMap extends ManageZonesMapAbstract {
                                 context.coordinatorLayout,
                                 context.getString(R.string.update_zone_success),
                                 Snackbar.LENGTH_LONG)
-                                .show();
+                        .show();
                         goBackToManageZones();
                     } else {
                         Snackbar.make(
                                 context.coordinatorLayout,
                                 context.getString(R.string.update_zone_failure),
                                 Snackbar.LENGTH_LONG)
-                                .show();
+                        .show();
                     }
                 }
             }

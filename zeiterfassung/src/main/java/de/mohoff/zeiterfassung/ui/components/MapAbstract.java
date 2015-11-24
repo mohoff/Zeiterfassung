@@ -176,6 +176,12 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 MARKER_WIDTH,
                 MARKER_HEIGHT,
                 true);
+        // TODO: Based on drawables, not on assets. Maybe works when trying to support wider range of screen sizes.
+        /*markerFixLocation = createBitmapFromDrawable(
+                tintDrawable(getResources().getDrawable(R.drawable.ic_launcher), colorFixLocationMarker),
+                MARKER_WIDTH,
+                MARKER_HEIGHT,
+                true);*/
         colorCandidateLocationMarker = getResources().getColor(R.color.greenish_100);
         colorCandidateLocationCircle = getResources().getColor(R.color.greenish_50);
         markerCandidateLocation = createBitmapFromDrawable(
@@ -385,6 +391,10 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
             e.printStackTrace();
             return null;
         }
+        return tintDrawable(d, tintColor);
+    }
+
+    protected Drawable tintDrawable(Drawable d, int tintColor){
         if(tintColor != 0 && d != null){
             d.setColorFilter(tintColor, PorterDuff.Mode.SRC_IN);
         }

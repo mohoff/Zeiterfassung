@@ -43,17 +43,19 @@ public class AddZoneMap extends ManageZonesMapAbstract {
         context.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (candidateMarker == null) {
+                    Snackbar.make(
+                            context.coordinatorLayout,
+                            getString(R.string.error_input_no_pin),
+                            Snackbar.LENGTH_LONG)
+                    .show();
+                    return;
+                }
                 Loc newLoc = Loc.convertLatLngToLoc(candidateMarker.getPosition());
                 if (newRadius < Zone.MIN_RADIUS) {
                     Snackbar.make(
                             context.coordinatorLayout,
                             getString(R.string.error_input_radius_min, Zone.MIN_RADIUS),
-                            Snackbar.LENGTH_LONG)
-                    .show();
-                } else if (candidateMarker == null) {
-                    Snackbar.make(
-                            context.coordinatorLayout,
-                            getString(R.string.error_input_no_pin),
                             Snackbar.LENGTH_LONG)
                     .show();
                 } else if (dbHelper.isIntersectingAnyZone(newLoc, newRadius)) {
