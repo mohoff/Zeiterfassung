@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">Zeiterfassung</string>
+    <string name="app_creator">Moritz Hoffmann</string>
 
     <string name="nav_item_1_overview">Overview</string>
     <string name="nav_item_2_zones">Zones</string>

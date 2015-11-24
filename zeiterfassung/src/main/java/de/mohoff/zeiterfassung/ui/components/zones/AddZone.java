@@ -30,7 +30,6 @@ public class AddZone extends Fragment {
     private AutoCompleteTextView autoCompleteTextView;
     private EditText editText;
     private ColorPicker colorPicker;
-    private CardView pinButton;
     private String activityNames[];
 
     private String inputActivityName = "";
@@ -39,6 +38,8 @@ public class AddZone extends Fragment {
     public AddZone() {
         // Required empty public constructor
     }
+
+    // TODO: add location, activity, color when going back from AddZoneMap to AddZone (this fragment)
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

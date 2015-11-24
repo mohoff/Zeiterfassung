@@ -11,6 +11,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.Zone;
 
 /**
@@ -40,42 +41,48 @@ public class EditZonesMap extends ManageZonesMapAbstract {
         context.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Loc newLoc = Loc.convertLatLngToLoc(candidateMarker.getPosition());
                 if (newRadius < Zone.MIN_RADIUS) {
                     Snackbar.make(
                             context.coordinatorLayout,
-                            getString(R.string.error_input_radius_min,Zone.MIN_RADIUS),
+                            getString(R.string.error_input_radius_min, Zone.MIN_RADIUS),
                             Snackbar.LENGTH_LONG)
-                    .show();
-                } else if(candidateMarker == null) {
+                            .show();
+                } else if (candidateMarker == null) {
                     Snackbar.make(
                             context.coordinatorLayout,
                             getString(R.string.error_input_no_pin),
                             Snackbar.LENGTH_LONG)
-                    .show();
-                } else if(candidateMarker.getPosition().equals(editZone.getLatLng()) &&
+                            .show();
+                } else if (candidateMarker.getPosition().equals(editZone.getLatLng()) &&
                         newRadius == editZone.getRadius()) {
                     Snackbar.make(
                             context.coordinatorLayout,
                             getString(R.string.error_input_pin_equal),
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
+                } else if (dbHelper.isIntersectingOtherZone(newLoc, newRadius, candidateZoneId)) {
+                    Snackbar.make(
+                            context.coordinatorLayout,
+                            getString(R.string.error_input_pin_intersect),
+                            Snackbar.LENGTH_LONG)
+                            .show();
                 } else {
-                    // TODO: Check if entered newRadius is not near other Zones.
                     editZone.setRadius(newRadius);
                     editZone.setRadius((int) candidateCircle.getRadius());
-                    if(dbHelper.updateZone(editZone) == 1){
+                    if (dbHelper.updateZone(editZone) == 1) {
                         Snackbar.make(
                                 context.coordinatorLayout,
                                 context.getString(R.string.update_zone_success),
                                 Snackbar.LENGTH_LONG)
-                        .show();
+                                .show();
                         goBackToManageZones();
                     } else {
                         Snackbar.make(
                                 context.coordinatorLayout,
                                 context.getString(R.string.update_zone_failure),
                                 Snackbar.LENGTH_LONG)
-                        .show();
+                                .show();
                     }
                 }
             }
@@ -115,7 +122,7 @@ public class EditZonesMap extends ManageZonesMapAbstract {
 
     private void updateButtonColor(){
 
-        // TODO: rework this
+        // TODO: rework this for FAB color
 
         // Provide color feedback. Disable button if newRadius hasn't changed.
         /*if (newRadius == editZone.getRadius()) {

@@ -21,9 +21,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.util.Property;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -69,18 +66,8 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     int polylineColor = Color.BLACK;
     Marker currentLocation;
 
-    // Bitmaps for Marker icons in 3 different variants
-    Bitmap markerAccurate, markerInaccurate, markerNoConnection;
-    // Bitmap for Markers which will be displayed with a number on them.
-    // While generating this Bitmap, the number will be printed on of the 3 templates above.
-    Bitmap markerWithNumbers;
-    // Bitmap for Marker which shows most recent user secondLine on top of
-    // markerAccurate||markerInaccurate||markerNoConnection
-    Bitmap markerCurrentLocation;
-
     private static boolean FOLLOW_MAP_UPDATES;
     private static int CURRENT_LOC_MAX_AGE = 1000 * 60 * 5; // 5 min
-    private static int MARKER_DIM = 50; // px
     private static int MARKER_ANIMATION_DURATION = 1000; // ms
 
     private long timestampPreviousMarker = 0;
@@ -103,11 +90,6 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         super.onActivityCreated(savedInstanceState);
         polylineColor = getResources().getColor(R.color.greenish_50);
         //context.toolbar.setVisibility(View.GONE);
-
-        markerAccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_accurate, true);
-        markerInaccurate = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_inaccurate, true);
-        markerNoConnection = createBitmapFromDrawable(MARKER_DIM, R.drawable.mapmarker_noconnection, true);
-        markerCurrentLocation = createCurrentLocationBitmap(context, "markers/marker1.png");
 
         FOLLOW_MAP_UPDATES = sp.getBoolean(
                 context.getString(R.string.setting_map_follow_updates),
@@ -140,17 +122,9 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         context.fab.show();
     }
 
-    private Bitmap createBitmapFromDrawable(int dim, int drawable, boolean fullOpacity){
-        Bitmap b = Bitmap.createBitmap(dim, dim, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(b);
-        Drawable shape = ContextCompat.getDrawable(context, drawable);
-        shape.setAlpha(fullOpacity ? 255 : 150);
-        shape.setBounds(0, 0, b.getWidth(), b.getHeight());
-        shape.draw(canvas);
-        return b;
-    }
 
-    public Bitmap createCurrentLocationBitmap(Context context, String filePath){
+
+    /*public Bitmap createCurrentLocationBitmap(Context context, String filePath){
         // Original from asset (png file)
         Bitmap base = createBitmapFromAsset(context, filePath);
 
@@ -166,22 +140,9 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         canvas.drawBitmap(resized, 0, 0, null);
 
         return result;
-    }
+    }*/
 
-    public static Bitmap createBitmapFromAsset(Context context, String filePath) {
-        AssetManager assetManager = context.getAssets();
-        InputStream istr;
-        Bitmap bitmap = null;
 
-        try {
-            istr = assetManager.open(filePath);
-            bitmap = BitmapFactory.decodeStream(istr);
-            //istr.close(); // TODO: Should we close input stream here? Stackoverflow snippet was without close().
-        } catch (IOException e) {
-            // handle exception
-        }
-        return bitmap;
-    }
 
     @Override
     public void onResume() {
@@ -273,25 +234,6 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         return mo;
     }
 
-    private Bitmap addTextToBitmap(Bitmap b, String text){
-        if(text == null) text = "";
-
-        Canvas canvas = new Canvas(b);
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setColor(Color.WHITE);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTypeface(Typeface.DEFAULT_BOLD);
-        paint.setTextSize(35);
-        Rect bounds = new Rect();
-        paint.getTextBounds(text, 0, text.length(), bounds);
-        float x = b.getWidth() / 2.0f;
-        float y = (b.getHeight() - bounds.height()) / 2.0f - bounds.top;
-        canvas.drawText(text, x, y, paint);
-
-        return b;
-    }
-
     private int getLengthOfLatLngSeries(LatLng latLng){
         int result = 1;
         // Only check for markers array interval [0...size-2] since the last element (size-1) will
@@ -374,8 +316,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             MarkerOptions markerOptions = createMarkerOptions(loc, LocationService.ACCURACY_TRESHOLD);
             addMarkerToMap(map, markers, markerOptions);
             updateCurrentLocationMarker(map, loc);
-            // Move center of map to new marker ... in some cases not wanted --> TODO: checkbox on UI asking "follow secondLine updates on the map"
-            // Really reset zoomLevel each call to 17?
+
             if(FOLLOW_MAP_UPDATES){
                 followWithCamera(markers, true);
             }

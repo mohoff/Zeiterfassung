@@ -108,6 +108,10 @@ public class Zone {
         return new LatLng(latitude, longitude);
     }
 
+    public Loc getLoc(){
+        return new Loc(latitude, longitude);
+    }
+
 
 
 

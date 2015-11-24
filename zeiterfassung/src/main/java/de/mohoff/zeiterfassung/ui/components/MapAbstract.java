@@ -5,7 +5,16 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -20,16 +29,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
@@ -45,6 +52,9 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     public static int MIN_ZOOM_LEVEL = 1;
     public static int MAX_ZOOM_LEVEL = 21;
     public static int ZOOM_LEVEL_OFFSET_FOR_PREFS = 6;
+    private static int MARKER_WIDTH = 50; // px
+    private static int MARKER_HEIGHT = 79; // px
+    private static int MARKER_DOT_DIM = MARKER_WIDTH; // px
     private static int MARKER_VIEWPORT_PADDING = 200; // px
 
     protected MainActivity context;
@@ -57,6 +67,20 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
 
     protected SharedPreferences sp;
     protected DatabaseHelper dbHelper = null;
+
+    // Bitmaps for Marker icons in 3 different variants
+    protected Bitmap markerAccurate, markerInaccurate, markerNoConnection;
+    // Bitmap for Markers which will be displayed with a number on them.
+    // While generating this Bitmap, the number will be printed on of the 3 templates above.
+    protected Bitmap markerWithNumbers;
+    // Bitmap for Marker which shows most recent user secondLine on top of
+    // markerAccurate||markerInaccurate||markerNoConnection
+    protected Bitmap markerCurrentLocation;
+    // Bitmap for Markers which show center of a Zone area.
+    protected Bitmap markerFixLocation, markerCandidateLocation;
+    protected int colorFixLocationCircle, colorCandidateLocationMarker;
+    protected int colorFixLocationMarker, colorCandidateLocationCircle;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,6 +158,39 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 context.getString(R.string.setting_map_zoomin),
                 Boolean.valueOf(context.getString(R.string.setting_map_zoomin_default_value))
         );
+
+        colorFixLocationMarker = getResources().getColor(R.color.grey_50);
+        colorFixLocationCircle = getResources().getColor(R.color.grey_10_alpha);
+        markerFixLocation = createBitmapFromDrawable(
+                getTintedDrawable("markers/marker_50px.png", colorFixLocationMarker),
+                MARKER_WIDTH,
+                MARKER_HEIGHT,
+                true);
+        colorCandidateLocationMarker = getResources().getColor(R.color.greenish_100);
+        colorCandidateLocationCircle = getResources().getColor(R.color.greenish_50);
+        markerCandidateLocation = createBitmapFromDrawable(
+                getTintedDrawable("markers/marker_50px.png", colorCandidateLocationMarker),
+                MARKER_WIDTH,
+                MARKER_HEIGHT,
+                true);
+        markerAccurate = createBitmapFromDrawable(
+                getResources().getDrawable(R.drawable.mapmarker_accurate),
+                MARKER_DOT_DIM,
+                MARKER_DOT_DIM,
+                true);
+        markerInaccurate = createBitmapFromDrawable(
+                getResources().getDrawable(R.drawable.mapmarker_inaccurate),
+                MARKER_DOT_DIM,
+                MARKER_DOT_DIM,
+                true);
+        markerNoConnection = createBitmapFromDrawable(
+                getResources().getDrawable(R.drawable.mapmarker_noconnection),
+                MARKER_DOT_DIM,
+                MARKER_DOT_DIM,
+                true);
+        markerCurrentLocation = createBitmapFromAsset(
+                context,
+                "markers/marker_50px_padding.png");
     }
 
     @Override
@@ -276,9 +333,67 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         }
         LatLngBounds bounds = boundBilder.build();
 
-        //CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, MARKER_VIEWPORT_PADDING);
-
         return CameraUpdateFactory.newLatLngBounds(bounds, MARKER_VIEWPORT_PADDING);
+    }
+
+    // Can be used directly without other method calls when icon doesn't need to be tinted.
+    public static Bitmap createBitmapFromAsset(Context context, String filePath) {
+        AssetManager assetManager = context.getAssets();
+        InputStream istr;
+        Bitmap bitmap = null;
+
+        try {
+            istr = assetManager.open(filePath);
+            bitmap = BitmapFactory.decodeStream(istr);
+            //istr.close(); // TODO: Should we close input stream here? Stackoverflow snippet was without close().
+        } catch (IOException e) {
+            // handle exception
+        }
+
+        return bitmap;
+    }
+
+    protected Drawable getTintedDrawable(String filePath, int tintColor) {
+        Drawable d = null;
+        try{
+            d = Drawable.createFromStream(context.getAssets().open(filePath), null);
+        } catch (IOException e){
+            e.printStackTrace();
+            return null;
+        }
+        if(tintColor != 0 && d != null){
+            d.setColorFilter(tintColor, PorterDuff.Mode.SRC_IN);
+        }
+        return d;
+    }
+
+    protected Bitmap createBitmapFromDrawable(Drawable d, int width, int height, boolean fullOpacity){
+        Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(b);
+        d.setAlpha(fullOpacity ? 255 : 150);
+        d.setBounds(0, 0, b.getWidth(), b.getHeight());
+        d.draw(canvas);
+        return b;
+    }
+
+    protected Bitmap addTextToBitmap(Bitmap b, String text){
+        if(text == null) text = "";
+
+        Canvas canvas = new Canvas(b);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.WHITE);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTypeface(Typeface.DEFAULT_BOLD);
+        paint.setTextSize(35);
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+        float x = b.getWidth() / 2.0f;
+        float y = (b.getHeight() - bounds.height()) / 2.0f - bounds.top;
+        canvas.drawText(text, x, y, paint);
+
+        return b;
     }
 
     protected DatabaseHelper getDbHelper(Context context) {

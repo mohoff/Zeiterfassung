@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.Marker;
 import java.util.ArrayList;
 
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 
@@ -42,6 +43,7 @@ public class AddZoneMap extends ManageZonesMapAbstract {
         context.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Loc newLoc = Loc.convertLatLngToLoc(candidateMarker.getPosition());
                 if (newRadius < Zone.MIN_RADIUS) {
                     Snackbar.make(
                             context.coordinatorLayout,
@@ -54,12 +56,16 @@ public class AddZoneMap extends ManageZonesMapAbstract {
                             getString(R.string.error_input_no_pin),
                             Snackbar.LENGTH_LONG)
                     .show();
+                } else if (dbHelper.isIntersectingAnyZone(newLoc, newRadius)) {
+                    Snackbar.make(
+                            context.coordinatorLayout,
+                            getString(R.string.error_input_pin_intersect),
+                            Snackbar.LENGTH_LONG)
+                    .show();
                 } else {
-                    // TODO: Check if entered newRadius is not near other Zones.
-                    LatLng pos = candidateMarker.getPosition();
                     if (1 == dbHelper.createNewZone(
-                            pos.latitude,
-                            pos.longitude,
+                            newLoc.getLatitude(),
+                            newLoc.getLongitude(),
                             newRadius,
                             activityName,
                             locationName,
@@ -86,9 +92,6 @@ public class AddZoneMap extends ManageZonesMapAbstract {
     public void drawExistingZones(){
         super.drawExistingZones();
 
-        // TODO: provide appropriate colors: gray (uneditable) and greenish (editable)
-        // TODO: we want gray markers (custom markers) and gray fill colors to show that. Via .colorBarIcon() ?
-
         ArrayList<LatLng> latLngList = new ArrayList<>();
 
         for(Zone zone : dbHelper.getAllZones()){
@@ -104,6 +107,10 @@ public class AddZoneMap extends ManageZonesMapAbstract {
             fixMarkers.add(marker);
             fixCircles.add(circle);
         }
-        centerMapTo(MapAbstract.getMapViewport(latLngList), SHOW_MAP_ANIMATIONS);
+
+        if(!latLngList.isEmpty()){
+            centerMapTo(MapAbstract.getMapViewport(latLngList), SHOW_MAP_ANIMATIONS);
+        }
+
     }
 }

@@ -94,8 +94,8 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         context.fab.show();
         context.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_save_black_24dp));
 
-        colorButtonDisabled = getResources().getColor(R.color.grey_25);
-        colorButtonEnabled = getResources().getColor(R.color.greenish);
+        //colorButtonDisabled = getResources().getColor(R.color.grey_25);
+        //colorButtonEnabled = getResources().getColor(R.color.greenish);
 
         radiusValue = (EditText) view.findViewById(R.id.radiusValue);
         radiusValue.setText(String.valueOf(newRadius));
@@ -141,14 +141,15 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                                 .position(lookupLatLng)
                                 .draggable(true)
                                 .title(context.getString(R.string.map_new_zone))
-                                        // TODO: use custom marker with Zone's color
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                                .icon(BitmapDescriptorFactory.fromBitmap(markerCandidateLocation));
 
                         // Add marker and circle for the lookup position to the map
                         candidateMarker = map.addMarker(markerOptions);
 
                         candidateCircle = map.addCircle(
-                                createCircleOptions(Color.argb(100, 81, 112, 226)).center(lookupLatLng).radius(newRadius)
+                                createCircleOptions(colorCandidateLocationCircle)
+                                        .center(lookupLatLng)
+                                        .radius(newRadius)
                         );
 
                         // Move camera to lookup position
@@ -233,7 +234,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                 GeneralHelper.hideSoftKeyboard(getActivity());
 
                 // In case there is a marker and circle on the map already, remove them both.
-                if(candidateMarker != null && candidateCircle != null){
+                if (candidateMarker != null && candidateCircle != null) {
                     candidateMarker.remove();
                     candidateCircle.remove();
                 }
@@ -242,11 +243,10 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                                 .position(point)
                                 .draggable(true)
                                 .title(context.getString(R.string.map_new_zone))
-                                        // TODO: use custom marker with Zone's color
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                                .icon(BitmapDescriptorFactory.fromBitmap(markerCandidateLocation))
                 );
                 candidateCircle = map.addCircle(
-                        createCircleOptions(Color.argb(100, 81, 112, 226)).center(point).radius(newRadius)
+                        createCircleOptions(colorCandidateLocationCircle).center(point).radius(newRadius)
                 );
             }
         });
@@ -256,18 +256,13 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         // Initialize MarkerOptions
         optionsFixMarker = new MarkerOptions()
                 .draggable(false)
-                    // TODO: use Zone's color
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-        optionsFixCircle = createCircleOptions(
-                Color.HSVToColor(100, new float[]{BitmapDescriptorFactory.HUE_ROSE, 1, 1})
-        );
+                .icon(BitmapDescriptorFactory.fromBitmap(markerFixLocation));
+        optionsFixCircle = createCircleOptions(colorFixLocationCircle);
+
         optionsCandidateMarker = new MarkerOptions()
                 .draggable(true)
-                        // TODO: use Zone's color as marker color
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-        optionsCandidateCircle = createCircleOptions(
-                Color.HSVToColor(100, new float[]{BitmapDescriptorFactory.HUE_RED, 1, 1})
-        );
+                .icon(BitmapDescriptorFactory.fromBitmap(markerCandidateLocation));
+        optionsCandidateCircle = createCircleOptions(colorCandidateLocationCircle);
     }
 
     protected void goBackToManageZones(){

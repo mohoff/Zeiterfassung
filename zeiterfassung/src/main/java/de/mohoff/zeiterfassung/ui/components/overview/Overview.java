@@ -18,7 +18,7 @@ import de.mohoff.zeiterfassung.ui.MainActivity;
 import de.mohoff.zeiterfassung.R;
 
 public class Overview extends Fragment implements TimeslotEventListener, ServiceChangeListener{
-    MainActivity parentActivity;
+    MainActivity context;
     AdapterOverview adapter;
     RecyclerView recList;
     LinearLayoutManager llm;
@@ -45,7 +45,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        parentActivity = (MainActivity) getActivity();
+        context = (MainActivity) getActivity();
 
         // Disable ItemAnimator to prevent a visual bug by calling updateFirstCardPeriodically().
         //recList.setItemAnimator(new MyItemAnimator());
@@ -62,8 +62,9 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         recList.setLayoutManager(llm);
 
         // Set FAB colorBarIcon and click listener
-        parentActivity.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_search_black_24dp));
-        parentActivity.fab.show();
+        context.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_search_black_24dp));
+        // TODO: Change to fab.show() when finished with search feature.
+        context.fab.hide();
         /*context.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,17 +83,17 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
     public void onResume() {
         super.onResume();
 
-        if(!parentActivity.serviceStatus.isRunning()){
+        if(!context.serviceStatus.isRunning()){
             Snackbar.make(
-                    parentActivity.coordinatorLayout,
+                    context.coordinatorLayout,
                     getString(R.string.service_not_running),
                     Snackbar.LENGTH_LONG)
                     .show();
         }
 
         // Set listeners
-        parentActivity.setOnTimeslotEventListener(this);
-        parentActivity.serviceStatus.addListener(this);
+        context.setOnTimeslotEventListener(this);
+        context.serviceStatus.addListener(this);
 
         // Update adapter model and update UI
         adapter.updateData();
@@ -106,8 +107,8 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         super.onPause();
 
         // Remove listeners
-        parentActivity.removeOnTimeslotEventListener();
-        parentActivity.serviceStatus.removeListener(this);
+        context.removeOnTimeslotEventListener();
+        context.serviceStatus.removeListener(this);
     }
 
     private void updateFirstCardPeriodically() {

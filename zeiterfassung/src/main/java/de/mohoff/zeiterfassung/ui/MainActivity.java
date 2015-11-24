@@ -121,9 +121,12 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 return true;
             }
         });
-        // Select the first menu item at app start.
-        navigationView.getMenu().getItem(0).setChecked(true);
-        navigationView.getMenu().performIdentifierAction(R.id.item_overview, 0);
+        // Select the first menu item at app start. Don't select first when savedInstanceState is
+        // not null (e.g. when screen is rotated).
+        if(savedInstanceState == null) {
+            navigationView.getMenu().getItem(0).setChecked(true);
+            navigationView.getMenu().performIdentifierAction(R.id.item_overview, 0);
+        }
 
         drawerToggle = new ActionBarDrawerToggle(
                 this,                  // host Activity

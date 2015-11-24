@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.CloseableIterator;
@@ -193,6 +195,29 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
+    // Use for EDIT
+    public boolean isIntersectingOtherZone(Loc newLoc, int newRadius, int editZoneId){
+        List<Zone> zones = getAllZones();
+        for(Zone z : zones){
+            if(Loc.distanceTo(newLoc, z.getLoc()) < z.getRadius() + newRadius &&
+                    editZoneId != z.get_id()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Use for ADD
+    public boolean isIntersectingAnyZone(Loc newLoc, int newRadius){
+        List<Zone> zones = getAllZones();
+        for(Zone z : zones){
+            if(Loc.distanceTo(newLoc, z.getLoc()) < z.getRadius() + newRadius){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int deleteAllTimeslots(){
         try {
             // Dropping and creating table will reset autoincrement for _id.
@@ -244,7 +269,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             updateBuilder.updateColumnValue("endtime", millis);
             updateBuilder.where().eq("endtime", 0);
-            //updateBuilder.where().isNull("endtime");
             updateBuilder.update();
             return 1;
         } catch (SQLException e) {

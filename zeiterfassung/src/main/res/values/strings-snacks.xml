@@ -25,6 +25,7 @@
     <string name="error_input_radius_equal">Radius already saved.</string>
     <string name="error_input_no_pin">Please pin area on map.</string>
     <string name="error_input_pin_equal">Pin and radius haven\'t changed.</string>
+    <string name="error_input_pin_intersect">Pin and radius intersect with another Zone.</string>
     <string name="error_input_no_number">Input is not a number.</string>
     <string name="error_input_geolookup_empty">Please fill in address or place.</string>
     <string name="error_input_geolookup_invalid">Address or place not found. Please try again.</string>
@@ -71,7 +72,7 @@
     <string name="settings_clean_map_failure">Couldn\'t clean Map.</string>
 
     <string name="settings_alert_msg_reset_settings">Reset Settings and restore their default values?</string>
-    <string name="settings_reset_settings_success">Settings resetted.</string>
+    <string name="settings_reset_settings_success">Settings reset.</string>
     <string name="settings_reset_settings_failure">Couldn\'t reset Settings.</string>
 
 </resources>

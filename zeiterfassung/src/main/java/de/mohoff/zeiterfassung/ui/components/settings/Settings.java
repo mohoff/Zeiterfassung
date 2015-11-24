@@ -323,7 +323,7 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                             .show();
                 }
                 editTextPref.setText(String.valueOf(input));
-                editTextPref.setSummary(input + " (" + input*100/15+ "%)");
+                editTextPref.setSummary(input + " (" + (input-1)*100/14+ "%)");
             } else {
                 p.setSummary(editTextPref.getText());
             }

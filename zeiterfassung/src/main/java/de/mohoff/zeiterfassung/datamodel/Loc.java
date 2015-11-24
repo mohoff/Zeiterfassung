@@ -95,7 +95,7 @@ public class Loc implements Parcelable{
                 Math.cos(loc1LatInRadians) * Math.cos(loc2LatInRadians) *
                         Math.sin(lngDiffInRadians/2) * Math.sin(lngDiffInRadians/2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        double distance = earthRadius * c;
+        double distance = earthRadius * c * 1000;
 
         return (int) distance;
     }

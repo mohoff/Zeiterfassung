@@ -58,7 +58,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     // In milliseconds. Used values so far:  60 * 1000, 150 * 1000, 120 * 1000
     public static int REGULAR_UPDATE_INTERVAL = 60 * 1000;
     // Time interval after which a new secondLine update is accepted at the earliest from other applications' requests
-    public static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 2;
+    public static int FASTEST_UPDATE_INTERVAL = REGULAR_UPDATE_INTERVAL / 6;
     // Ignore secondLine updates for activeCache which have accuracy > 300m
     public static double ACCURACY_TRESHOLD = 300.0;
     // Determines the ratio of inbound locations in activeCache to trigger an enter-event
@@ -143,7 +143,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     @Override
     public IBinder onBind(Intent intent) {
         getHelper(this);
-        dbHelper._createSampleZones();
+        // TODO: Remove this completely
+        //dbHelper._createSampleZones();
         googleApiClient.connect();
 
         return binder;
