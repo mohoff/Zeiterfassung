@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -42,6 +43,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.R;
@@ -174,8 +176,9 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     @Override
     public void onMapReady(GoogleMap googleMap) {
         super.onMapReady(googleMap);
-        CircularFifoQueue<Loc> cache = LocationCache.getInstance().getPassiveCache();
+        drawExistingZones();
 
+        CircularFifoQueue<Loc> cache = LocationCache.getInstance().getPassiveCache();
         if(cache != null && cache.size() > 0){
             for(int i=0; i<cache.size(); i++){
                 Loc loc = cache.get(i);
@@ -190,6 +193,30 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         } else {
             Snackbar.make(context.coordinatorLayout, getString(R.string.error_no_data), Snackbar.LENGTH_LONG)
                     .show();
+        }
+    }
+
+    @Override
+    protected void drawExistingZones() {
+        super.drawExistingZones();
+
+        ArrayList<LatLng> latLngList = new ArrayList<>();
+
+        for(Zone zone : dbHelper.getAllZones()){
+            LatLng latLng = new LatLng(zone.getLatitude(), zone.getLongitude());
+            Marker marker = map.addMarker(
+                    optionsFixMarker.position(latLng)
+            );
+            Circle circle = map.addCircle(
+                    optionsFixCircle.center(latLng).radius(zone.getRadius())
+            );
+
+            fixMarkers.add(marker);
+            fixCircles.add(circle);
+        }
+
+        if(!latLngList.isEmpty()){
+            centerMapTo(MapAbstract.getMapViewport(latLngList), SHOW_MAP_ANIMATIONS);
         }
     }
 

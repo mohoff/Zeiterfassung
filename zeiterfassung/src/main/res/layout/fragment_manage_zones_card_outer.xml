@@ -61,6 +61,8 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/deleteActivityButton"
                     android:src="@drawable/ic_delete_black_24dp"
+                    android:scaleType="fitXY"
+                    android:adjustViewBounds="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="7dp"
                     android:layout_alignParentRight="true"/>

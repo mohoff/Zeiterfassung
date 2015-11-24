@@ -29,9 +29,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import java.io.IOException;
@@ -68,6 +72,9 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     protected SharedPreferences sp;
     protected DatabaseHelper dbHelper = null;
 
+    protected ArrayList<Marker> fixMarkers = new ArrayList<Marker>();
+    protected ArrayList<Circle> fixCircles = new ArrayList<Circle>();
+
     // Bitmaps for Marker icons in 3 different variants
     protected Bitmap markerAccurate, markerInaccurate, markerNoConnection;
     // Bitmap for Markers which will be displayed with a number on them.
@@ -78,6 +85,9 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     protected Bitmap markerCurrentLocation;
     // Bitmap for Markers which show center of a Zone area.
     protected Bitmap markerFixLocation, markerCandidateLocation;
+
+    protected MarkerOptions optionsFixMarker, optionsCandidateMarker;
+    protected CircleOptions optionsFixCircle, optionsCandidateCircle;
     protected int colorFixLocationCircle, colorCandidateLocationMarker;
     protected int colorFixLocationMarker, colorCandidateLocationCircle;
 
@@ -325,6 +335,20 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 .strokeWidth(0)
                 .strokeColor(Color.TRANSPARENT);
     }
+
+    protected void drawExistingZones(){
+        // Initialize MarkerOptions
+        optionsFixMarker = new MarkerOptions()
+                .draggable(false)
+                .icon(BitmapDescriptorFactory.fromBitmap(markerFixLocation));
+        optionsFixCircle = createCircleOptions(colorFixLocationCircle);
+
+        optionsCandidateMarker = new MarkerOptions()
+                .draggable(true)
+                .icon(BitmapDescriptorFactory.fromBitmap(markerCandidateLocation));
+        optionsCandidateCircle = createCircleOptions(colorCandidateLocationCircle);
+    }
+
 
     public static CameraUpdate getMapViewport(ArrayList<LatLng> latLngList){
         LatLngBounds.Builder boundBilder = LatLngBounds.builder();

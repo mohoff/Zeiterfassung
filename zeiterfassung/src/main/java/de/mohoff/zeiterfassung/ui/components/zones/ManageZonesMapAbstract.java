@@ -40,8 +40,6 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
 
     SharedPreferences sp;
 
-    ArrayList<Marker> fixMarkers = new ArrayList<Marker>();
-    ArrayList<Circle> fixCircles = new ArrayList<Circle>();
     LatLng lookupLatLng;
 
     Marker candidateMarker = null;
@@ -53,10 +51,6 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
     ImageButton searchButton;
     // TODO: Replace button with appropriate SAVE colorBarIcon
 
-    int colorButtonEnabled, colorButtonDisabled;
-
-    MarkerOptions optionsFixMarker, optionsCandidateMarker;
-    CircleOptions optionsFixCircle, optionsCandidateCircle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -200,7 +194,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         // the variable googleMap doesn't represent an empty map after navigating to this fragment
         // more than once.
         googleMap.clear();
-        // Inside drawExistingZones(), map center will be setIsRunning and animated.
+        // Inside drawExistingZones(), map center will be setIsRunning and animated. TODO: What ?! setIsRunning?
         drawExistingZones();
 
         map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
@@ -252,7 +246,8 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         });
     }
 
-    public void drawExistingZones(){
+    /*@Override
+    protected void drawExistingZones(){
         // Initialize MarkerOptions
         optionsFixMarker = new MarkerOptions()
                 .draggable(false)
@@ -263,7 +258,7 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
                 .draggable(true)
                 .icon(BitmapDescriptorFactory.fromBitmap(markerCandidateLocation));
         optionsCandidateCircle = createCircleOptions(colorCandidateLocationCircle);
-    }
+    }*/
 
     protected void goBackToManageZones(){
         // Clear back stack because we're done with adding or editing a Zone.

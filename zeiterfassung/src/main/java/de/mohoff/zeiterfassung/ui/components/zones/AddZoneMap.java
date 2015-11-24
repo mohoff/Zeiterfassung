@@ -111,6 +111,5 @@ public class AddZoneMap extends ManageZonesMapAbstract {
         if(!latLngList.isEmpty()){
             centerMapTo(MapAbstract.getMapViewport(latLngList), SHOW_MAP_ANIMATIONS);
         }
-
     }
 }

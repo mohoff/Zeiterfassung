@@ -27,6 +27,8 @@
             android:src="@drawable/ic_add_white_36dp"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
             android:clickable="false"
             android:focusable="false"/>
 
