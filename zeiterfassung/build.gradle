@@ -45,5 +45,6 @@ dependencies {
     compile 'com.j256.ormlite:ormlite-android:4.48'
     compile 'com.github.PhilJay:MPAndroidChart:v2.1.6'
     compile "ch.acra:acra:4.6.2"
+    compile 'com.android.support:multidex:1.0.1'        // need for pre-Lollipop devices in order to support multiDex
     //compile 'com.github.amlcurran.showcaseview:library:5.3.0'
 }
