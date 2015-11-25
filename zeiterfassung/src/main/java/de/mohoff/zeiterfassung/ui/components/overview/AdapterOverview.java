@@ -108,21 +108,9 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public AdapterOverview(Context context) {
+    public AdapterOverview(Context ctx) {
         getDbHelper(context);
-        this.context = (MainActivity) context;
-        /*
-        this.data.add(new Timeslot(1416759002267L, 1416760002267L, "activity1", "act1, location1"));
-        this.data.add(new Timeslot(1416754002267L, 1416758002267L, "activity2", "act2, location1"));
-        this.data.add(new Timeslot(1416751002267L, 1416752002267L, "activity3", "act3, location1"));
-        this.data.add(new Timeslot(1416744002267L, 1416758002267L, "activity4", "act4, location1"));
-        this.data.add(new Timeslot(1416714002267L, 1416738002267L, "activity5", "act5, location1"));
-        this.data.add(new Timeslot(1416694002267L, 1416718002267L, "activity1", "act1, location1"));
-        this.data.add(new Timeslot(1416674002267L, 1416688002267L, "activity2", "act2, location1"));
-        this.data.add(new Timeslot(1416674002267L, 1416698002267L, "activity3", "act3, location1"));
-        this.data.add(new Timeslot(1416524002267L, 1416558002267L, "activity4", "act4, location1"));
-        this.data.add(new Timeslot(1416224002267L, 1416728002267L, "activity5", "act5, location1"));
-        */
+        context = (MainActivity) ctx;
         data.addAll(dbHelper.getAllTimeslots());
         sp = PreferenceManager.getDefaultSharedPreferences(context);
         showActivityFirst = sp.getBoolean(

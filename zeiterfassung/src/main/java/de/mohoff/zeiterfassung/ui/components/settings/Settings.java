@@ -360,12 +360,12 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                 return cal.getTimeInMillis();
             case 2:
                 // This week
-                cal.add(Calendar.DATE, -7);
+                // TODO: When Monday not considered first day of week but Sunday is for example?
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
                 return cal.getTimeInMillis();
             case 3:
                 // Last 10 days
-                // TODO: Check locale calendars and when Monday not considered first day of week
-                cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                cal.add(Calendar.DATE, -10);
                 return cal.getTimeInMillis();
             case 4:
                 // This month
