@@ -86,8 +86,6 @@ public class ColorPicker extends View {
         popoutPaint.setStyle(Style.FILL);
 
         recalcCellSize();
-
-
     }
 
     @Override
@@ -240,11 +238,14 @@ public class ColorPicker extends View {
     }
 
     public void setSelectedColor(int color) {
-        for(int i=0; i<mNumberOfFields; i++){
+        int i;
+        for(i=0; i<mNumberOfFields; i++){
             if(mUsedPalette[i] == color){
                 mSelectedIndex = i;
+                return;
             }
         }
+        // If iterated over whole mUsedPalette-array and no match is found, set -1 as default.
         mSelectedIndex = -1;
     }
 

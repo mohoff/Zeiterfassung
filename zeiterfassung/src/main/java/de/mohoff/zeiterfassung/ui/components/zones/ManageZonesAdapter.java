@@ -48,11 +48,17 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private final static int VIEWTYPE_ADD = 2;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ManageZonesAdapter(Activity context) {
+    public ManageZonesAdapter(Activity ctx) {
         getDbHelper();
+        updateModel();
+        context = (MainActivity)ctx;
+    }
+
+    // Runs when this Fragment is initially created or an update on the model happens,
+    // so notifyDataIsChanged() is called.
+    private void updateModel(){
         this.zones = dbHelper.getAllZones();
         this.activityNames = dbHelper.getDistinctActivityNames();
-        this.context = (MainActivity)context;
     }
 
     // Activity ViewHolderItem (outer holder)
@@ -99,7 +105,6 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-
     // Create new views (invoked by the layout manager)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,
@@ -117,7 +122,7 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             return outerHolder;
         }
-        // show "add" option as card listed last
+        // show ADD option as a card listed last
         if(viewType == VIEWTYPE_ADD) {
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_manage_zones_card_outer_add, parent, false);
@@ -126,7 +131,6 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return null;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
@@ -138,7 +142,13 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             // Create an adapter if none exists, and put in the map
             if (!locationAdapterMap.containsKey(activity)) {
-                locationAdapterMap.put(activity, new AdapterManageZoneInner(this, context, getRelevantZonesByActivity(zones, activity)));
+                locationAdapterMap.put(activity, new AdapterManageZoneInner(
+                        this,
+                        context,
+                        getRelevantZonesByActivity(
+                                zones,
+                                activity)
+                ));
             }
 
             actHolder.recyclerView.setAdapter(locationAdapterMap.get(activity));
@@ -153,19 +163,32 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 @Override
                                 public void onClick(DialogInterface dialog, int i) {
                                     if (et.getText().toString().equals(actHolder.activityName.getText().toString())) {
-                                        Snackbar.make(context.coordinatorLayout, context.getString(R.string.error_input_name_color_equal), Snackbar.LENGTH_LONG)
-                                                .show();
+                                        Snackbar.make(
+                                                context.coordinatorLayout,
+                                                context.getString(R.string.error_input_name_color_equal),
+                                                Snackbar.LENGTH_LONG)
+                                        .show();
                                     } else {
                                         // Execute update on DB
                                         int result = dbHelper.updateZoneActivityName(activity, et.getText().toString());
                                         if (result > 0) {
-                                            updateList(outerAdapter, locationAdapterMap.get(activity)); // (outerAdapter, innerAdapter)
-                                            Snackbar.make(context.coordinatorLayout, context.getResources().getQuantityString(R.plurals.update_zone_multiple_success, result), Snackbar.LENGTH_LONG)
-                                                    .show();
+                                            String newActivity = et.getText().toString();
+                                            updateListForActivity(activity, newActivity);
+                                            Snackbar.make(
+                                                    context.coordinatorLayout,
+                                                    context.getResources().getQuantityString(
+                                                            R.plurals.update_zone_multiple_success,
+                                                            result,
+                                                            result),
+                                                    Snackbar.LENGTH_LONG)
+                                            .show();
                                             dialog.dismiss();
                                         } else {
-                                            Snackbar.make(context.coordinatorLayout, context.getString(R.string.update_zone_multiple_failure), Snackbar.LENGTH_LONG)
-                                                    .show();
+                                            Snackbar.make(
+                                                    context.coordinatorLayout,
+                                                    context.getString(R.string.update_zone_multiple_failure),
+                                                    Snackbar.LENGTH_LONG)
+                                            .show();
                                         }
                                     }
                                 }
@@ -196,13 +219,24 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                     // Delete action
                                     int result = dbHelper.deleteZonesByActivity(activity);
                                     if (result > 0) {
-                                        Snackbar.make(context.coordinatorLayout, context.getResources().getQuantityString(R.plurals.delete_zone_multiple_success, result), Snackbar.LENGTH_LONG)
-                                                .show();
+                                        Snackbar.make(
+                                                context.coordinatorLayout,
+                                                context.getResources().getQuantityString(
+                                                        R.plurals.delete_zone_multiple_success,
+                                                        result,
+                                                        result),
+                                                Snackbar.LENGTH_LONG)
+                                        .show();
+                                        // To make sure the whole Activity gets removed from UI,
+                                        // first set adapter to null.
                                         actHolder.recyclerView.setAdapter(null);
-                                        updateList(outerAdapter, null); // outerAdapter == this
+                                        updateListForActivity(activity, null);
                                     } else {
-                                        Snackbar.make(context.coordinatorLayout, context.getString(R.string.delete_zone_multiple_failure), Snackbar.LENGTH_LONG)
-                                                .show();
+                                        Snackbar.make(
+                                                context.coordinatorLayout,
+                                                context.getString(R.string.delete_zone_multiple_failure),
+                                                Snackbar.LENGTH_LONG)
+                                        .show();
                                     }
                                     dialog.dismiss();
                                 }
@@ -233,35 +267,6 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return VIEWTYPE_NORMAL;
     }
 
-    // Updates the the complete list (outer and inner adapter). To be called when there has happened
-    // a DB-change in order to reflect that on UI.
-    private void updateList(ManageZonesAdapter outerAdapter, AdapterManageZoneInner innerAdapter){
-        // To update the outer adapter, we first have to retrieve all Zones from the DB.
-        this.zones = dbHelper.getAllZones();
-        this.activityNames = dbHelper.getDistinctActivityNames();
-        outerAdapter.notifyDataSetChanged();
-
-        // To update the inner adapter, we first have to compose the relevant Zone list from scratch.
-        // When a whole Activity is deleted, innerAdapter is null so we need to check here. In this
-        // case, the inner recyclerView will be garbage collected. SetAdapter(null) is called inside
-        // alertDialog.
-        if (innerAdapter != null) {
-            String activity = innerAdapter.relevantZones.get(0).getActivityName();
-            innerAdapter.relevantZones = getRelevantZonesByActivity(this.zones, activity);
-            innerAdapter.notifyDataSetChanged();
-        }
-    }
-
-    // Helper function to reduce all Zones to a setIsRunning which elements all correspond to one Activity.
-    private List<Zone> getRelevantZonesByActivity(List<Zone> list, String activity){
-        ArrayList<Zone> relevantZones = new ArrayList<>();
-        for (Zone entry : list) {
-            if (entry.getActivityName().equals(activity)) {
-                relevantZones.add(entry);
-            }
-        }
-        return relevantZones;
-    }
 
     // --- Inner adapter ---
     private class AdapterManageZoneInner extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -322,21 +327,33 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                     public void onClick(DialogInterface dialog, int i) {
                                         if(et.getText().toString().equals(locHolder.locationName.getText().toString()) &&
                                                 colorPicker.getSelectedColor() == zone.getColor()){
-                                            Snackbar.make(context.coordinatorLayout, context.getString(R.string.error_input_name_color_equal), Snackbar.LENGTH_LONG)
-                                                    .show();
+                                            Snackbar.make(
+                                                    context.coordinatorLayout,
+                                                    context.getString(R.string.error_input_name_color_equal),
+                                                    Snackbar.LENGTH_LONG)
+                                            .show();
                                         } else {
                                             zone.setLocationName(et.getText().toString());
                                             zone.setColor(colorPicker.getSelectedColor());
                                             if(dbHelper.updateZone(zone) == 1){
-                                                // Directly update the adapter's model, so we can avoid a new DB query
-                                                relevantZones.set(position, zone);
-                                                innerAdapter.notifyDataSetChanged();
-                                                Snackbar.make(context.coordinatorLayout, context.getString(R.string.update_zone_success), Snackbar.LENGTH_LONG)
-                                                        .show();
+                                                updateListForLocationEdit(innerAdapter, zone, position);
+
+                                                // TODO: delete next 2 lines?
+                                                //relevantZones.set(position, zone);
+                                                //notifyDataSetChanged();
+
+                                                Snackbar.make(
+                                                        context.coordinatorLayout,
+                                                        context.getString(R.string.update_zone_success),
+                                                        Snackbar.LENGTH_LONG)
+                                                .show();
                                                 dialog.dismiss();
                                             } else {
-                                                Snackbar.make(context.coordinatorLayout, context.getString(R.string.update_zone_failure), Snackbar.LENGTH_LONG)
-                                                        .show();
+                                                Snackbar.make(
+                                                        context.coordinatorLayout,
+                                                        context.getString(R.string.update_zone_failure),
+                                                        Snackbar.LENGTH_LONG)
+                                                .show();
                                             }
                                         }
                                     }
@@ -344,13 +361,10 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 .setNegativeButton(context.getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
-                                        // Cancel action
                                         dialog.dismiss();
                                     }
                                 })
                                 .setTitle(context.getString(R.string.alert_title_update_zone_location))
-                                //.setMessage(context.getString(R.string.alert_msg_update_zone))
-                                //.setView(GeneralHelper.getAlertDialogEditTextContainer(context, et, locHolder.locationName.getText().toString()))
                                 .setView(dialogView)
                                 .create();
                         // TODO: add app colorBarIcon to the alertDialog.
@@ -367,7 +381,6 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         Bundle args = new Bundle();
                         args.putInt(context.getString(R.string.arg_zone_id), zone.get_id());
                         nextFragment.setArguments(args);
-
                         context.replaceFragment(nextFragment, true);
                     }
                 });
@@ -379,13 +392,27 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                                 .setPositiveButton(context.getString(R.string.dialog_delete), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
-                                        if (dbHelper.deleteZoneById(zone.get_id()) == 1) {
-                                            Snackbar.make(context.coordinatorLayout, context.getString(R.string.delete_zone_success), Snackbar.LENGTH_LONG)
-                                                    .show();
-                                            updateList(outerAdapter, innerAdapter); // innerAdapter == this
+                                        if(1 == dbHelper.deleteZoneById(zone.get_id())) {
+                                            Snackbar.make(
+                                                    context.coordinatorLayout,
+                                                    context.getString(R.string.delete_zone_success),
+                                                    Snackbar.LENGTH_LONG)
+                                            .show();
+
+                                            // Redirect deletion of Location to deletion of Activity when there
+                                            // is only one Location for an Activity. So also the outer adapter
+                                            // can update itself.
+                                            if(relevantZones.size() == 1){
+                                                updateListForActivity(zone.getActivityName(), null);
+                                            } else {
+                                                updateListForLocationDeletion(innerAdapter, zone.getActivityName());
+                                            }
                                         } else {
-                                            Snackbar.make(context.coordinatorLayout, context.getString(R.string.delete_zone_failure), Snackbar.LENGTH_LONG)
-                                                    .show();
+                                            Snackbar.make(
+                                                    context.coordinatorLayout,
+                                                    context.getString(R.string.delete_zone_failure),
+                                                    Snackbar.LENGTH_LONG)
+                                            .show();
                                         }
                                         dialog.dismiss();
                                     }
@@ -431,6 +458,63 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 return VIEWTYPE_NORMAL;
             }
         }
+    }
+
+
+
+    // --- Methods for updating the nested lists in case of deletions and edits. ---
+
+
+    // Used for both deletion and editing (of Activity name) of Activities.
+    // In case of deletion, parameter newActivity must be null.
+    // In case of editing, parameter newActivity must hold the new Activity name.
+    // Also used for deletions of Locations when there are no other Locations for an Activity
+    // available.
+    private void updateListForActivity(String oldActivity, String newActivity){
+        updateModel();
+        // Remove entry in locationAdapterMap for old Activity name.
+        locationAdapterMap.remove(oldActivity);
+        // newActivity == null: Activity got deleted. Don't add new inner adapter.
+        // newActivity != null: Activity name got edited. New name stored in newActivity. Add new inner
+        // adapter.
+        // Put entry in locationAdapterMap for new Activity name and init inner adapter.
+        if(newActivity != null){
+            locationAdapterMap.put(newActivity, new AdapterManageZoneInner(
+                    outerAdapter,
+                    context,
+                    getRelevantZonesByActivity(
+                            zones,
+                            newActivity)
+            ));
+        }
+        outerAdapter.notifyDataSetChanged();
+    }
+
+    // Used when a Location is deleted but there are still other Locations saved for the same Activity.
+    // When there is only one Location within the Activity, the delete-call is passed to
+    // updateListForActivity().
+    private void updateListForLocationDeletion(AdapterManageZoneInner innerAdapter, String activity){
+        updateModel();
+        innerAdapter.relevantZones = getRelevantZonesByActivity(zones, activity);
+        innerAdapter.notifyDataSetChanged();
+    }
+
+    // Used when an existing Location is edited (either name or color). We directly update the model
+    // and reflect the changes in the inner adapter.
+    private void updateListForLocationEdit(AdapterManageZoneInner innerAdapter, Zone zone, int position){
+        innerAdapter.relevantZones.set(position, zone);
+        innerAdapter.notifyDataSetChanged();
+    }
+
+    // Helper function to reduce all Zones to a setIsRunning which elements all correspond to one Activity.
+    private List<Zone> getRelevantZonesByActivity(List<Zone> list, String activity){
+        ArrayList<Zone> relevantZones = new ArrayList<>();
+        for (Zone entry : list) {
+            if (entry.getActivityName().equals(activity)) {
+                relevantZones.add(entry);
+            }
+        }
+        return relevantZones;
     }
 
     private DatabaseHelper getDbHelper() {

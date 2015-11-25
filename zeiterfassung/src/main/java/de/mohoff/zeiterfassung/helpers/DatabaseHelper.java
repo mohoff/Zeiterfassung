@@ -121,8 +121,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             updateBuilder.updateColumnValue("locationName", newLocationName);
             updateBuilder.where().eq("_id", id);
-            updateBuilder.update();
-            return 1;
+            return updateBuilder.update();
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
@@ -134,8 +133,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             updateBuilder.updateColumnValue("activityName", newActivityName);
             updateBuilder.where().eq("activityName", oldActivityName);
-            updateBuilder.update();
-            return 1;
+            return updateBuilder.update();
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
@@ -163,8 +161,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         DeleteBuilder<Zone, Integer> deleteBuilder = zonesREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("activityName", activity).and().eq("locationName", location);
-            deleteBuilder.delete();
-            return 1;
+            return deleteBuilder.delete();
         } catch(SQLException e){
             e.printStackTrace();
             return -1;
@@ -175,8 +172,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         DeleteBuilder<Zone, Integer> deleteBuilder = zonesREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("_id", id);
-            deleteBuilder.delete();
-            return 1;
+            return deleteBuilder.delete();
         } catch(SQLException e){
             e.printStackTrace();
             return -1;
@@ -187,8 +183,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         DeleteBuilder<Zone, Integer> deleteBuilder = zonesREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("activityName", activity);
-            deleteBuilder.delete();
-            return 1;
+            return deleteBuilder.delete();
         } catch(SQLException e){
             e.printStackTrace();
             return -1;
@@ -269,8 +264,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             updateBuilder.updateColumnValue("endtime", millis);
             updateBuilder.where().eq("endtime", 0);
-            updateBuilder.update();
-            return 1;
+            return updateBuilder.update();
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
@@ -588,8 +582,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             updateBuilder.updateColumnValue("value", newValue);
             updateBuilder.where().eq("identifier", identifier);
-            updateBuilder.update();
-            return 1;
+            return updateBuilder.update();
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
@@ -619,8 +612,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             updateBuilder.updateColumnValue("value", newValue);
             updateBuilder.where().eq("identifier", identifier);
-            updateBuilder.update();
-            return 1;
+            return updateBuilder.update();
         } catch (SQLException e){
             e.printStackTrace();
             return -1;
