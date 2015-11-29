@@ -39,7 +39,7 @@ import de.mohoff.zeiterfassung.ui.components.about.About;
 import de.mohoff.zeiterfassung.ui.components.overview.Overview;
 import de.mohoff.zeiterfassung.ui.components.settings.Settings;
 import de.mohoff.zeiterfassung.ui.components.statistics.Statistics;
-import de.mohoff.zeiterfassung.ui.components.zones.ManageZones;
+import de.mohoff.zeiterfassung.ui.components.zones.Zones;
 import de.mohoff.zeiterfassung.ui.components.NavigationDrawerListener;
 import de.mohoff.zeiterfassung.ui.components.maplive.MapLive;
 import de.mohoff.zeiterfassung.R;
@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 next = new Overview();
                 break;
             case R.id.item_zones:
-                next = new ManageZones();
+                next = new Zones();
                 break;
             case R.id.item_maplive:
                 next = new MapLive();

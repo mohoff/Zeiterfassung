@@ -34,21 +34,21 @@ import de.mohoff.zeiterfassung.ui.colorpicker.ExtraColorPicker;
  * Created by moo on 8/17/15.
  */
 // --- Outer adapter ---
-public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     private MainActivity context;
     private DatabaseHelper dbHelper = null;
     //private LayoutInflater li;
     List<Zone> zones;
     // TODO: make activityNames a HashMap, key:name, value: #(Zones referred to it). Then we can improve alert dialog message (from "delete Zone(s)" to "delete 3 Zones or delete 1 Zone" (see strings-dialogs.xml)
     List<String> activityNames = new ArrayList<String>();
-    private ManageZonesAdapter outerAdapter = this;
+    private ZonesAdapter outerAdapter = this;
 
     private Map<String, AdapterManageZoneInner> locationAdapterMap = new HashMap<>();
     private final static int VIEWTYPE_NORMAL = 1;
     private final static int VIEWTYPE_ADD = 2;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public ManageZonesAdapter(Activity ctx) {
+    public ZonesAdapter(Activity ctx) {
         getDbHelper();
         updateModel();
         context = (MainActivity)ctx;
@@ -273,10 +273,10 @@ public class ManageZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         MainActivity context;
         List<Zone> relevantZones;
         AdapterManageZoneInner innerAdapter = this;
-        ManageZonesAdapter outerAdapter;
+        ZonesAdapter outerAdapter;
         LayoutInflater inflater;
 
-        public AdapterManageZoneInner(ManageZonesAdapter outerAdapter, MainActivity context, List<Zone> relevantZones) {
+        public AdapterManageZoneInner(ZonesAdapter outerAdapter, MainActivity context, List<Zone> relevantZones) {
             this.outerAdapter = outerAdapter;
             this.context = context;
             this.relevantZones = relevantZones;

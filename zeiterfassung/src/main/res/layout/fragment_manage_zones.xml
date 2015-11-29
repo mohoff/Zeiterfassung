@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:tag="MANAGETLAS"
-    tools:context="de.mohoff.zeiterfassung.ui.components.zones.ManageZones">
+    tools:context=".ui.components.zones.Zones">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"

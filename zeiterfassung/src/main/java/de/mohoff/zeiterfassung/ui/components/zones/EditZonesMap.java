@@ -17,7 +17,7 @@ import de.mohoff.zeiterfassung.datamodel.Zone;
 /**
  * Created by moo on 8/16/15.
  */
-public class EditZonesMap extends ManageZonesMapAbstract {
+public class EditZonesMap extends ZonesMapAbstract {
     int candidateZoneId;
     Zone editZone;
 

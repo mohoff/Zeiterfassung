@@ -2,7 +2,6 @@ package de.mohoff.zeiterfassung.ui.components.zones;
 
 import android.app.Fragment;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.location.Address;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -20,13 +19,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
@@ -35,7 +32,7 @@ import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 /**
  * Created by moo on 10/9/15.
  */
-public abstract class ManageZonesMapAbstract extends MapAbstract {
+public abstract class ZonesMapAbstract extends MapAbstract {
     protected static boolean SHOW_MAP_ANIMATIONS;
 
     SharedPreferences sp;
@@ -256,8 +253,8 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
     protected void goBackToManageZones(){
         // Clear back stack because we're done with adding or editing a Zone.
         GeneralHelper.clearBackStack(context);
-        // Go back to ManageZones fragment with clean back stack
-        Fragment nextFragment = new ManageZones();
+        // Go back to Zones fragment with clean back stack
+        Fragment nextFragment = new Zones();
         context.replaceFragment(nextFragment, false);
     }
 }

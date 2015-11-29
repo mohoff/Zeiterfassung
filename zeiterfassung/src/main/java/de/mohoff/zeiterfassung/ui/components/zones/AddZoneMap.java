@@ -20,7 +20,7 @@ import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 /**
  * Created by moo on 10/9/15.
  */
-public class AddZoneMap extends ManageZonesMapAbstract {
+public class AddZoneMap extends ZonesMapAbstract {
     String activityName, locationName;
 
     @Override

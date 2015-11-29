@@ -12,12 +12,12 @@ import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
-public class ManageZones extends Fragment {
+public class Zones extends Fragment {
     private MainActivity context;
     private DatabaseHelper dbHelper = null;
     private RecyclerView recyclerView;
     private LinearLayoutManager linLayoutManager;
-    private ManageZonesAdapter adapter;
+    private ZonesAdapter adapter;
 
     // TODO: add kind of tutorial: alertDialog which explains that user has to longclick Zones in order to edit them. With checkbox "Don't show tipp again"
 
@@ -49,7 +49,7 @@ public class ManageZones extends Fragment {
         recyclerView.setLayoutManager(linLayoutManager);
 
         // specify an adapter (see also next example)
-        adapter = new ManageZonesAdapter(context);
+        adapter = new ZonesAdapter(context);
         recyclerView.setAdapter(adapter);
 
         // Set FAB colorBarIcon and click listener
