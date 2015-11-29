@@ -63,22 +63,6 @@ public class GeneralHelper {
     // HELPER METHODS
     // --------------
 
-    // LocationService Methods
-    public void startAndConnectToLocationService() {
-        context.startService(new Intent(context, LocationService.class)); // Calling startService() first prevents it from being killed on unbind()
-        lsc = new LocationServiceConnection();  // connect to it
-
-        boolean result = context.bindService(
-                new Intent(context, LocationService.class),
-                lsc,
-                Context.BIND_AUTO_CREATE
-        );
-
-        if(!result){
-            throw new RuntimeException("Unable to bind with service.");
-        }
-        serviceIsRunning = true;
-    }
     protected class LocationServiceConnection implements ServiceConnection {
         public void onServiceConnected(ComponentName name, IBinder service) {
             LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
@@ -104,10 +88,10 @@ public class GeneralHelper {
         }
     }
 
-    public static void showToast(Context ctx, String msg) {
+    /*public static void showToast(Context ctx, String msg) {
         Toast toast = Toast.makeText(ctx, msg, Toast.LENGTH_LONG);
         toast.show();
-    }
+    }*/
 
     public static LatLng convertLocToLatLng(Loc loc){
         return new LatLng(loc.getLatitude(), loc.getLongitude());

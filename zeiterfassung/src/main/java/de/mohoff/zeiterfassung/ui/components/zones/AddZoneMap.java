@@ -77,6 +77,7 @@ public class AddZoneMap extends ManageZonesMapAbstract {
                                 getString(R.string.create_zone_success),
                                 Snackbar.LENGTH_LONG)
                         .show();
+                        updateLocationServiceZones();
                         goBackToManageZones();
                     } else {
                         Snackbar.make(

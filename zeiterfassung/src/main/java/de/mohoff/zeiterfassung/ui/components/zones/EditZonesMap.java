@@ -78,6 +78,7 @@ public class EditZonesMap extends ManageZonesMapAbstract {
                                 context.getString(R.string.update_zone_success),
                                 Snackbar.LENGTH_LONG)
                         .show();
+                        updateLocationServiceZones();
                         goBackToManageZones();
                     } else {
                         Snackbar.make(
@@ -92,7 +93,7 @@ public class EditZonesMap extends ManageZonesMapAbstract {
     }
 
     @Override
-    public void drawExistingZones(){
+    public void drawExistingZones() {
         super.drawExistingZones();
         for(Zone zone : dbHelper.getAllZones()) {
             Marker marker;

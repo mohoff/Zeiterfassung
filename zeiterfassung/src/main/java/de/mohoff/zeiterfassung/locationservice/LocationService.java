@@ -231,11 +231,15 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         super.onDestroy();
     }
 
+    public void updateAllZones(){
+        allZones = dbHelper.getAllZones();
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         googleApiClient.connect();
         getHelper(this);
-        allZones = dbHelper.getAllZones();
+        updateAllZones();
 
         IS_SERVICE_RUNNING = true;
         sendServiceEventViaBroadcast("start");

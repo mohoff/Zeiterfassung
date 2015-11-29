@@ -246,19 +246,12 @@ public abstract class ManageZonesMapAbstract extends MapAbstract {
         });
     }
 
-    /*@Override
-    protected void drawExistingZones(){
-        // Initialize MarkerOptions
-        optionsFixMarker = new MarkerOptions()
-                .draggable(false)
-                .icon(BitmapDescriptorFactory.fromBitmap(markerFixLocation));
-        optionsFixCircle = createCircleOptions(colorFixLocationCircle);
-
-        optionsCandidateMarker = new MarkerOptions()
-                .draggable(true)
-                .icon(BitmapDescriptorFactory.fromBitmap(markerCandidateLocation));
-        optionsCandidateCircle = createCircleOptions(colorCandidateLocationCircle);
-    }*/
+    // If LocationService is running, it should retrieve updated list of Zones.
+    protected void updateLocationServiceZones(){
+        if(context.mService != null){
+            context.mService.updateAllZones();
+        }
+    }
 
     protected void goBackToManageZones(){
         // Clear back stack because we're done with adding or editing a Zone.

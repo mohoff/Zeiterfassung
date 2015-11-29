@@ -66,7 +66,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     private Button buttonStartService;
     private Button buttonStopService;
 
-    private LocationServiceConnection lsc = null;
+    public LocationService mService;
+    private LocationServiceConnection serviceCon = null;
     private MainActivity that = this;
     public LocationServiceStatus serviceStatus;
 
@@ -217,20 +218,20 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     }
 
     private boolean bindLocationService(){
-        // it's ok when service is already bound: Will return TRUE
-        lsc = new LocationServiceConnection();  // connect to it
+        // It's ok when service is already bound: Will return TRUE
+        serviceCon = new LocationServiceConnection();
         return bindService(
                 new Intent(this, LocationService.class),
-                lsc,
+                serviceCon,
                 BIND_AUTO_CREATE
         );
     }
 
     public void unbindLocationService(){
         // It's ok when service is already unbound
-        if(lsc != null){
-            unbindService(lsc);
-            lsc = null;
+        if(serviceCon != null){
+            unbindService(serviceCon);
+            serviceCon = null;
         }
     }
 
@@ -238,6 +239,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         public void onServiceConnected(ComponentName name, IBinder service) {
             //LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
             //refThis.service = (LocationService) binder.getService();
+            LocationService.LocalBinder localBinder = (LocationService.LocalBinder)service;
+            mService = (LocationService) localBinder.getService();
         }
         @Override
         public void onServiceDisconnected(ComponentName name) {
