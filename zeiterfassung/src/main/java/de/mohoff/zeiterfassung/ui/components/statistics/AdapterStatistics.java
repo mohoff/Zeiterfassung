@@ -189,29 +189,32 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
         HashMap<String, Long> mapSum = new HashMap<>();
 
         for (Map.Entry<String, HashMap<String,Long>> entry : map.entrySet()) {
-            String key = entry.getKey();
+            String activity = entry.getKey();
             HashMap<String, Long> inner = entry.getValue();
 
             Long sum = Long.valueOf(0);
             for (Long locTime : inner.values()){
                 sum += locTime;
             }
-            mapSum.put(key, sum);
+            mapSum.put(activity, sum);
         }
 
         List<Entry> timesData = new ArrayList<Entry>();
-        int i = 0;
+        List<String> activities = new ArrayList<>();
 
+        int i = 0;
         for (Map.Entry<String, Long> entry : mapSum.entrySet()) {
+            // yValues (time duration)
             // Divide by (1000*60), so Entry only needs to stores 'minutes' instead of milliseconds.
             timesData.add(new Entry(
                     (float) entry.getValue()/(1000*60),
                     i++,
                     entry.getKey()
             ));
+            // xValues (Activity name)
+            activities.add(entry.getKey());
         }
 
-        List<String> activities = new ArrayList<>(map.keySet());
         PieDataSet dataSet = new PieDataSet(timesData, "");
 
         // Add colors from ColorPalette.GREENISH. If more colors need than there are in the array,

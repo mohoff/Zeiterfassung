@@ -536,8 +536,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return 1;
     }
 
+    // outer String is an Activity, inner String a Location.
     public HashMap<String, HashMap<String, Long>> getTimeSpentForEachZone(){
-        HashMap<String, HashMap<String, Long>> map = new HashMap<>();
+        HashMap<String, HashMap<String, Long>> outer = new HashMap<>();
         List<Timeslot> allTimeslots = getAllTimeslots();
 
         // Iterate over all Timeslots and add durations for equal Zones
@@ -545,7 +546,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             String activity = t.getZone().getActivityName();
             String location = t.getZone().getLocationName();
             Long time = Long.valueOf(0);
-            HashMap inner = map.get(activity);
+            HashMap inner = outer.get(activity);
 
             if(inner == null){
                 inner = new HashMap<>();
@@ -555,9 +556,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
             time += t.getDuration();
             inner.put(location, time);
-            map.put(activity, inner);
+            outer.put(activity, inner);
         }
-        return map;
+        return outer;
     }
 
     private void checkForStat(String identifier){

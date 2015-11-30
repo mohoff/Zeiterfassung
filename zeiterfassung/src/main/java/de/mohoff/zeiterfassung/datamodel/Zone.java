@@ -111,8 +111,4 @@ public class Zone {
     public Loc getLoc(){
         return new Loc(latitude, longitude);
     }
-
-
-
-
 }
