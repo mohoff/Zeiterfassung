@@ -265,12 +265,12 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     private void updateServiceButtons(){
         if(serviceStatus.isRunning()){
             // manage start button
-            buttonStartService.getBackground().setColorFilter(getResources().getColor(R.color.grey_25), PorterDuff.Mode.MULTIPLY);
+            buttonStartService.getBackground().setColorFilter(getResources().getColor(R.color.grey_25), PorterDuff.Mode.SRC_ATOP);
             buttonStartService.setEnabled(false);
             buttonStartService.setTextColor(getResources().getColor(R.color.white)); // need to setIsRunning text color explicitly after setEnabled(false). Else text color gets grey somehow
             buttonStartService.setOnClickListener(null);
             // manage stop button
-            buttonStopService.getBackground().setColorFilter(getResources().getColor(R.color.greenish), PorterDuff.Mode.MULTIPLY);
+            buttonStopService.getBackground().setColorFilter(getResources().getColor(R.color.greenish), PorterDuff.Mode.SRC_ATOP);
             buttonStopService.setEnabled(true);
             buttonStopService.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -284,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             });
         } else {
             // manage start button
-            buttonStartService.getBackground().setColorFilter(getResources().getColor(R.color.greenish), PorterDuff.Mode.MULTIPLY);
+            buttonStartService.getBackground().setColorFilter(getResources().getColor(R.color.greenish), PorterDuff.Mode.SRC_ATOP);
             buttonStartService.setEnabled(true);
             buttonStartService.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -297,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 }
             });
             // manage stop button
-            buttonStopService.getBackground().setColorFilter(getResources().getColor(R.color.grey_25), PorterDuff.Mode.MULTIPLY);
+            buttonStopService.getBackground().setColorFilter(getResources().getColor(R.color.grey_25), PorterDuff.Mode.SRC_ATOP);
             buttonStopService.setEnabled(false);
             buttonStopService.setTextColor(getResources().getColor(R.color.white)); // need to setIsRunning text color explicitly after setEnabled(false). Else text color gets grey somehow
             buttonStopService.setOnClickListener(null);
