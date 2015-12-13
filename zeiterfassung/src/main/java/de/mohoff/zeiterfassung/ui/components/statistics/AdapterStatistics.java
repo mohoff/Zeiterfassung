@@ -207,7 +207,7 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
             // yValues (time duration)
             // Divide by (1000*60), so Entry only needs to stores 'minutes' instead of milliseconds.
             timesData.add(new Entry(
-                    (float) entry.getValue()/(1000*60),
+                    (float) (entry.getValue()/(1000*60)),
                     i++,
                     entry.getKey()
             ));

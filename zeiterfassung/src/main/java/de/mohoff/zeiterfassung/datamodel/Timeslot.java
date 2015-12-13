@@ -118,7 +118,7 @@ public class Timeslot {
     }
 
     public static String getReadableDuration(long diff, boolean ignoreSeconds, boolean multiLine){
-        int secInMillis = 1000,
+        long secInMillis = 1000,
                 minInMillis = secInMillis * 60,
                 hourInMillis = minInMillis * 60,
                 dayInMillis = hourInMillis * 24,

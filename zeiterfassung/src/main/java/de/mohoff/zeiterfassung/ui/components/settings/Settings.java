@@ -345,6 +345,7 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
+        cal.setFirstDayOfWeek(Calendar.MONDAY);
 
         switch (i){
             case 0:
@@ -360,8 +361,9 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                 return cal.getTimeInMillis();
             case 2:
                 // This week
-                // TODO: When Monday not considered first day of week but Sunday is for example?
-                cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                // Workaround because cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY) is not working reliably.
+                int currentDayOfWeek = (cal.get(Calendar.DAY_OF_WEEK) + 7 - cal.getFirstDayOfWeek()) % 7;
+                cal.add(Calendar.DAY_OF_YEAR, -currentDayOfWeek);
                 return cal.getTimeInMillis();
             case 3:
                 // Last 10 days
