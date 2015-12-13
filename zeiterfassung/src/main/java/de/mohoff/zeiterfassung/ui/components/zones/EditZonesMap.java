@@ -71,7 +71,9 @@ public class EditZonesMap extends ZonesMapAbstract {
                     .show();
                 } else {
                     editZone.setRadius(newRadius);
-                    editZone.setRadius((int) candidateCircle.getRadius());
+                    //editZone.setRadius((int) candidateCircle.getRadius());
+                    editZone.setLatitude((float)candidateMarker.getPosition().latitude);
+                    editZone.setLongitude((float)candidateMarker.getPosition().longitude);
                     if (dbHelper.updateZone(editZone) == 1) {
                         Snackbar.make(
                                 context.coordinatorLayout,
