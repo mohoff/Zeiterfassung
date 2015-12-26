@@ -74,8 +74,6 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
             }
         });*/
 
-
-
         updateFirstCardPeriodically();
     }
 

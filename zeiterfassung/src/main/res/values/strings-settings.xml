@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Appearance (cattegory) -->
+    <!-- LocationService -->
+    <string name="setting_restart_service_on_boot">startServiceOnBoot</string>
+    <string name="setting_restart_service_on_boot_title">Start Tracking automatically</string>
+    <string name="setting_restart_service_on_boot_summary">Start Tracking automatically after rebooting device</string>
+    <string name="setting_restart_service_on_boot_default_value">true</string>
+
+    <!-- Appearance (category) -->
     <string name="setting_cat_appearance_title">Appearance</string>
     <string name="setting_cat_appearance">appearance</string>
 
