@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- LocationService -->
+    <SwitchPreference android:title="@string/setting_restart_service_on_boot_title"
+                      android:summary="@string/setting_restart_service_on_boot_summary"
+                      android:defaultValue="true"
+                      android:key="@string/setting_restart_service_on_boot" />
+
     <!-- Appearance -->
     <PreferenceCategory android:title="@string/setting_cat_appearance_title"
                         android:key="@string/setting_cat_appearance">
