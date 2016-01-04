@@ -21,7 +21,6 @@
     <string name="overview_no_entries">No entries yet.</string>
 
 
-
     <!-- Colors -->
     <color name="transparent">#00FFFFFF</color>
     <color name="white">#FFFFFFFF</color>
@@ -79,10 +78,10 @@
 
     <color name="cardview_background">#FFF9F9F9</color>
 
-<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-<!-- TODO: REWORK
+    <!-- TODO: REWORK
     <color name="navigation_drawer_bg">@color/white</color>
     <color name="navigation_drawer_top_bg">@color/greenish_10</color>
     <color name="navigation_drawer_items">@color/grey_navigation_drawer_text</color>

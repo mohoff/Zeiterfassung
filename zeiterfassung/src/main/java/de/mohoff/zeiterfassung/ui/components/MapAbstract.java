@@ -16,6 +16,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.location.Geocoder;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.InflateException;
@@ -115,7 +116,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        //mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         return view;
@@ -138,7 +140,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        //mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         return view;
@@ -246,11 +249,24 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
            the parent view can be inflated properly with a new MapFragment.
          */
         try {
-            MapFragment fragment = (MapFragment)(getFragmentManager().findFragmentById(R.id.map));
-            FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
-            ft.remove(fragment);
-            //ft.commit();
-            ft.commitAllowingStateLoss();
+            // TODO: Check if we really need distinction in Android versions here...
+            // Every Android OS older than Marshmallow (< 6.0)
+            if(android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+                MapFragment fragment = (MapFragment)(getFragmentManager().findFragmentById(R.id.map));
+                FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+                ft.remove(fragment);
+                //ft.commit();
+                ft.commitAllowingStateLoss();
+            } else {
+                // TODO: Maybe <6.0 also can work with getChildFragmentManager() ?
+                // For Android Marshmallow and above (>= 6.0):
+                MapFragment fragment = (MapFragment)(getChildFragmentManager().findFragmentById(R.id.map));
+                //FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+                FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+                ft.remove(fragment);
+                //ft.commit();
+                ft.commitAllowingStateLoss();
+            }
         } catch(Exception e){
             e.printStackTrace();
         }

@@ -33,6 +33,9 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBhGC3B6R8sodII0rrWPx1FJclOr4f4FM0"/>
 
+        <activity android:name=".ui.Intro"
+                  android:label="Intro" />
+
         <activity
             android:name=".ui.MainActivity"
             android:label="Zeiterfassung">

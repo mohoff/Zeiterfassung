@@ -82,11 +82,12 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         super.onResume();
 
         if(!context.serviceStatus.isRunning()){
-            Snackbar.make(
+            /* Snackbar.make(
                     context.coordinatorLayout,
                     getString(R.string.service_not_running),
                     Snackbar.LENGTH_LONG)
                     .show();
+            */
         }
 
         // Set listeners

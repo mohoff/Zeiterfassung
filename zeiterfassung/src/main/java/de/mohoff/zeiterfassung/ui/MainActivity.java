@@ -1,23 +1,30 @@
 package de.mohoff.zeiterfassung.ui;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.*;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -48,6 +55,9 @@ import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 // TODO: add lite version of google maps to lower area of navigation drawer and maybe 'About' page
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerListener {
+    private static final int PERMISSION_REQUEST_LOCATION = 1;
+
+
     private DatabaseHelper dbHelper;
 
     public static FragmentManager fragM;
@@ -56,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     public CoordinatorLayout coordinatorLayout;
     public NavigationView navigationView;
+    public View navigationViewHeader;
     public Toolbar toolbar;
     public FloatingActionButton fab;
     private NavigationDrawerListener drawerListener;
@@ -102,6 +113,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         navigationView = ((NavigationView) findViewById(R.id.navigationView));
+        navigationViewHeader = navigationView.getHeaderView(0);
+        buttonStartService = (Button) navigationViewHeader.findViewById(R.id.buttonStartService);
+        buttonStopService = (Button) navigationViewHeader.findViewById(R.id.buttonStopService);
         fab = (FloatingActionButton) findViewById(R.id.fab);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -164,9 +178,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             }
         });
 
-        buttonStartService = (Button) findViewById(R.id.buttonStartService);
-        buttonStopService = (Button) findViewById(R.id.buttonStopService);
-
         // Initializes LocationCache (singleton) and fills it with locations from DB if the
         // locations are not too old.
         GeneralHelper.setupLocationCache(dbHelper);
@@ -205,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         }
     }
 
-    public void unbindAndStopLocationService(){
+    public void unbindAndStopService(){
         // The order of following executed lines is debatable. I value UI
         // responsiveness over waiting for stopService call. Since stopService
         // does not provide any feedback about its success, I prefer UI feedback
@@ -250,13 +261,108 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     @Override
     public void StartButtonClicked() {
-        startAndBindToLocationService();
+        requestPermissionsAndStartService();
     }
 
     @Override
     public void StopButtonClicked() {
-        unbindAndStopLocationService();
+        unbindAndStopService();
     }
+
+    public void requestPermissionsAndStartService(){
+        // 1) Use the support library version ContextCompat.checkSelfPermission(...) to avoid
+        // checking the build version since Context.checkSelfPermission(...) is only available
+        // in Marshmallow
+        // 2) Always check for permission (even if permission has already been granted)
+        // since the user can revoke permissions at any time through Settings
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // The permission is NOT already granted.
+            // Check if the user has been asked about this permission already and denied
+            // it. If so, we want to give more explanation about why the permission is needed.
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+                // Show our own UI to explain to the user why we need to read the contacts
+                // before actually requesting the permission and showing the default UI
+                Snackbar.make(
+                        coordinatorLayout,
+                        "Camera access is required to display the camera preview.",
+                        Snackbar.LENGTH_INDEFINITE)
+                        .setAction("GRANT", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                // Request the permission
+                                ActivityCompat.requestPermissions(
+                                        MainActivity.this,
+                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                        PERMISSION_REQUEST_LOCATION
+                                );
+                            }
+                        })
+                .show();
+            }
+
+            // Fire off an async request to actually get the permission
+            // This will show the standard permission request dialog UI
+            ActivityCompat.requestPermissions(
+                    MainActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_REQUEST_LOCATION
+            );
+        } else {
+            // When permissions have already been granted previously, start the LocationService.
+            startAndBindToLocationService();
+        }
+    }
+
+    // Callback with the request from calling requestPermissions(...)
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Snackbar.make(
+                            coordinatorLayout,
+                            "Access Locations permission granted.",
+                            Snackbar.LENGTH_LONG)
+                    .show();
+                    // Since we have needed permissions now, we can start the LocationService
+                    startAndBindToLocationService();
+                } else {
+                    AlertDialog alertDialog = new AlertDialog.Builder(this)
+                            .setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    // Open relevant system settings
+                                    Intent intent = new Intent();
+                                    intent.setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                    intent.setData(uri);
+                                    startActivity(intent);
+                                }
+                            })
+                            .setNegativeButton(getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setTitle("Important Note")
+                            .setMessage("In order to track your movements, this app needs Location permissions. Since you once chose to deny them without getting asked again, you now need to grant Location permissions manually. To do so, click SETTINGS in this dialog and then activate Location under 'Permissions'.")
+                            .create();
+                    alertDialog.show();
+                }
+                return;
+            }
+            default: {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
 
     @Override
     public void onItemSelected(View view, int position) {
