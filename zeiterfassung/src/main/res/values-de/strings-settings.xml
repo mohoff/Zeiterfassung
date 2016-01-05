@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- General (category) -->
+    <string name="setting_cat_general_title">Allgemein</string>
+    <string name="setting_cat_general">general</string>
+
+    <string name="setting_general_restart_service_on_boot">startServiceOnBoot</string>
+    <string name="setting_general_restart_service_on_boot_title">Tracking automatisch starten</string>
+    <string name="setting_general_restart_service_on_boot_summary">Startet das Tracking automatisch nach Geräteneustart</string>
+    <string name="setting_general_restart_service_on_boot_default_value">true</string>
+
+    <string name="setting_general_show_intro">showAppIntro</string>
+    <string name="setting_general_show_intro_title">App Intro anzeigen</string>
+
+    <!-- Appearance (category) -->
+    <string name="setting_cat_appearance_title">Aussehen</string>
+    <string name="setting_cat_appearance">appearance</string>
+
+    <string name="setting_appearance_label_order">labelOrderTimeslotLocationFirst</string>
+    <string name="setting_appearance_label_order_title">Label Reihenfolge</string>
+    <string name="setting_appearance_label_order_summary_on">Erste Zeile: Name des Orts</string>
+    <string name="setting_appearance_label_order_summary_off">Erste Zeile: Name der Aktivität</string>
+    <string name="setting_appearance_label_order_default_value">true</string>
+
+    <string name="setting_appearance_color_indicator">showTimeslotColorIndicator</string>
+    <string name="setting_appearance_color_indicator_title">Farbhinweis</string>
+    <string name="setting_appearance_color_indicator_summary_on">Farbhinweis anzeigen</string>
+    <string name="setting_appearance_color_indicator_summary_off">Farbhinweis verbergen</string>
+    <string name="setting_appearance_color_indicator_default_value">true</string>
+
+    <string name="setting_appearance_extra_info">showTimeslotContextInfo</string>
+    <string name="setting_appearance_extra_info_title">Kurzstatistik</string>
+    <string name="setting_appearance_extra_info_summary_on">Kurzstatistik anzeigen</string>
+    <string name="setting_appearance_extra_info_summary_off">Kurzstatistik verbergen</string>
+    <string name="setting_appearance_extra_info_default_value">true</string>
+
+    <string name="setting_appearance_extra_info_detail">showTimeslotContextInfoInterval</string>
+    <string name="setting_appearance_extra_info_detail_title">Zeitraum der Kurzstatistik</string>
+    <string name="setting_appearance_extra_info_detail_default_value">2</string>
+    <array name="extraInfoEntries">
+        <item>Heute</item>
+        <item>Gestern</item>
+        <item>Diese Woche</item>
+        <item>Letzten 10 Tage</item>
+        <item>Dieser Monat</item>
+        <item>Dieses Jahr</item>
+        <item>Seit Appaufzeichnung</item>
+    </array>
+    <string-array name="extraInfoEntryValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+
+
+    <!-- Zones -->
+    <string name="setting_cat_zones">zones</string>
+    <string name="setting_cat_zones_title">Zonene</string>
+
+    <string name="setting_zones_default_radius">zoneDefaultRadius</string>
+    <string name="setting_zones_default_radius_title">Standard Zonenradius</string>
+    <string name="setting_zones_default_radius_message">Der Radius muss min. 30 Meter betragen.</string>
+    <string name="setting_zones_default_radius_default_value">50</string>
+
+
+    <!-- Map (Live Map) -->
+    <string name="setting_cat_map">map</string>
+    <string name="setting_cat_map_title">Map</string>
+
+    <string name="setting_map_default_zoom">mapDefaultZoom</string>
+    <string name="setting_map_default_zoom_title">Standard Zoomlevel</string>
+    <string name="setting_map_default_zoom_dialog_message">Bitte gebe einen Wert zwischen 1 und 15 ein.\nMinimaler Zoom: 1\nMaximaler Zoom: 15\nEmpfohlen: 11</string>
+    <string name="setting_map_default_zoom_default_value">11</string>
+
+    <string name="setting_map_follow_updates">mapFollowLocationUpdates</string>
+    <string name="setting_map_follow_updates_title">Positionsänderungen live anzeigen</string>
+    <string name="setting_map_follow_updates_summary">Map wird live auf neue Positionen zentriert</string>
+    <string name="setting_map_follow_updates_default_value">true</string>
+
+    <string name="setting_map_zoomin">mapZoomIn</string>
+    <string name="setting_map_zoomin_title">Hereinzoom-Animation</string>
+    <string name="setting_map_zoomin_summary_on">Hereinzoom-Animation anzeigen</string>
+    <string name="setting_map_zoomin_summary_off">Hereinzoom-Animation verbergen</string>
+    <string name="setting_map_zoomin_default_value">true</string>
+
+
+    <!-- OTHER -->
+    <string name="setting_crashlog_report">reportCrashlogs</string>
+    <string name="setting_crashlog_report_title">Crash-Berichte</string>
+    <string name="setting_crashlog_report_summary">Crash-Berichte automatisch zum Appentwickler senden</string>
+    <string name="setting_crashlog_report_default_value">true</string>
+
+    <!-- Danger Zone (category) -->
+    <string name="setting_cat_danger_zone">dangerZone</string>
+    <string name="setting_cat_danger_zone_title">Gefahrenzone</string>
+
+    <string name="setting_delete_timeslots">deleteAllTimeslots</string>
+    <string name="setting_delete_timeslots_title">Alle Einträge im Überblick löschen</string>
+
+    <string name="setting_delete_zones">deleteAllZones</string>
+    <string name="setting_delete_zones_title">Alle Zonen löschen</string>
+
+    <string name="setting_clean_map">cleanMap</string>
+    <string name="setting_clean_map_title">Map säubern</string>
+    <string name="setting_clean_map_summary">Entfernt alle Marker und Linien von der Map</string>
+
+    <string name="setting_reset_settings">resetSettings</string>
+    <string name="setting_reset_settings_title">Einstellungen zurücksetzen</string>
+    <string name="setting_reset_settings_summary">Stellt die Standardeinstellungen wieder her</string>
+
+</resources>

@@ -4,8 +4,8 @@
     <!-- LocationService events -->
 
     <string name="service_not_running">Location Service is not running&#8230;</string>
-    <string name="timeslot_opened">Timeslot opened.</string>
-    <string name="timeslot_closed">Timeslot closed.</string>
+    <string name="timeslot_opened">Zone entered.</string>
+    <string name="timeslot_closed">Zone left.</string>
 
 
     <!-- Map -->

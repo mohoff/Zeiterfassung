@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE resources [
+    <!ENTITY appname "Zeiterfassung">
+    ]>
+<resources>
+
+    <!-- Note: subtitle text style is italic by default. -->
+    <!-- Note: <![CDATA[ .... ]]> blocks allow the usage of text styling via <i>,<b>,etc. tags. -->
+
+    <string name="welcome_1_title">Willkommen!</string>
+    <string name="welcome_1_subtitle">""</string>
+    <string name="welcome_1_description"><![CDATA[<i>]]>&appname;<![CDATA[</i> verfolgt deine Ortsaufenthalte im Hintergrund.
+        Dafür brauchst du nicht einmal GPS!]]></string>
+
+    <string name="gettingstarted_2_title">Los geht\'s</string>
+    <string name="gettingstarted_2_subtitle">Teil I</string>
+    <string name="gettingstarted_2_description"><![CDATA[Zuerst solltest du deine eigenen <i>Zonen</i> festlegen, die den Gebieten entsprechen, die du verfolgen lassen willst. Jede <i>Zone</i> hat einen Namen und belegt ein Gebiet auf der Map.]]></string>
+
+    <string name="gettingstarted_3_title">@string/gettingstarted_2_title</string>
+    <string name="gettingstarted_3_subtitle">Teil II</string>
+    <string name="gettingstarted_3_description"><![CDATA[Jetzt kann es schon losgehen! Nachdem Du das Tracking im Hintergrund aktiviert hast, füllt sich allmählich der <i>Überblick</i>, je nach dem wie du zuvor definierten Zonen betrittst und verlässt.\n\nDie genauen Messungen kannst Du in der <i>Live Map</i> mitverfolgen.]]></string>
+
+    <string name="enjoy_4_title">Viel Spaß!</string>
+    <string name="enjoy_4_subtitle">""</string>
+    <string name="enjoy_4_description"><![CDATA[Vergiss nicht die App in den <i>Einstellungen</i> nach deinen Wünschen anzupassen und die <i>Statistik</i> auszuwerten.\n\nViel Spaß mit der App!]]></string>
+
+</resources>

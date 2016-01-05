@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- LocationService events -->
+
+    <string name="service_not_running">Tracking nicht aktiv.&#8230;</string>
+    <string name="timeslot_opened">Zone betreten.</string>
+    <string name="timeslot_closed">Zone verlassen.</string>
+
+
+    <!-- Map -->
+
+    <string name="error_no_data">Aktuell keine Positionsdaten verfügbar.</string>
+    <string name="error_no_recent_data">Keine aktuellen Positionsdaten verfügbar.</string>
+    <string name="error_no_init">Map ist nicht initialisiert.</string>
+
+
+    <!-- Manage Zones -->
+
+    <string name="error_input_names">Bitte fülle beide Namen aus.</string>
+    <string name="error_input_name_exists">Zone existiert bereits.</string>
+    <string name="error_input_name_color_equal">Name und Farbe haben sich nicht geändert.</string>
+    <string name="error_input_color">Bitte wähle eine Farbe aus.</string>
+    <string name="error_input_radius_min">Eingabe muss >= %1$d Meter sein.</string>
+    <string name="error_input_radius_equal">Radiuseingabe bereits gespeichert.</string>
+    <string name="error_input_no_pin">Bitte markiere einen Bereich auf der Map.</string>
+    <string name="error_input_pin_equal">Bereich und Radius haben sich nicht geändert.</string>
+    <string name="error_input_pin_intersect">Bereich und Radius schneiden sich mit anderer Zone.</string>
+    <string name="error_input_no_number">Eingabe ist keine Zahl.</string>
+    <string name="error_input_geolookup_empty">Bitte Adresse oder Platz eingeben.</string>
+    <string name="error_input_geolookup_invalid">Adresse oder Platz nicht gefunden. Bitte nochmal versuchen.</string>
+    <string name="error_geolookup">Suche fehlgeschlagen. Internetverbindung hergestellt?</string>
+    <!-- Create/Add Zone/s -->
+    <string name="create_zone_failure">Zone hinzugefügen fehlgeschlagen. Existiert sie bereits?</string>
+    <string name="create_zone_success">Zone hinzugefügt.</string>
+    <!-- Update Zone/s -->
+    <string name="update_zone_success">Zone aktualisiert.</string>
+    <plurals name="update_zone_multiple_success">
+        <item quantity="one">%d Zone aktualisiert.</item>
+        <item quantity="other">%d Zonen aktualisiert.</item>
+    </plurals>
+    <string name="update_zone_failure">Zone aktualisieren fehlgeschlagen.</string>
+    <string name="update_zone_multiple_failure">Zone(n) aktualisieren fehlgeschlagen.</string>
+    <!-- Delete Zone/s -->
+    <string name="delete_zone_success">Zone gelöscht.</string>
+    <plurals name="delete_zone_multiple_success">
+        <item quantity="one">%d Zone gelöscht.</item>
+        <item quantity="other">%d Zonen gelöscht.</item>
+    </plurals>
+    <string name="delete_zone_failure">Zone löschen fehlgeschlagen.</string>
+    <string name="delete_zone_multiple_failure">Zone(n) löschen fehlgeschlagen.</string>
+
+
+    <!-- Settings -->
+    <string name="settings_alert_msg_zones_default_radius_failure">Radius muss mindestens %1$s Meter betragen.</string>
+
+    <string name="settings_alert_msg_map_default_zoom_toolow">Eingabe wurde auf Minimales Zoomlevel korrigiert.</string>
+    <string name="settings_alert_msg_map_default_zoom_toohigh">Eingabe wurde auf Maximales Zoomlevel korrigiert.</string>
+
+    <string name="settings_report_crashlogs_block">Mehh.. das lassen wir mal an :P</string>
+
+    <string name="settings_alert_msg_delete_entries">Alle Tracking Einträge löschen?</string>
+    <string name="settings_delete_entries_success">Einträge gelöscht.</string>
+    <string name="settings_delete_entries_failure">Einträge löschen fehlgeschlagen.</string>
+
+    <string name="settings_alert_msg_delete_zones">Alle Zonen löschen?</string>
+    <string name="settings_delete_zones_success">Zonen gelöscht.</string>
+    <string name="settings_delete_zones_failure">Zonen löschen fehlgeschlagen.</string>
+
+    <string name="settings_alert_msg_clean_map">Map säubern?</string>
+    <string name="settings_clean_map_success">Map gesäubert.</string>
+    <string name="settings_clean_map_failure">Map säubern fehlgeschlagen.</string>
+
+    <string name="settings_alert_msg_reset_settings">Standardeinstellungen wiederherstellen?</string>
+    <string name="settings_reset_settings_success">Standardeinstellungen wiederhergestellt.</string>
+    <string name="settings_reset_settings_failure">Standardeinstellungen wiederherstellen fehlgeschlagen.</string>
+
+</resources>
