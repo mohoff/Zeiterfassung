@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE resources [
+    <!ENTITY appname "Zeiterfassung">
+    ]>
+<resources>
+
+    <!-- Note: subtitle text style is italic by default. -->
+    <!-- Note: <![CDATA[ .... ]]> blocks allow the usage of text styling via <i>,<b>,etc. tags. -->
+
+    <string name="welcome_1_title">Welcome!</string>
+    <string name="welcome_1_subtitle">""</string>
+    <string name="welcome_1_description"><![CDATA[<i>]]>&appname;<![CDATA[</i> let\'s you track your whereabouts in the background.
+        For that you don\'t even need GPS!]]></string>
+
+    <string name="gettingstarted_2_title">Getting Started</string>
+    <string name="gettingstarted_2_subtitle">Part I</string>
+    <string name="gettingstarted_2_description"><![CDATA[First, you should define custom <i>Zones</i> which
+        mark the areas you want to track. For each <i>Zone</i> you enter a name and an area on
+        the map.]]></string>
+
+    <string name="gettingstarted_3_title">@string/gettingstarted_2_title</string>
+    <string name="gettingstarted_3_subtitle">Part II</string>
+    <string name="gettingstarted_3_description"><![CDATA[You\'re already ready to go! After starting the
+        background tracking, entries will pop up in the <i>Overview</i> as you enter and leave
+        previously defined Zones.\n\nYou can have a detailed look at the measurements on the
+        <i>Live Map</i>.]]></string>
+
+    <string name="enjoy_4_title">Enjoy!</string>
+    <string name="enjoy_4_subtitle">""</string>
+    <string name="enjoy_4_description"><![CDATA[Don\'t forget to personalize your experience in the
+        <i>Settings</i> and to check out the <i>Statistics</i>.\n\nHave fun!]]></string>
+
+</resources>

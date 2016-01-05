@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- LocationService -->
-    <string name="setting_restart_service_on_boot">startServiceOnBoot</string>
-    <string name="setting_restart_service_on_boot_title">Start Tracking automatically</string>
-    <string name="setting_restart_service_on_boot_summary">Start Tracking automatically after rebooting device</string>
-    <string name="setting_restart_service_on_boot_default_value">true</string>
+    <!-- General (category) -->
+    <string name="setting_cat_general_title">General</string>
+    <string name="setting_cat_general">general</string>
+
+    <string name="setting_general_restart_service_on_boot">startServiceOnBoot</string>
+    <string name="setting_general_restart_service_on_boot_title">Start Tracking automatically</string>
+    <string name="setting_general_restart_service_on_boot_summary">Start Tracking automatically after rebooting device</string>
+    <string name="setting_general_restart_service_on_boot_default_value">true</string>
+
+    <string name="setting_general_show_intro">showAppIntro</string>
+    <string name="setting_general_show_intro_title">Show App Intro</string>
 
     <!-- Appearance (category) -->
     <string name="setting_cat_appearance_title">Appearance</string>

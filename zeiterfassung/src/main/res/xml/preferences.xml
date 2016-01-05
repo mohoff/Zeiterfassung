@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- LocationService -->
-    <SwitchPreference android:title="@string/setting_restart_service_on_boot_title"
-                      android:summary="@string/setting_restart_service_on_boot_summary"
-                      android:defaultValue="true"
-                      android:key="@string/setting_restart_service_on_boot" />
+    <!-- General -->
+    <PreferenceCategory android:title="@string/setting_cat_general_title"
+                        android:key="@string/setting_cat_general">
+        <!-- LocationService -->
+        <SwitchPreference android:title="@string/setting_general_restart_service_on_boot_title"
+                          android:summary="@string/setting_general_restart_service_on_boot_summary"
+                          android:defaultValue="true"
+                          android:key="@string/setting_general_restart_service_on_boot" />
+
+        <!-- AppIntro -->
+        <Preference android:title="@string/setting_general_show_intro_title"
+                    android:key="@string/setting_general_show_intro" />
+    </PreferenceCategory>
 
     <!-- Appearance -->
     <PreferenceCategory android:title="@string/setting_cat_appearance_title"
                         android:key="@string/setting_cat_appearance">
-
         <SwitchPreference android:title="@string/setting_appearance_label_order_title"
-                            android:summaryOn="@string/setting_appearance_label_order_summary_on"
-                            android:summaryOff="@string/setting_appearance_label_order_summary_off"
-                            android:defaultValue="@string/setting_appearance_label_order_default_value"
-                            android:key="@string/setting_appearance_label_order"/>
+                          android:summaryOn="@string/setting_appearance_label_order_summary_on"
+                          android:summaryOff="@string/setting_appearance_label_order_summary_off"
+                          android:defaultValue="@string/setting_appearance_label_order_default_value"
+                          android:key="@string/setting_appearance_label_order"/>
         <SwitchPreference android:title="@string/setting_appearance_color_indicator_title"
                           android:summaryOn="@string/setting_appearance_color_indicator_summary_on"
                           android:summaryOff="@string/setting_appearance_color_indicator_summary_off"
                           android:defaultValue="@string/setting_appearance_color_indicator_default_value"
                           android:key="@string/setting_appearance_color_indicator"/>
         <CheckBoxPreference android:title="@string/setting_appearance_extra_info_title"
-                          android:summaryOn="@string/setting_appearance_extra_info_summary_on"
-                          android:summaryOff="@string/setting_appearance_extra_info_summary_off"
-                          android:defaultValue="@string/setting_appearance_extra_info_default_value"
-                          android:key="@string/setting_appearance_extra_info"/>
+                            android:summaryOn="@string/setting_appearance_extra_info_summary_on"
+                            android:summaryOff="@string/setting_appearance_extra_info_summary_off"
+                            android:defaultValue="@string/setting_appearance_extra_info_default_value"
+                            android:key="@string/setting_appearance_extra_info"/>
         <ListPreference
             android:entries="@array/extraInfoEntries"
             android:entryValues="@array/extraInfoEntryValues"
@@ -35,13 +42,11 @@
             android:summary="%s"
             android:defaultValue="@string/setting_appearance_extra_info_detail_default_value"/>
         <!-- TODO: Add SwitchPreference: Sum up extra time context info for Activity (on) or Location (off) -->
-
     </PreferenceCategory>
 
     <!-- Zones -->
     <PreferenceCategory android:title="@string/setting_cat_zones_title"
                         android:key="@string/setting_cat_zones">
-
         <EditTextPreference android:title="@string/setting_zones_default_radius_title"
                             android:defaultValue="@string/setting_zones_default_radius_default_value"
                             android:dialogTitle="@string/setting_zones_default_radius_title"
@@ -53,7 +58,6 @@
     <!-- Map -->
     <PreferenceCategory android:title="@string/setting_cat_map_title"
                         android:key="@string/setting_cat_map">
-
         <EditTextPreference android:title="@string/setting_map_default_zoom_title"
                             android:defaultValue="@string/setting_map_default_zoom_default_value"
                             android:dialogTitle="@string/setting_map_default_zoom_title"
@@ -78,7 +82,6 @@
     <de.mohoff.zeiterfassung.ui.components.settings.PreferenceCategoryDangerZone
         android:title="@string/setting_cat_danger_zone_title"
         android:key="@string/setting_cat_danger_zone">
-
         <Preference android:title="@string/setting_delete_timeslots_title"
                     android:key="@string/setting_delete_timeslots"/>
         <Preference android:title="@string/setting_delete_zones_title"
@@ -93,7 +96,7 @@
 
 
     <!-- OTHER -->
-    <!-- TODO: Currentyl hidden in the layout, because PreferenceCAtegoryDangerZone is bugged. Stackoverflow-question already asked: http://stackoverflow.com/questions/33820154/custom-preferencecategory-cut-off-at-bottom-of-preference-list -->
+    <!-- TODO: Currently hidden in the layout, because PreferenceCAtegoryDangerZone is bugged. Stackoverflow-question already asked: http://stackoverflow.com/questions/33820154/custom-preferencecategory-cut-off-at-bottom-of-preference-list -->
     <SwitchPreference android:title="@string/setting_crashlog_report_title"
                       android:summary="@string/setting_crashlog_report_summary"
                       android:defaultValue="@string/setting_crashlog_report_default_value"

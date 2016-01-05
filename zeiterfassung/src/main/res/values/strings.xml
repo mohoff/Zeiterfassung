@@ -4,6 +4,12 @@
     <string name="app_name">Zeiterfassung</string>
     <string name="app_creator">Moritz Hoffmann</string>
 
+    <string name="about_by">"by "</string>
+    <string name="about_send_feedback">SEND FEEDBACK</string>
+    <string name="about_feedback_description">Please enter your feedback here:</string>
+    <string name="about_feedback_placeholder">"Hi, if I may speak freely: "</string>
+    <string name="about_feedback_thanks">Thank you!</string>
+
     <string name="nav_item_1_overview">Overview</string>
     <string name="nav_item_2_zones">Zones</string>
     <string name="nav_item_3_maplive">Live Map</string>

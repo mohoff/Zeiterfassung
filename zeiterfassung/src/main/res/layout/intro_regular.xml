@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@drawable/ic_zones"
-            android:tint="@color/almost_white"
+            android:tint="@color/white"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"/>
     </LinearLayout>

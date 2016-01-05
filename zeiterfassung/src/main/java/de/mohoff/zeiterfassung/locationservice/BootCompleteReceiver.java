@@ -18,8 +18,8 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         boolean startService = sp.getBoolean(
-                context.getString(R.string.setting_restart_service_on_boot),
-                Boolean.valueOf(context.getString(R.string.setting_restart_service_on_boot_default_value))
+                context.getString(R.string.setting_general_restart_service_on_boot),
+                Boolean.valueOf(context.getString(R.string.setting_general_restart_service_on_boot_default_value))
         );
 
         if(startService){

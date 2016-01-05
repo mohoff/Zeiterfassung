@@ -7,18 +7,30 @@
               android:layout_weight="10"
               android:background="@color/greenish"
               android:paddingBottom="64dp">
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:gravity="center"
         android:paddingLeft="32dp"
         android:paddingRight="32dp"
-        android:layout_weight="3"
-        android:text="Welcome"
-        android:textColor="@android:color/white"
-        android:textSize="28sp"/>
+        android:layout_weight="3">
+        <TextView
+            android:id="@+id/title"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Welcome"
+            android:textColor="@android:color/white"
+            android:textSize="28sp"/>
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/title"
+            android:textColor="@android:color/white"
+            android:textStyle="italic"
+            android:paddingTop="5dp"/>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -37,6 +49,7 @@
             android:paddingRight="16dp" />
     </LinearLayout>
     <TextView
+        android:id="@+id/description"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight="4"
@@ -48,7 +61,7 @@
         android:paddingLeft="50dp"
         android:paddingRight="50dp"
         android:textSize="16sp"
-        android:id="@+id/description" />
+ />
     <!--
     <TextView
         android:layout_width="fill_parent"

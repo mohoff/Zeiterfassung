@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     }
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,8 +119,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 SharedPreferences getPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 boolean isFirstStart = getPrefs.getBoolean("firstStart", true);
                 if(isFirstStart){
-                    Intent i = new Intent(MainActivity.this, Intro.class);
-                    startActivity(i);
+                    showAppIntro();
                     //  Edit preference to make it false because we don't want this to run again
                     SharedPreferences.Editor e = getPrefs.edit();
                     e.putBoolean("firstStart", false);
@@ -219,6 +219,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
         // Load preferences' default values into SharedPreference.
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+    }
+
+    public void showAppIntro(){
+        Intent i = new Intent(MainActivity.this, Intro.class);
+        startActivity(i);
     }
 
     public void startAndBindToLocationService() {

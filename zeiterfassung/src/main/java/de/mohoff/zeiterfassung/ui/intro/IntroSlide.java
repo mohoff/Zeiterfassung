@@ -1,19 +1,25 @@
 package de.mohoff.zeiterfassung.ui.intro;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import de.mohoff.zeiterfassung.R;
 
 public class IntroSlide extends Fragment {
     private static final String ARG_LAYOUT_RES_ID = "layoutResId";
     private int layoutResId;
+    private String mTitle, mSubtitle, mDescription;
+    private Drawable mSlideIcon;
 
     public IntroSlide() {
         // Required empty public constructor
@@ -21,7 +27,6 @@ public class IntroSlide extends Fragment {
 
     public static IntroSlide newInstance(int layoutResId) {
         IntroSlide slide = new IntroSlide();
-
         Bundle args = new Bundle();
         args.putInt(ARG_LAYOUT_RES_ID, layoutResId);
         slide.setArguments(args);
@@ -40,6 +45,29 @@ public class IntroSlide extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(layoutResId, container, false);
+        View v = inflater.inflate(layoutResId, container, false);
+
+        ((TextView) v.findViewById(R.id.title)).setText(Html.fromHtml(mTitle));
+        ((TextView) v.findViewById(R.id.subtitle)).setText(Html.fromHtml(mSubtitle));
+        ((ImageView) v.findViewById(R.id.slideIcon)).setImageDrawable(mSlideIcon);
+        ((TextView) v.findViewById(R.id.description)).setText(Html.fromHtml(mDescription));
+
+        return v;
+    }
+
+    public void setTitle(String title){
+        mTitle = title;
+    }
+
+    public void setSubitle(String subtitle){
+        mSubtitle = subtitle;
+    }
+
+    public void setImage(Drawable slideIcon){
+        mSlideIcon = slideIcon;
+    }
+
+    public void setDescription(String description){
+        mDescription = description;
     }
 }

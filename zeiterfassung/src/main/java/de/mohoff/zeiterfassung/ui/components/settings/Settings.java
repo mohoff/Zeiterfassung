@@ -33,14 +33,12 @@ import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class Settings extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     MainActivity context;
     DatabaseHelper dbHelper;
     SharedPreferences sp;
 
+    Preference showAppIntro;
     Preference cleanMap, deleteAllTimeslots, deleteAllZones, resetAllSettings;
     Preference mapDefaultZoomLevel;
     Preference sendCrashlogs;
@@ -55,12 +53,21 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
 
         initSummaries(getPreferenceScreen());
 
+        showAppIntro = findPreference(getString(R.string.setting_general_show_intro));
         deleteAllTimeslots = findPreference(getString(R.string.setting_delete_timeslots));
         deleteAllZones = findPreference(getString(R.string.setting_delete_zones));
         cleanMap = findPreference(getString(R.string.setting_clean_map));
         resetAllSettings = findPreference(getString(R.string.setting_reset_settings));
         mapDefaultZoomLevel = findPreference(getString(R.string.setting_map_default_zoom));
         sendCrashlogs = findPreference(getString(R.string.setting_crashlog_report));
+
+        showAppIntro.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                context.showAppIntro();
+                return true;
+            }
+        });
 
         deleteAllTimeslots.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
