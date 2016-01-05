@@ -277,7 +277,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.map = googleMap;
-        // Disable "Navigation" and "GPS Pointer" buttons whiche are visible by default
+        // Disable "Navigation" and "GPS Pointer" buttons which are visible by default
         map.getUiSettings().setMapToolbarEnabled(false);
         // Enables "Show my secondLine" button which shows current secondLine with bearing on the map
         // map.getUiSettings().setMyLocationButtonEnabled(true);

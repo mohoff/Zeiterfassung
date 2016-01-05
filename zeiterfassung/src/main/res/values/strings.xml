@@ -29,7 +29,7 @@
     <color name="almost_black">#FF111111</color>
     <color name="almost_white">#FFEEEEEE</color>
     <color name="yellow">#F3BB25</color>
-    <color name="red">#FFF32A25</color>
+    <color name="red">#F32A25</color>
 
     <color name="marker_accurate">@color/greenish</color>
     <color name="marker_accurate_border">@color/greenish_light</color>

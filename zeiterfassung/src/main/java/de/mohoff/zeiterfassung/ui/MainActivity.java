@@ -51,6 +51,7 @@ import de.mohoff.zeiterfassung.ui.components.NavigationDrawerListener;
 import de.mohoff.zeiterfassung.ui.components.maplive.MapLive;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
+import de.mohoff.zeiterfassung.ui.intro.Intro;
 
 // TODO: add lite version of google maps to lower area of navigation drawer and maybe 'About' page
 
@@ -107,6 +108,27 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_main);
         getDbHelper();
+
+        // Show Intro Activity when app is started the first time
+        // Declare a new thread to do a preference check
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //  Initialize SharedPreferences
+                SharedPreferences getPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                boolean isFirstStart = getPrefs.getBoolean("firstStart", true);
+                if(isFirstStart){
+                    Intent i = new Intent(MainActivity.this, Intro.class);
+                    startActivity(i);
+                    //  Edit preference to make it false because we don't want this to run again
+                    SharedPreferences.Editor e = getPrefs.edit();
+                    e.putBoolean("firstStart", false);
+                    e.apply();
+                }
+            }
+        });
+        t.start();
+
         fragM = getFragmentManager();
         fragT = fragM.beginTransaction();
 
@@ -326,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                             coordinatorLayout,
                             "Access Locations permission granted.",
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
                     // Since we have needed permissions now, we can start the LocationService
                     startAndBindToLocationService();
                 } else {

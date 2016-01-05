@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/main"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_weight="10"
+              android:background="@color/greenish"
+              android:paddingBottom="64dp">
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:layout_weight="3"
+        android:text="Enjoy!"
+        android:textColor="@android:color/white"
+        android:textSize="28sp"/>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_weight="1">
+        <ImageView
+            android:id="@+id/slideIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_location_on_black_24dp"
+            android:tint="@color/almost_white"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"/>
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="6"
+        android:text="Don't forget to personalize your experience in the Settings and to check out the Statistics.\n\nHave fun!"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:lineSpacingExtra="5dp"
+        android:textColor="@android:color/white"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:textSize="16sp"
+        android:id="@+id/description" />
+</LinearLayout>

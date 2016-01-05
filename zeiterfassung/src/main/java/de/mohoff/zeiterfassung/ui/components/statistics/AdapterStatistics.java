@@ -140,7 +140,12 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
             statHolder.headline.setText(stat.getDisplayString());
 
             statHolder.chart.setData(getInitialChartData());
+            statHolder.chart.setNoDataText("");
             statHolder.chart.setNoDataTextDescription("No tracking information available yet.");
+            // Set no data text color
+            Paint p = statHolder.chart.getPaint(Chart.PAINT_INFO);
+            p.setColor(context.getResources().getColor(R.color.grey_25));
+
             statHolder.chart.setUsePercentValues(true); // true
             statHolder.chart.setDescription("");
             statHolder.chart.setExtraOffsets(10, 20, 10, 5); // left, top, right, bottom

@@ -33,7 +33,7 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyBhGC3B6R8sodII0rrWPx1FJclOr4f4FM0"/>
 
-        <activity android:name=".ui.Intro"
+        <activity android:name=".ui.intro.Intro"
                   android:label="Intro" />
 
         <activity

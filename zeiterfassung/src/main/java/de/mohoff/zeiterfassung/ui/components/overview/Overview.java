@@ -137,8 +137,10 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         adapter.notifyItemInserted(adapter.getItemCount()-1);
         adapter.notifyItemInserted(adapter.getItemCount()-2);
         // Update the 2nd list element. Its endtime and enddate might have TYPEFACE.ITALIC still.
+        adapter.notifyItemChanged(adapter.getItemCount()-1);
         adapter.notifyItemChanged(adapter.getItemCount()-2);
         adapter.notifyItemChanged(adapter.getItemCount()-3);
+        // TODO: not working yet I guess. Only Snackbar "New Timeslot opened" shows up
         // Give visual feedback that a new item has beed added: Scroll smoothly to top
         recList.smoothScrollToPosition(adapter.getItemCount()-1);
     }
