@@ -186,6 +186,7 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                                 if(sp.edit().clear().commit()){
                                     setPreferenceScreen(null);
                                     addPreferencesFromResource(R.xml.preferences);
+                                    initSummaries(getPreferenceScreen());
                                     Snackbar.make(
                                             context.coordinatorLayout,
                                             getString(R.string.settings_reset_settings_success),
@@ -316,7 +317,7 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                             context.coordinatorLayout,
                             getString(R.string.settings_alert_msg_map_default_zoom_toohigh, Zone.MIN_RADIUS),
                             Snackbar.LENGTH_LONG)
-                            .show();
+                    .show();
                 }
                 // Usually we need to compute treshold with MapAbstract.ZOOM_LEVEL_OFFSET_FOR_PREFS
                 // like it is done above. But both the lower hard limit and the lower pref limit
@@ -327,7 +328,7 @@ public class Settings extends PreferenceFragment implements SharedPreferences.On
                             context.coordinatorLayout,
                             getString(R.string.settings_alert_msg_map_default_zoom_toolow, Zone.MIN_RADIUS),
                             Snackbar.LENGTH_LONG)
-                            .show();
+                    .show();
                 }
                 editTextPref.setText(String.valueOf(input));
                 editTextPref.setSummary(input + " (" + (input-1)*100/14+ "%)");
