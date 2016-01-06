@@ -1,8 +1,6 @@
 package de.mohoff.zeiterfassung.ui.intro;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -48,7 +46,9 @@ public class IntroSlide extends Fragment {
         View v = inflater.inflate(layoutResId, container, false);
 
         ((TextView) v.findViewById(R.id.title)).setText(Html.fromHtml(mTitle));
-        ((TextView) v.findViewById(R.id.subtitle)).setText(Html.fromHtml(mSubtitle));
+        if(mSubtitle != null && !mSubtitle.equals("") && !mSubtitle.equals(" ")){
+            ((TextView) v.findViewById(R.id.subtitle)).setText(Html.fromHtml(mSubtitle));
+        }
         ((ImageView) v.findViewById(R.id.slideIcon)).setImageDrawable(mSlideIcon);
         ((TextView) v.findViewById(R.id.description)).setText(Html.fromHtml(mDescription));
 

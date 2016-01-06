@@ -8,7 +8,7 @@
     <!-- Note: <![CDATA[ .... ]]> blocks allow the usage of text styling via <i>,<b>,etc. tags. -->
 
     <string name="welcome_1_title">Welcome!</string>
-    <string name="welcome_1_subtitle">""</string>
+    <string name="welcome_1_subtitle">" "</string>
     <string name="welcome_1_description"><![CDATA[<i>]]>&appname;<![CDATA[</i> let\'s you track your whereabouts in the background.
         For that you don\'t even need GPS!]]></string>
 
@@ -26,7 +26,7 @@
         <i>Live Map</i>.]]></string>
 
     <string name="enjoy_4_title">Enjoy!</string>
-    <string name="enjoy_4_subtitle">""</string>
+    <string name="enjoy_4_subtitle">" "</string>
     <string name="enjoy_4_description"><![CDATA[Don\'t forget to personalize your experience in the
         <i>Settings</i> and to check out the <i>Statistics</i>.\n\nHave fun!]]></string>
 
