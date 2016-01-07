@@ -78,10 +78,10 @@
 
 
     <!-- Danger Zone -->
-    <!--<PreferenceCategory-->
+    <!-- <PreferenceCategory -->
     <de.mohoff.zeiterfassung.ui.components.settings.PreferenceCategoryDangerZone
-        android:title="@string/setting_cat_danger_zone_title"
-        android:key="@string/setting_cat_danger_zone">
+                        android:title="@string/setting_cat_danger_zone_title"
+                        android:key="@string/setting_cat_danger_zone">
         <Preference android:title="@string/setting_delete_timeslots_title"
                     android:key="@string/setting_delete_timeslots"/>
         <Preference android:title="@string/setting_delete_zones_title"
@@ -93,6 +93,7 @@
                     android:summary="@string/setting_reset_settings_summary"
                     android:key="@string/setting_reset_settings"/>
     </de.mohoff.zeiterfassung.ui.components.settings.PreferenceCategoryDangerZone>
+    <!--</PreferenceCategory>-->
 
 
     <!-- OTHER -->
