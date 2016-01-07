@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,7 +15,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
@@ -25,8 +23,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 
-import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 
 /**
@@ -68,10 +66,6 @@ public abstract class ZonesMapAbstract extends MapAbstract {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        MapsInitializer.initialize(context);
-
-        sp = PreferenceManager.getDefaultSharedPreferences(context);
-
         // Handle setting 'Default Zone Radius'
         newRadius = Integer.parseInt(sp.getString(
                 context.getString(R.string.setting_zones_default_radius),
@@ -83,7 +77,7 @@ public abstract class ZonesMapAbstract extends MapAbstract {
 
         // Set FAB colorBarIcon and click listener
         context.fab.show();
-        context.fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_save_black_24dp));
+        context.fab.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_save_black_24dp));
 
         //colorButtonDisabled = getResources().getColor(R.color.grey_25);
         //colorButtonEnabled = getResources().getColor(R.color.greenish);

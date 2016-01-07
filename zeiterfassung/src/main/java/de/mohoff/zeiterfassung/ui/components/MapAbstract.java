@@ -29,6 +29,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
@@ -126,16 +127,17 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        /*if (view != null) {
+        // TODO: This block was commented out before Jan07-2016 ... needed?
+        if (view != null) {
             ViewGroup parent = (ViewGroup) view.getParent();
             if (parent != null)
                 parent.removeView(view);
         }
         try {
-            view = (RelativeLayout) inflater.inflate(R.layout.fragment_map, container, false);
+            view = inflater.inflate(R.layout.fragment_map, container, false);
         } catch (InflateException e) {
             // map is already there, just return view as it is
-        }*/
+        }
 
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
@@ -159,6 +161,10 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         dbHelper = getDbHelper(context);
         sp = PreferenceManager.getDefaultSharedPreferences(context);
 
+        // Prevents a NullPointerException with BitmapDescriptorFactory
+        // see http://stackoverflow.com/questions/13935725/ibitmapdescriptorfactory-is-not-initialized-error
+        MapsInitializer.initialize(context.getApplicationContext());
+
         // Handle setting 'Default Zoom Level'
         DEFAULT_ZOOM_LEVEL = Settings.getRealZoomLevel(
                 Integer.parseInt(sp.getString(
@@ -172,8 +178,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 Boolean.valueOf(context.getString(R.string.setting_map_zoomin_default_value))
         );
 
-        colorFixLocationMarker = getResources().getColor(R.color.grey_50);
-        colorFixLocationCircle = getResources().getColor(R.color.grey_10_alpha);
+        colorFixLocationMarker = context.getResources().getColor(R.color.grey_50);
+        colorFixLocationCircle = context.getResources().getColor(R.color.grey_10_alpha);
         markerFixLocation = createBitmapFromDrawable(
                 getTintedDrawable("markers/marker_50px.png", colorFixLocationMarker),
                 MARKER_WIDTH,
@@ -185,25 +191,25 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 MARKER_WIDTH,
                 MARKER_HEIGHT,
                 true);*/
-        colorCandidateLocationMarker = getResources().getColor(R.color.greenish_100);
-        colorCandidateLocationCircle = getResources().getColor(R.color.greenish_50);
+        colorCandidateLocationMarker = context.getResources().getColor(R.color.greenish_100);
+        colorCandidateLocationCircle = context.getResources().getColor(R.color.greenish_50);
         markerCandidateLocation = createBitmapFromDrawable(
                 getTintedDrawable("markers/marker_50px.png", colorCandidateLocationMarker),
                 MARKER_WIDTH,
                 MARKER_HEIGHT,
                 true);
         markerAccurate = createBitmapFromDrawable(
-                getResources().getDrawable(R.drawable.mapmarker_accurate),
+                context.getResources().getDrawable(R.drawable.mapmarker_accurate),
                 MARKER_DOT_DIM,
                 MARKER_DOT_DIM,
                 true);
         markerInaccurate = createBitmapFromDrawable(
-                getResources().getDrawable(R.drawable.mapmarker_inaccurate),
+                context.getResources().getDrawable(R.drawable.mapmarker_inaccurate),
                 MARKER_DOT_DIM,
                 MARKER_DOT_DIM,
                 true);
         markerNoConnection = createBitmapFromDrawable(
-                getResources().getDrawable(R.drawable.mapmarker_noconnection),
+                context.getResources().getDrawable(R.drawable.mapmarker_noconnection),
                 MARKER_DOT_DIM,
                 MARKER_DOT_DIM,
                 true);
@@ -261,7 +267,6 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 // TODO: Maybe <6.0 also can work with getChildFragmentManager() ?
                 // For Android Marshmallow and above (>= 6.0):
                 MapFragment fragment = (MapFragment)(getChildFragmentManager().findFragmentById(R.id.map));
-                //FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
                 FragmentTransaction ft = getChildFragmentManager().beginTransaction();
                 ft.remove(fragment);
                 //ft.commit();
