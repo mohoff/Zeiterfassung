@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -65,6 +66,9 @@ public abstract class ZonesMapAbstract extends MapAbstract {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        // For some reason, we also need to asign the PreferenceManager here as well. That is also done in superclass MapAbstract
+        sp = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Handle setting 'Default Zone Radius'
         newRadius = Integer.parseInt(sp.getString(
