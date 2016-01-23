@@ -528,7 +528,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         FragmentManager manager = getFragmentManager();
         boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
 
-        if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null) { //fragment not in back stack, create it.
+        if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null && fragment != null) { //fragment not in back stack, create it.
             FragmentTransaction ft = manager.beginTransaction();
             ft.replace(R.id.content_frame, fragment, fragmentTag);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
@@ -537,6 +537,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             }
             //ft.commit();
             ft.commitAllowingStateLoss();
+            // new
+            //manager.executePendingTransactions();
         }
     }
 

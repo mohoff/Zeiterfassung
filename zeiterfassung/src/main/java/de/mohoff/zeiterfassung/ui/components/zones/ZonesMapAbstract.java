@@ -1,6 +1,7 @@
 package de.mohoff.zeiterfassung.ui.components.zones;
 
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
