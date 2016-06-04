@@ -28,7 +28,7 @@ public class ExtraColorPicker extends ColorPicker {
         }
     }
 
-    private Rect getExtraColorRect(int left, int top, int right, int bottom){
+    private Rect getExtraColorRect(int left, int top, int right, int bottom) {
         rect.left = left;
         rect.top = top;
         rect.right = right;
@@ -37,17 +37,17 @@ public class ExtraColorPicker extends ColorPicker {
     }
 
     @Override
-    protected void drawHorizontalPicker(Canvas canvas){
+    protected void drawHorizontalPicker(Canvas canvas) {
         paint.setColor(mExtraColor);
         getExtraColorRect(
                 POPOUT_SIZE,
                 POPOUT_SIZE,
                 cellSize * 3 + POPOUT_SIZE,
-                canvas.getHeight()/2 - 3*POPOUT_SIZE
+                canvas.getHeight() / 2 - 3 * POPOUT_SIZE
         );
 
         // Draw extra color separately
-        if(isColorSelected() && mSelectedIndex == -2){
+        if (isColorSelected() && mSelectedIndex == -2) {
             popoutRect.left = 0;
             popoutRect.top = 0;
             popoutRect.right = rect.right + POPOUT_SIZE;
@@ -62,7 +62,7 @@ public class ExtraColorPicker extends ColorPicker {
         drawHorizontalPalette(canvas, mUsedPalette.length,
                 getFirstPaletteRect(
                         0,
-                        canvas.getHeight()/2 + 3*POPOUT_SIZE,
+                        canvas.getHeight() / 2 + 3 * POPOUT_SIZE,
                         POPOUT_SIZE,
                         canvas.getHeight() - POPOUT_SIZE)
         );
@@ -70,7 +70,7 @@ public class ExtraColorPicker extends ColorPicker {
 
     @Override
     public int getSelectedColor() {
-        if(isColorSelected() && mSelectedIndex == -2)
+        if (isColorSelected() && mSelectedIndex == -2)
             return mExtraColor;
         else {
             return super.getSelectedColor();
@@ -79,7 +79,7 @@ public class ExtraColorPicker extends ColorPicker {
 
     @Override
     public void setSelectedColor(int color) {
-        if(mExtraColor == color){
+        if (mExtraColor == color) {
             mSelectedIndex = -2;
         } else {
             super.setSelectedColor(color);
@@ -88,19 +88,19 @@ public class ExtraColorPicker extends ColorPicker {
 
 
     @Override
-    public boolean isColorSelected(){
+    public boolean isColorSelected() {
         return mSelectedIndex == -2 || super.isColorSelected();
     }
 
     @Override
     protected int getFieldIndexAt(float x, float y) {
         if (mOrientation == HORIZONTAL) {
-            if(y < (c.getHeight()/2 - 2*POPOUT_SIZE) && x < cellSize*3 + POPOUT_SIZE){
+            if (y < (c.getHeight() / 2 - 2 * POPOUT_SIZE) && x < cellSize * 3 + POPOUT_SIZE) {
                 return -2;
             }
-            return (int)x/cellSize;
+            return (int) x / cellSize;
         } else {
-            return (int)y/cellSize;
+            return (int) y / cellSize;
         }
     }
 }

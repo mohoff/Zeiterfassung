@@ -48,7 +48,7 @@ public class AddZoneMap extends ZonesMapAbstract {
                             context.coordinatorLayout,
                             getString(R.string.error_input_no_pin),
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
                     return;
                 }
                 Loc newLoc = Loc.convertLatLngToLoc(candidateMarker.getPosition());
@@ -57,13 +57,13 @@ public class AddZoneMap extends ZonesMapAbstract {
                             context.coordinatorLayout,
                             getString(R.string.error_input_radius_min, Zone.MIN_RADIUS),
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
                 } else if (dbHelper.isIntersectingAnyZone(newLoc, newRadius)) {
                     Snackbar.make(
                             context.coordinatorLayout,
                             getString(R.string.error_input_pin_intersect),
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
                 } else {
                     if (1 == dbHelper.createNewZone(
                             newLoc.getLatitude(),
@@ -76,7 +76,7 @@ public class AddZoneMap extends ZonesMapAbstract {
                                 context.coordinatorLayout,
                                 getString(R.string.create_zone_success),
                                 Snackbar.LENGTH_LONG)
-                        .show();
+                                .show();
                         updateLocationServiceZones();
                         goBackToManageZones();
                     } else {
@@ -84,7 +84,7 @@ public class AddZoneMap extends ZonesMapAbstract {
                                 context.coordinatorLayout,
                                 getString(R.string.create_zone_failure),
                                 Snackbar.LENGTH_LONG)
-                        .show();
+                                .show();
                     }
                 }
             }
@@ -92,26 +92,26 @@ public class AddZoneMap extends ZonesMapAbstract {
     }
 
     @Override
-    public void drawExistingZones(){
+    public void drawExistingZones() {
         super.drawExistingZones();
 
         ArrayList<LatLng> latLngList = new ArrayList<>();
 
-        for(Zone zone : dbHelper.getAllZones()){
+        for (Zone zone : dbHelper.getAllZones()) {
             LatLng latLng = new LatLng(zone.getLatitude(), zone.getLongitude());
             latLngList.add(latLng);
             Marker marker = map.addMarker(
-                optionsFixMarker.position(latLng)
+                    optionsFixMarker.position(latLng)
             );
             Circle circle = map.addCircle(
-                optionsFixCircle.center(latLng).radius(zone.getRadius())
+                    optionsFixCircle.center(latLng).radius(zone.getRadius())
             );
 
             fixMarkers.add(marker);
             fixCircles.add(circle);
         }
 
-        if(!latLngList.isEmpty()){
+        if (!latLngList.isEmpty()) {
             centerMapTo(MapAbstract.getMapViewport(latLngList), SHOW_MAP_ANIMATIONS);
         }
     }

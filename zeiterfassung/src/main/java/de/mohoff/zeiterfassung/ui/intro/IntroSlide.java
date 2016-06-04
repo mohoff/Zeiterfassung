@@ -35,7 +35,7 @@ public class IntroSlide extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(getArguments() != null && getArguments().containsKey(ARG_LAYOUT_RES_ID)) {
+        if (getArguments() != null && getArguments().containsKey(ARG_LAYOUT_RES_ID)) {
             layoutResId = getArguments().getInt(ARG_LAYOUT_RES_ID);
         }
     }
@@ -46,7 +46,7 @@ public class IntroSlide extends Fragment {
         View v = inflater.inflate(layoutResId, container, false);
 
         ((TextView) v.findViewById(R.id.title)).setText(Html.fromHtml(mTitle));
-        if(mSubtitle != null && !mSubtitle.equals("") && !mSubtitle.equals(" ")){
+        if (mSubtitle != null && !mSubtitle.equals("") && !mSubtitle.equals(" ")) {
             ((TextView) v.findViewById(R.id.subtitle)).setText(Html.fromHtml(mSubtitle));
         }
         ((ImageView) v.findViewById(R.id.slideIcon)).setImageDrawable(mSlideIcon);
@@ -55,19 +55,19 @@ public class IntroSlide extends Fragment {
         return v;
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         mTitle = title;
     }
 
-    public void setSubitle(String subtitle){
+    public void setSubitle(String subtitle) {
         mSubtitle = subtitle;
     }
 
-    public void setImage(Drawable slideIcon){
+    public void setImage(Drawable slideIcon) {
         mSlideIcon = slideIcon;
     }
 
-    public void setDescription(String description){
+    public void setDescription(String description) {
         mDescription = description;
     }
 }

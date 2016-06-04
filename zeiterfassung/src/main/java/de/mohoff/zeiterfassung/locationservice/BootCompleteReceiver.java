@@ -22,7 +22,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
                 Boolean.valueOf(context.getString(R.string.setting_general_restart_service_on_boot_default_value))
         );
 
-        if(startService){
+        if (startService) {
             Intent service = new Intent(context, LocationService.class);
             context.startService(service);
         }

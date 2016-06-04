@@ -1,8 +1,7 @@
 package de.mohoff.zeiterfassung.ui.components.overview;
 
-import android.os.Bundle;
 import android.app.Fragment;
-import android.support.design.widget.Snackbar;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,12 +11,12 @@ import android.view.ViewGroup;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.locationservice.ServiceChangeListener;
 import de.mohoff.zeiterfassung.locationservice.TimeslotEventListener;
 import de.mohoff.zeiterfassung.ui.MainActivity;
-import de.mohoff.zeiterfassung.R;
 
-public class Overview extends Fragment implements TimeslotEventListener, ServiceChangeListener{
+public class Overview extends Fragment implements TimeslotEventListener, ServiceChangeListener {
     MainActivity context;
     AdapterOverview adapter;
     RecyclerView recList;
@@ -81,7 +80,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
     public void onResume() {
         super.onResume();
 
-        if(!context.serviceStatus.isRunning()){
+        if (!context.serviceStatus.isRunning()) {
             /* Snackbar.make(
                     context.coordinatorLayout,
                     getString(R.string.service_not_running),
@@ -98,7 +97,7 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         adapter.updateData();
         adapter.notifyDataSetChanged();
         // Scroll to top
-        recList.scrollToPosition(adapter.getItemCount()-1);
+        recList.scrollToPosition(adapter.getItemCount() - 1);
     }
 
     @Override
@@ -115,11 +114,11 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if(getActivity() != null && adapter != null){
+                if (getActivity() != null && adapter != null) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            adapter.notifyItemChanged(adapter.getItemCount()-1);
+                            adapter.notifyItemChanged(adapter.getItemCount() - 1);
                         }
                     });
                 }
@@ -134,35 +133,35 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
 
         // The current implementation only expects inserts, no deletions.
         // Thus the only action is to notify the adapter that an item is added.
-        adapter.notifyItemInserted(adapter.getItemCount()-1);
-        adapter.notifyItemInserted(adapter.getItemCount()-2);
+        adapter.notifyItemInserted(adapter.getItemCount() - 1);
+        adapter.notifyItemInserted(adapter.getItemCount() - 2);
         // Update the 2nd list element. Its endtime and enddate might have TYPEFACE.ITALIC still.
-        adapter.notifyItemChanged(adapter.getItemCount()-1);
-        adapter.notifyItemChanged(adapter.getItemCount()-2);
-        adapter.notifyItemChanged(adapter.getItemCount()-3);
+        adapter.notifyItemChanged(adapter.getItemCount() - 1);
+        adapter.notifyItemChanged(adapter.getItemCount() - 2);
+        adapter.notifyItemChanged(adapter.getItemCount() - 3);
         // TODO: not working yet I guess. Only Snackbar "New Timeslot opened" shows up
         // Give visual feedback that a new item has beed added: Scroll smoothly to top
-        recList.smoothScrollToPosition(adapter.getItemCount()-1);
+        recList.smoothScrollToPosition(adapter.getItemCount() - 1);
     }
 
     @Override
     public void onTimeslotSealed(int id) {
         // Only most recent Timeslot can be possibly sealed. For that the item position is known anytime.
         //adapter.notifyItemRangeChanged(adapter.getItemCount());
-        adapter.notifyItemChanged(adapter.getItemCount()-1);
-        adapter.notifyItemChanged(adapter.getItemCount()-2);
+        adapter.notifyItemChanged(adapter.getItemCount() - 1);
+        adapter.notifyItemChanged(adapter.getItemCount() - 2);
     }
 
     @Override
     public void onServiceStatusEvent(boolean isRunning) {
-        if(isRunning){
+        if (isRunning) {
             adapter.notifyItemRemoved(adapter.getItemCount() - 1);
         } else {
             adapter.notifyItemInserted(adapter.getItemCount() - 1);
         }
 
         //adapter.notifyItemChanged(adapter.getItemCount()-2);
-        if(!isRunning){
+        if (!isRunning) {
             // Because a reverse layout is used, the most upper card has index n and
             // the card at the bottom of the list has index 0. Taking screen height
             // into account, firstVisible is approx. n-4 by default.
@@ -172,9 +171,9 @@ public class Overview extends Fragment implements TimeslotEventListener, Service
             // findFirstVisibleItemPosition() returns first (partly) visible item position
             int firstVisible = llm.findFirstVisibleItemPosition();
             int itemCount = adapter.getItemCount();
-            if(firstVisible > itemCount-10){
+            if (firstVisible > itemCount - 10) {
                 //recList.scrollToPosition(itemCount-1);
-                recList.smoothScrollToPosition(itemCount-1);
+                recList.smoothScrollToPosition(itemCount - 1);
             }
         }
     }

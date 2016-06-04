@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <!-- Permission to receive COOT_COMPLETED events to start LocationService automatically on boot. -->
+    <!-- Permission to receive BOOT_COMPLETED events to start LocationService automatically on boot. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <!-- Permission to receive Google Maps -->

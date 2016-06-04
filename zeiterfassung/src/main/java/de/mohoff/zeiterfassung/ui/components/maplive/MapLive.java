@@ -4,21 +4,12 @@ import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.util.Property;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,26 +23,25 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-//import com.google.maps.android.clustering.Cluster;
-//import com.google.maps.android.clustering.ClusterManager;
-//import de.mohoff.zeiterfassung.ui.components.LocClusterRenderer;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.mohoff.zeiterfassung.datamodel.Zone;
-import de.mohoff.zeiterfassung.helpers.GeneralHelper;
-import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
+import de.mohoff.zeiterfassung.datamodel.Zone;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.locationservice.LocationService;
 import de.mohoff.zeiterfassung.ui.components.MapAbstract;
+
+//import com.google.maps.android.clustering.Cluster;
+//import com.google.maps.android.clustering.ClusterManager;
+//import de.mohoff.zeiterfassung.ui.components.LocClusterRenderer;
 
 
 // TODO: Eventually add Cluster/ClusterManager. Also add polylines (how to compute polyline dots in cluster center?)
@@ -60,7 +50,7 @@ import de.mohoff.zeiterfassung.ui.components.MapAbstract;
 // TODO: Integrate "connection lost" colorBarIcon
 
 
-public class MapLive extends MapAbstract implements LocationChangeListener{
+public class MapLive extends MapAbstract implements LocationChangeListener {
     //CircularFifoQueue<Loc> userLocs = new CircularFifoQueue<>();
     //private ClusterManager<Loc> clusterManager;
     List<Marker> markers;
@@ -145,7 +135,6 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     }*/
 
 
-
     @Override
     public void onResume() {
         context.setOnNewLocationListener(this); // setIsRunning listener
@@ -179,12 +168,12 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         drawExistingZones();
 
         CircularFifoQueue<Loc> cache = LocationCache.getInstance().getPassiveCache();
-        if(cache != null && cache.size() > 0){
-            for(int i=0; i<cache.size(); i++){
+        if (cache != null && cache.size() > 0) {
+            for (int i = 0; i < cache.size(); i++) {
                 Loc loc = cache.get(i);
                 MarkerOptions markerOptions = createMarkerOptions(loc, LocationService.ACCURACY_TRESHOLD);
                 addMarkerToMap(map, markers, markerOptions);
-                if((i == cache.size()-1) && loc.isNotOlderThan(CURRENT_LOC_MAX_AGE)){
+                if ((i == cache.size() - 1) && loc.isNotOlderThan(CURRENT_LOC_MAX_AGE)) {
                     updateCurrentLocationMarker(map, loc);
                 }
             }
@@ -202,7 +191,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
 
         ArrayList<LatLng> latLngList = new ArrayList<>();
 
-        for(Zone zone : dbHelper.getAllZones()){
+        for (Zone zone : dbHelper.getAllZones()) {
             LatLng latLng = new LatLng(zone.getLatitude(), zone.getLongitude());
             Marker marker = map.addMarker(
                     optionsFixMarker.position(latLng)
@@ -215,12 +204,12 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
             fixCircles.add(circle);
         }
 
-        if(!latLngList.isEmpty()){
+        if (!latLngList.isEmpty()) {
             centerMapTo(MapAbstract.getMapViewport(latLngList), SHOW_MAP_ANIMATIONS);
         }
     }
 
-    private MarkerOptions createMarkerOptions(Loc loc, double accuracyTreshold){
+    private MarkerOptions createMarkerOptions(Loc loc, double accuracyTreshold) {
         // Setup marker properties
         LatLng latLng = loc.getLatLng();
         MarkerOptions markerOptions = new MarkerOptions()
@@ -230,15 +219,15 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                 .anchor(0.5f, 0.5f) // anchor in the very center of the marker colorBarIcon
                 .title("Location")
                 .snippet("A:" + loc.getAccuracy() +
-                                "\n O:" + GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()) +
-                                "\n t:" + Timeslot.getReadableDuration(timestampPreviousMarker, loc.getTimestampInMillis(), false, false)
+                        "\n O:" + GeneralHelper.getOpacityFromAccuracy(loc.getAccuracy()) +
+                        "\n t:" + Timeslot.getReadableDuration(timestampPreviousMarker, loc.getTimestampInMillis(), false, false)
                 );
 
         // Artificially created (non-real) Locs are always accurate because they are retrieved
         // from activeCache. Therefore there is no need for distinguishing accurate and inaccurate
         // markers visually.
-        if(loc.isRealUpdate()){
-            if(loc.getAccuracy() < accuracyTreshold){
+        if (loc.isRealUpdate()) {
+            if (loc.getAccuracy() < accuracyTreshold) {
                 markerOptions = setIcon(markerAccurate, markerOptions, latLng);
             } else {
                 markerOptions = setIcon(markerInaccurate, markerOptions, latLng);
@@ -249,9 +238,9 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         return markerOptions;
     }
 
-    private MarkerOptions setIcon(Bitmap template, MarkerOptions mo, LatLng newLatLng){
+    private MarkerOptions setIcon(Bitmap template, MarkerOptions mo, LatLng newLatLng) {
         int latLngSeries = getLengthOfLatLngSeries(newLatLng);
-        if(latLngSeries > 1){
+        if (latLngSeries > 1) {
             markerWithNumbers = template.copy(template.getConfig(), true);
             markerWithNumbers = addTextToBitmap(markerWithNumbers, String.valueOf(latLngSeries));
             mo.icon(BitmapDescriptorFactory.fromBitmap(markerWithNumbers));
@@ -261,12 +250,12 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         return mo;
     }
 
-    private int getLengthOfLatLngSeries(LatLng latLng){
+    private int getLengthOfLatLngSeries(LatLng latLng) {
         int result = 1;
         // Only check for markers array interval [0...size-2] since the last element (size-1) will
         // drop out this iteration and latLng will be added to markers at index 0.
-        for(int i=0; i<=markers.size()-2; i++){
-            if(markers.get(i).getPosition().equals(latLng)){
+        for (int i = 0; i <= markers.size() - 2; i++) {
+            if (markers.get(i).getPosition().equals(latLng)) {
                 result++;
             } else {
                 return result;
@@ -279,7 +268,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         // Ensure that there are only passiveCache.maxSize() markers displayed to prevent memory leak.
         // If passiveQueue is full and at least one drop happened already in it
         // (= hasFirstPassiveQueueDropHappened()), remove oldest marker.
-        if(LocationCache.getInstance().hasFirstPassiveQueueDropHappened() && markers.size() == LocationCache.getInstance().getPassiveCacheMaxSize()){
+        if (LocationCache.getInstance().hasFirstPassiveQueueDropHappened() && markers.size() == LocationCache.getInstance().getPassiveCacheMaxSize()) {
             try {
                 // Determine index which should be deleted in markers arraylist. Markers with numbers
                 // are placed on top of each other. If there one marker of that marker stack needs to
@@ -288,11 +277,11 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                 // deleteIndex = markers.size()-1. If not, iterate from [size()-2 ... 0] to isRunning the
                 // youngest marker which position is the same as the oldest marker. Delete the
                 // youngest marker in this series of markers of same positions.
-                Marker oldest = markers.get(markers.size()-1);
-                int deleteIndex = markers.size()-1;
-                for(int i=markers.size()-2; i>=0; i--){
-                    if(!markers.get(i).getPosition().equals(oldest.getPosition())) {
-                        deleteIndex = i+1;
+                Marker oldest = markers.get(markers.size() - 1);
+                int deleteIndex = markers.size() - 1;
+                for (int i = markers.size() - 2; i >= 0; i--) {
+                    if (!markers.get(i).getPosition().equals(oldest.getPosition())) {
+                        deleteIndex = i + 1;
                         break;
                     }
                     deleteIndex = i;
@@ -301,7 +290,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
                 markers.get(deleteIndex).remove();
                 // Remove marker from markers arraylist, so marker is completely removed.
                 markers.remove(deleteIndex);
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -315,41 +304,41 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         markers.add(0, marker);
     }
 
-    private Polyline addPolylineToMap(GoogleMap map, CircularFifoQueue<Loc> locs){
+    private Polyline addPolylineToMap(GoogleMap map, CircularFifoQueue<Loc> locs) {
         PolylineOptions options = new PolylineOptions()  // .geodesic(false)
                 .color(polylineColor)
                 .width(15);
 
-        for(Loc loc : locs){
+        for (Loc loc : locs) {
             options.add(GeneralHelper.convertLocToLatLng(loc));
         }
 
         return map.addPolyline(options);
     }
 
-    private void followWithCamera(List<Marker> markers, boolean showAnimation){
+    private void followWithCamera(List<Marker> markers, boolean showAnimation) {
         ArrayList<LatLng> respectedLatLngs = new ArrayList<>();
         try {
             respectedLatLngs.add(markers.get(0).getPosition());
             respectedLatLngs.add(markers.get(1).getPosition());
-        } catch (Exception e){
+        } catch (Exception e) {
             // .isRunning(1) failed because it's not yet filled.
         }
         centerMapTo(getMapViewport(respectedLatLngs), showAnimation);
     }
 
     public void onNewLocation(Loc loc) {
-        if(map != null){
+        if (map != null) {
             MarkerOptions markerOptions = createMarkerOptions(loc, LocationService.ACCURACY_TRESHOLD);
             addMarkerToMap(map, markers, markerOptions);
             updateCurrentLocationMarker(map, loc);
 
-            if(FOLLOW_MAP_UPDATES){
+            if (FOLLOW_MAP_UPDATES) {
                 followWithCamera(markers, true);
             }
 
             // Update polyline
-            if(currentPolyline != null){
+            if (currentPolyline != null) {
                 currentPolyline.remove();
             }
             currentPolyline = addPolylineToMap(map, LocationCache.getInstance().getPassiveCache());
@@ -360,16 +349,16 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         timestampPreviousMarker = loc.getTimestampInMillis();
     }
 
-    private void updateCurrentLocationMarker(GoogleMap map, Loc loc){
-        if(currentLocation == null){
+    private void updateCurrentLocationMarker(GoogleMap map, Loc loc) {
+        if (currentLocation == null) {
             currentLocation = map.addMarker(new MarkerOptions()
                     .position(loc.getLatLng())
                     .draggable(false)
-                            //.colorBarIcon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
+                    //.colorBarIcon(BitmapDescriptorFactory.fromAsset("markers/marker1.png"))
                     .icon(BitmapDescriptorFactory.fromBitmap(markerCurrentLocation))
                     //.colorBarIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .title(context.getString(R.string.map_current_location)))
-                    ;
+            ;
         } else {
             animateMarker(currentLocation, loc.getLatLng());
         }
@@ -404,8 +393,6 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
     }
 
 
-
-
     // not applicable because you can't modify UI elements in doInBackground ("map" in this case)
     private class LoadingMapTask extends AsyncTask<Void, Void, Void> {
         private CircularFifoQueue<Loc> locs;
@@ -413,7 +400,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         private List<Marker> markers;
         private boolean markersAdded;
 
-        LoadingMapTask(List<Marker> markers, CircularFifoQueue locs, GoogleMap map){
+        LoadingMapTask(List<Marker> markers, CircularFifoQueue locs, GoogleMap map) {
             this.locs = locs;
             this.map = map;
             this.markers = markers;
@@ -433,9 +420,9 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
 
         @Override
         protected Void doInBackground(Void... voids) {
-            if(this.locs.size() > 0){
+            if (this.locs.size() > 0) {
                 this.markersAdded = true;
-                for( Loc loc : this.locs){
+                for (Loc loc : this.locs) {
                     // (method signature updated meanwhile...)
                     //addMarkerToMap(map, markers, GeneralHelper.convertLocToLatLng(loc), 1);
                 }
@@ -449,7 +436,7 @@ public class MapLive extends MapAbstract implements LocationChangeListener{
         protected void onPostExecute(Void params) {
             // hide spinner
             progressBar.setVisibility(View.GONE);
-            if(!this.markersAdded){
+            if (!this.markersAdded) {
                 //Snackbar.make(context.coordinatorLayout, "Currently no secondLine data available.", Snackbar.LENGTH_LONG)
                 //        .show();
             }

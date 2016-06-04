@@ -1,21 +1,19 @@
 package de.mohoff.zeiterfassung;
 
-import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
 import org.acra.ACRA;
 import org.acra.annotation.ReportsCrashes;
+import org.acra.sender.HttpSender;
 
 /**
  * Created by moo on 11/19/15.
  */
 @ReportsCrashes(
         formUri = "http://www.mohoff.de/acra.php",
-        //formUriBasicAuthLogin = "your username", // optional
-        //formUriBasicAuthPassword = "your password",  // optional
-        reportType = org.acra.sender.HttpSender.Type.JSON
+        reportType = HttpSender.Type.JSON
 )
 public class Zeiterfassung extends MultiDexApplication {
     @Override

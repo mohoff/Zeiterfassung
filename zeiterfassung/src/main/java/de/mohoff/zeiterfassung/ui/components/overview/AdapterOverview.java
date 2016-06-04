@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
+import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 import de.mohoff.zeiterfassung.ui.components.settings.Settings;
 
-public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private DatabaseHelper dbHelper = null;
     private ArrayList<Timeslot> data = new ArrayList<Timeslot>();
     private int lastPosition = 99999;
@@ -48,7 +48,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolderItem extends RecyclerView.ViewHolder{
+    public static class ViewHolderItem extends RecyclerView.ViewHolder {
         public Context context;
         // each data item is just a string in this case
         public CardView container;
@@ -69,7 +69,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
         //public RelativeLayout topConnectorPart, bottomConnectorPart;
         //public View middleConnectorPart;
 
-        public ViewHolderItem(Context context, View v){
+        public ViewHolderItem(Context context, View v) {
             super(v);
             this.context = context;
             this.container = (CardView) v.findViewById(R.id.card_view);
@@ -100,7 +100,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public CardView container;
         public TextView infoText;
 
-        public ViewHolderInfoItem(View v){
+        public ViewHolderInfoItem(View v) {
             super(v);
             this.container = (CardView) v.findViewById(R.id.card_view);
             this.infoText = (TextView) v.findViewById(R.id.infoText);
@@ -125,7 +125,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 context.getString(R.string.setting_appearance_extra_info),
                 Boolean.valueOf(context.getString(R.string.setting_appearance_extra_info_default_value))
         );
-        if(showTimeContextInfo){
+        if (showTimeContextInfo) {
             int index = Integer.parseInt(sp.getString(
                     context.getString(R.string.setting_appearance_extra_info_detail),
                     String.valueOf(context.getString(R.string.setting_appearance_extra_info_detail_default_value))
@@ -140,7 +140,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     }
 
-    public void updateData(){
+    public void updateData() {
         data.clear();
         data.addAll(dbHelper.getAllTimeslots());
     }
@@ -148,12 +148,12 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     // Create new views (invoked by the layout manager)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if(viewType == VIEWTYPE_NORMAL){
+        if (viewType == VIEWTYPE_NORMAL) {
             View itemView = LayoutInflater.from(parent.getContext()).
                     inflate(R.layout.fragment_overview_card, parent, false);
             return new ViewHolderItem(context, itemView);
         }
-        if((viewType == VIEWTYPE_SERVICEINFO) || (viewType == VIEWTYPE_NOENTRYINFO)){
+        if ((viewType == VIEWTYPE_SERVICEINFO) || (viewType == VIEWTYPE_NOENTRYINFO)) {
             View itemView = LayoutInflater.from(parent.getContext()).
                     inflate(R.layout.fragment_overview_card_info, parent, false);
             return new ViewHolderInfoItem(itemView);
@@ -165,13 +165,13 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         //position = isServiceRunning ? position : position-1;
-        if(holder.getItemViewType() == VIEWTYPE_NORMAL) {
+        if (holder.getItemViewType() == VIEWTYPE_NORMAL) {
             ViewHolderItem vh = (ViewHolderItem) holder;
             Timeslot timeslot = data.get(position);
 
             vh.container.setCardBackgroundColor(context.getResources().getColor(R.color.white));
-            if(timeslot.getReadableEndTime(context).equals(context.getString(R.string.overview_end_pending)) &&
-                    timeslot.getReadableEndDate(context).equals(context.getString(R.string.overview_end_pending))){
+            if (timeslot.getReadableEndTime(context).equals(context.getString(R.string.overview_end_pending)) &&
+                    timeslot.getReadableEndDate(context).equals(context.getString(R.string.overview_end_pending))) {
                 vh.endTime.setTypeface(null, Typeface.ITALIC);
                 vh.endDate.setTypeface(null, Typeface.ITALIC);
             } else {
@@ -180,7 +180,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             // Handle setting 'Color Indicator'
-            if(showColorIndicator){
+            if (showColorIndicator) {
                 vh.colorBarContainer.setVisibility(View.VISIBLE);
                 vh.colorBar.setBackground(null);
                 vh.colorBar.setBackgroundColor(timeslot.getZone().getColor());
@@ -191,7 +191,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             // Handle setting 'Timeslot Context Info'
-            if(showTimeContextInfo){
+            if (showTimeContextInfo) {
                 vh.timeContextInfoWrapper.setVisibility(View.VISIBLE);
                 String extraInfo = timeContextInfoInterval + ": " + summedTime.get(timeslot.getZone().getActivityName());
                 vh.timeContextInfo.setText(extraInfo);
@@ -201,7 +201,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
 
             // Handle setting 'Label Order'
-            if(showActivityFirst){
+            if (showActivityFirst) {
                 vh.firstLine.setText(timeslot.getZone().getActivityName());
                 vh.secondLine.setText(timeslot.getZone().getLocationName());
             } else {
@@ -240,16 +240,16 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 vh.bottomConnectorPart.setOnClickListener(null);
             }*/
 
-        } else if(holder.getItemViewType() == VIEWTYPE_SERVICEINFO){
+        } else if (holder.getItemViewType() == VIEWTYPE_SERVICEINFO) {
             ViewHolderInfoItem ivh = (ViewHolderInfoItem) holder;
             ivh.infoText.setText(context.getString(R.string.service_not_running));
-        } else if(holder.getItemViewType() == VIEWTYPE_NOENTRYINFO){
+        } else if (holder.getItemViewType() == VIEWTYPE_NOENTRYINFO) {
             ViewHolderInfoItem ivh = (ViewHolderInfoItem) holder;
             ivh.infoText.setText(context.getString(R.string.overview_no_entries));
         }
     }
 
-    private View.OnClickListener getOnMergeClickListener(){
+    private View.OnClickListener getOnMergeClickListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -291,11 +291,11 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        if (showServiceNotRunningInfo() && position == getItemCount()-1) {
+        if (showServiceNotRunningInfo() && position == getItemCount() - 1) {
             return VIEWTYPE_SERVICEINFO;
         } else if (data.size() == 0 &&
-                (position == getItemCount()-1 && !showServiceNotRunningInfo() ||
-                position == getItemCount()-2 && showServiceNotRunningInfo())
+                (position == getItemCount() - 1 && !showServiceNotRunningInfo() ||
+                        position == getItemCount() - 2 && showServiceNotRunningInfo())
                 ) {
             return VIEWTYPE_NOENTRYINFO;
         } else {
@@ -305,7 +305,7 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private void setAnimation(View viewToAnimate, int position) {
         // If the bound view wasn't previously displayed on screen, it's animated
-        if (position < lastPosition){
+        if (position < lastPosition) {
             Animation animation = AnimationUtils.loadAnimation(this.context, R.anim.animation_bottom_top);
             // --> PROBLEM with following line: at position=100 it results into 10s offset. How to refresh offset after initial load?
             //animation.setStartOffset(position * 100);
@@ -318,17 +318,17 @@ public class AdapterOverview extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public int getItemCount() {
         int extraInfoCards = 0;
-        if(showServiceNotRunningInfo()){
+        if (showServiceNotRunningInfo()) {
             extraInfoCards++;
         }
-        if(data.size() == 0){
+        if (data.size() == 0) {
             extraInfoCards++;
         }
         return data.size() + extraInfoCards;
     }
 
-    private boolean showServiceNotRunningInfo(){
-        return !((MainActivity)context).serviceStatus.isRunning();
+    private boolean showServiceNotRunningInfo() {
+        return !((MainActivity) context).serviceStatus.isRunning();
     }
 
     private DatabaseHelper getDbHelper(Context context) {

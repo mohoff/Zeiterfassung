@@ -5,7 +5,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import de.mohoff.zeiterfassung.R;
@@ -38,7 +37,7 @@ public class ScrollAwareFAB extends FloatingActionButton.Behavior {
         // starts scrolling because of this method. Thus, we check here explicitly for R.id.recList
         // which triggers this class to keep FAB hidden for 'Statistics'.
         // TODO: Add search filter in 'Overview'. Then enable following if-statement
-        if(target.getId() == R.id.cardList && false){
+        if (target.getId() == R.id.cardList && false) {
             if (dyConsumed > 0 && child.getVisibility() == View.VISIBLE) {
                 // User scrolled down and the FAB is currently visible -> hide the FAB
                 child.hide();

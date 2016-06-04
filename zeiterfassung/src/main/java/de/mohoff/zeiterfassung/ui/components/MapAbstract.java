@@ -100,7 +100,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     }
 
     public View onCreateViewWithLayout(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState, int layout) {
+                                       Bundle savedInstanceState, int layout) {
         //view = inflater.inflate(layout, container, false);
         if (view != null) {
             ViewGroup parent = (ViewGroup) view.getParent();
@@ -257,8 +257,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         try {
             // TODO: Check if we really need distinction in Android versions here...
             // Every Android OS older than Marshmallow (< 6.0)
-            if(android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-                MapFragment fragment = (MapFragment)(getFragmentManager().findFragmentById(R.id.map));
+            if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                MapFragment fragment = (MapFragment) (getFragmentManager().findFragmentById(R.id.map));
                 FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
                 ft.remove(fragment);
                 //ft.commit();
@@ -266,13 +266,13 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
             } else {
                 // TODO: Maybe <6.0 also can work with getChildFragmentManager() ?
                 // For Android Marshmallow and above (>= 6.0):
-                MapFragment fragment = (MapFragment)(getChildFragmentManager().findFragmentById(R.id.map));
+                MapFragment fragment = (MapFragment) (getChildFragmentManager().findFragmentById(R.id.map));
                 FragmentTransaction ft = getChildFragmentManager().beginTransaction();
                 ft.remove(fragment);
                 //ft.commit();
                 ft.commitAllowingStateLoss();
             }
-        } catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -331,15 +331,15 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         }
     }*/
 
-    protected void centerMapTo(LatLng cameraCenter, int zoomLevel, boolean showAnimation){
-        if(zoomLevel < MIN_ZOOM_LEVEL || zoomLevel > MAX_ZOOM_LEVEL){
+    protected void centerMapTo(LatLng cameraCenter, int zoomLevel, boolean showAnimation) {
+        if (zoomLevel < MIN_ZOOM_LEVEL || zoomLevel > MAX_ZOOM_LEVEL) {
             zoomLevel = DEFAULT_ZOOM_LEVEL;
         }
         centerMapTo(CameraUpdateFactory.newLatLngZoom(cameraCenter, zoomLevel), showAnimation);
     }
 
-    protected  void centerMapTo(CameraUpdate cu, boolean showAnimation){
-        if(showAnimation){
+    protected void centerMapTo(CameraUpdate cu, boolean showAnimation) {
+        if (showAnimation) {
             map.animateCamera(cu);
         } else {
             map.moveCamera(cu);
@@ -355,7 +355,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 .colorBarIcon(bitmapDescriptor);
     }*/
 
-    protected CircleOptions createCircleOptions(int fillColor){
+    protected CircleOptions createCircleOptions(int fillColor) {
         // without position and radius
         return new CircleOptions()
                 .fillColor(fillColor)
@@ -363,7 +363,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
                 .strokeColor(Color.TRANSPARENT);
     }
 
-    protected void drawExistingZones(){
+    protected void drawExistingZones() {
         // Initialize MarkerOptions
         optionsFixMarker = new MarkerOptions()
                 .draggable(false)
@@ -377,9 +377,9 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
     }
 
 
-    public static CameraUpdate getMapViewport(ArrayList<LatLng> latLngList){
+    public static CameraUpdate getMapViewport(ArrayList<LatLng> latLngList) {
         LatLngBounds.Builder boundBilder = LatLngBounds.builder();
-        for(LatLng latLng : latLngList){
+        for (LatLng latLng : latLngList) {
             boundBilder.include(latLng);
         }
         LatLngBounds bounds = boundBilder.build();
@@ -406,23 +406,23 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
 
     protected Drawable getTintedDrawable(String filePath, int tintColor) {
         Drawable d = null;
-        try{
+        try {
             d = Drawable.createFromStream(context.getAssets().open(filePath), null);
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
         return tintDrawable(d, tintColor);
     }
 
-    protected Drawable tintDrawable(Drawable d, int tintColor){
-        if(tintColor != 0 && d != null){
+    protected Drawable tintDrawable(Drawable d, int tintColor) {
+        if (tintColor != 0 && d != null) {
             d.setColorFilter(tintColor, PorterDuff.Mode.SRC_IN);
         }
         return d;
     }
 
-    protected Bitmap createBitmapFromDrawable(Drawable d, int width, int height, boolean fullOpacity){
+    protected Bitmap createBitmapFromDrawable(Drawable d, int width, int height, boolean fullOpacity) {
         Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(b);
@@ -432,8 +432,8 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         return b;
     }
 
-    protected Bitmap addTextToBitmap(Bitmap b, String text){
-        if(text == null) text = "";
+    protected Bitmap addTextToBitmap(Bitmap b, String text) {
+        if (text == null) text = "";
 
         Canvas canvas = new Canvas(b);
         Paint paint = new Paint();
@@ -458,7 +458,7 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         }
         return dbHelper;
     }
-    
+
 
 }
 

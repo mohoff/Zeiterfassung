@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.mohoff.zeiterfassung.datamodel.Zone;
-import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
+import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 import de.mohoff.zeiterfassung.ui.colorpicker.ExtraColorPicker;
 
@@ -34,7 +34,7 @@ import de.mohoff.zeiterfassung.ui.colorpicker.ExtraColorPicker;
  * Created by moo on 8/17/15.
  */
 // --- Outer adapter ---
-public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private MainActivity context;
     private DatabaseHelper dbHelper = null;
     //private LayoutInflater li;
@@ -51,12 +51,12 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     public ZonesAdapter(Activity ctx) {
         getDbHelper();
         updateModel();
-        context = (MainActivity)ctx;
+        context = (MainActivity) ctx;
     }
 
     // Runs when this Fragment is initially created or an update on the model happens,
     // so notifyDataIsChanged() is called.
-    private void updateModel(){
+    private void updateModel() {
         this.zones = dbHelper.getAllZones();
         this.activityNames = dbHelper.getDistinctActivityNames();
     }
@@ -108,9 +108,9 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     // Create new views (invoked by the layout manager)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                   int viewType) {
+                                                      int viewType) {
         // show normal Activity
-        if(viewType == VIEWTYPE_NORMAL) {
+        if (viewType == VIEWTYPE_NORMAL) {
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_manage_zones_card_outer, parent, false);
 
@@ -123,7 +123,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             return outerHolder;
         }
         // show ADD option as a card listed last
-        if(viewType == VIEWTYPE_ADD) {
+        if (viewType == VIEWTYPE_ADD) {
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_manage_zones_card_outer_add, parent, false);
             return new AddHolder(v);
@@ -134,7 +134,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        if(holder.getItemViewType() == VIEWTYPE_NORMAL) {
+        if (holder.getItemViewType() == VIEWTYPE_NORMAL) {
             final ActViewHolder actHolder = (ActViewHolder) holder;
             // - isRunning element from your dataset at this position
             // - replace the contents of the view with that element
@@ -167,7 +167,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                                                 context.coordinatorLayout,
                                                 context.getString(R.string.error_input_name_color_equal),
                                                 Snackbar.LENGTH_LONG)
-                                        .show();
+                                                .show();
                                     } else {
                                         // Execute update on DB
                                         int result = dbHelper.updateZoneActivityName(activity, et.getText().toString());
@@ -181,14 +181,14 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                                                             result,
                                                             result),
                                                     Snackbar.LENGTH_LONG)
-                                            .show();
+                                                    .show();
                                             dialog.dismiss();
                                         } else {
                                             Snackbar.make(
                                                     context.coordinatorLayout,
                                                     context.getString(R.string.update_zone_multiple_failure),
                                                     Snackbar.LENGTH_LONG)
-                                            .show();
+                                                    .show();
                                         }
                                     }
                                 }
@@ -226,7 +226,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                                                         result,
                                                         result),
                                                 Snackbar.LENGTH_LONG)
-                                        .show();
+                                                .show();
                                         // To make sure the whole Activity gets removed from UI,
                                         // first set adapter to null.
                                         actHolder.recyclerView.setAdapter(null);
@@ -236,7 +236,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                                                 context.coordinatorLayout,
                                                 context.getString(R.string.delete_zone_multiple_failure),
                                                 Snackbar.LENGTH_LONG)
-                                        .show();
+                                                .show();
                                     }
                                     dialog.dismiss();
                                 }
@@ -249,7 +249,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                             })
                             .setTitle(context.getString(R.string.alert_title_delete_zone_multiple))
                             .setMessage(context.getString(R.string.alert_msg_delete_zone_multiple, activity))
-                                    .create();
+                            .create();
                     // TODO: add app colorBarIcon to the alertDialog.
                     alertDialog.show();
                 }
@@ -286,12 +286,12 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             // Show normal Location
-            if(viewType == VIEWTYPE_NORMAL) {
+            if (viewType == VIEWTYPE_NORMAL) {
                 View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_manage_zones_card_inner, parent, false);
                 return new LocViewHolder(v);
             }
             // Show "add" option as card listed last
-            if(viewType == VIEWTYPE_ADD) {
+            if (viewType == VIEWTYPE_ADD) {
                 View v = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.fragment_manage_zones_card_inner_add, parent, false);
                 return new AddHolder(v);
@@ -301,7 +301,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-            if(holder.getItemViewType() == VIEWTYPE_NORMAL) {
+            if (holder.getItemViewType() == VIEWTYPE_NORMAL) {
                 final LocViewHolder locHolder = (LocViewHolder) holder;
 
                 // Get Zone at position to setup textView and clickListeners below
@@ -325,17 +325,17 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                                 .setPositiveButton(context.getString(R.string.dialog_save), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
-                                        if(et.getText().toString().equals(locHolder.locationName.getText().toString()) &&
-                                                colorPicker.getSelectedColor() == zone.getColor()){
+                                        if (et.getText().toString().equals(locHolder.locationName.getText().toString()) &&
+                                                colorPicker.getSelectedColor() == zone.getColor()) {
                                             Snackbar.make(
                                                     context.coordinatorLayout,
                                                     context.getString(R.string.error_input_name_color_equal),
                                                     Snackbar.LENGTH_LONG)
-                                            .show();
+                                                    .show();
                                         } else {
                                             zone.setLocationName(et.getText().toString());
                                             zone.setColor(colorPicker.getSelectedColor());
-                                            if(dbHelper.updateZone(zone) == 1){
+                                            if (dbHelper.updateZone(zone) == 1) {
                                                 updateListForLocationEdit(innerAdapter, zone, position);
 
                                                 // TODO: delete next 2 lines?
@@ -346,14 +346,14 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                                                         context.coordinatorLayout,
                                                         context.getString(R.string.update_zone_success),
                                                         Snackbar.LENGTH_LONG)
-                                                .show();
+                                                        .show();
                                                 dialog.dismiss();
                                             } else {
                                                 Snackbar.make(
                                                         context.coordinatorLayout,
                                                         context.getString(R.string.update_zone_failure),
                                                         Snackbar.LENGTH_LONG)
-                                                .show();
+                                                        .show();
                                             }
                                         }
                                     }
@@ -392,17 +392,17 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                                 .setPositiveButton(context.getString(R.string.dialog_delete), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int i) {
-                                        if(1 == dbHelper.deleteZoneById(zone.get_id())) {
+                                        if (1 == dbHelper.deleteZoneById(zone.get_id())) {
                                             Snackbar.make(
                                                     context.coordinatorLayout,
                                                     context.getString(R.string.delete_zone_success),
                                                     Snackbar.LENGTH_LONG)
-                                            .show();
+                                                    .show();
 
                                             // Redirect deletion of Location to deletion of Activity when there
                                             // is only one Location for an Activity. So also the outer adapter
                                             // can update itself.
-                                            if(relevantZones.size() == 1){
+                                            if (relevantZones.size() == 1) {
                                                 updateListForActivity(zone.getActivityName(), null);
                                             } else {
                                                 updateListForLocationDeletion(innerAdapter, zone.getActivityName());
@@ -412,7 +412,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                                                     context.coordinatorLayout,
                                                     context.getString(R.string.delete_zone_failure),
                                                     Snackbar.LENGTH_LONG)
-                                            .show();
+                                                    .show();
                                         }
                                         dialog.dismiss();
                                     }
@@ -426,7 +426,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                                 .setTitle(context.getString(R.string.alert_title_delete_zone))
                                 .setMessage(context.getString(R.string.alert_msg_delete_zone, zone.getLocationName()))
                                 .create();
-                                // TODO: add app colorBarIcon to the alertDialog.
+                        // TODO: add app colorBarIcon to the alertDialog.
                         alertDialog.show();
                     }
                 });
@@ -452,14 +452,13 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
         @Override
         public int getItemViewType(int position) {
-            if (position == getItemCount()-1) {
+            if (position == getItemCount() - 1) {
                 return VIEWTYPE_ADD;
             } else {
                 return VIEWTYPE_NORMAL;
             }
         }
     }
-
 
 
     // --- Methods for updating the nested lists in case of deletions and edits. ---
@@ -470,7 +469,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     // In case of editing, parameter newActivity must hold the new Activity name.
     // Also used for deletions of Locations when there are no other Locations for an Activity
     // available.
-    private void updateListForActivity(String oldActivity, String newActivity){
+    private void updateListForActivity(String oldActivity, String newActivity) {
         updateModel();
         // Remove entry in locationAdapterMap for old Activity name.
         locationAdapterMap.remove(oldActivity);
@@ -478,7 +477,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         // newActivity != null: Activity name got edited. New name stored in newActivity. Add new inner
         // adapter.
         // Put entry in locationAdapterMap for new Activity name and init inner adapter.
-        if(newActivity != null){
+        if (newActivity != null) {
             locationAdapterMap.put(newActivity, new AdapterManageZoneInner(
                     outerAdapter,
                     context,
@@ -493,7 +492,7 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     // Used when a Location is deleted but there are still other Locations saved for the same Activity.
     // When there is only one Location within the Activity, the delete-call is passed to
     // updateListForActivity().
-    private void updateListForLocationDeletion(AdapterManageZoneInner innerAdapter, String activity){
+    private void updateListForLocationDeletion(AdapterManageZoneInner innerAdapter, String activity) {
         updateModel();
         innerAdapter.relevantZones = getRelevantZonesByActivity(zones, activity);
         innerAdapter.notifyDataSetChanged();
@@ -501,13 +500,13 @@ public class ZonesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     // Used when an existing Location is edited (either name or color). We directly update the model
     // and reflect the changes in the inner adapter.
-    private void updateListForLocationEdit(AdapterManageZoneInner innerAdapter, Zone zone, int position){
+    private void updateListForLocationEdit(AdapterManageZoneInner innerAdapter, Zone zone, int position) {
         innerAdapter.relevantZones.set(position, zone);
         innerAdapter.notifyDataSetChanged();
     }
 
     // Helper function to reduce all Zones to a setIsRunning which elements all correspond to one Activity.
-    private List<Zone> getRelevantZonesByActivity(List<Zone> list, String activity){
+    private List<Zone> getRelevantZonesByActivity(List<Zone> list, String activity) {
         ArrayList<Zone> relevantZones = new ArrayList<>();
         for (Zone entry : list) {
             if (entry.getActivityName().equals(activity)) {

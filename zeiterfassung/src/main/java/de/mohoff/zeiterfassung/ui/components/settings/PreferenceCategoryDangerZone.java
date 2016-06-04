@@ -15,8 +15,6 @@ import de.mohoff.zeiterfassung.R;
 public class PreferenceCategoryDangerZone extends PreferenceCategory {
     //TextView titleView;
 
-
-
     /*@Override
     protected View onCreateView(ViewGroup parent) {
         View view = super.onCreateView(parent);
@@ -34,7 +32,7 @@ public class PreferenceCategoryDangerZone extends PreferenceCategory {
     }
 
     public PreferenceCategoryDangerZone(Context context, AttributeSet attrs,
-                                int defStyle) {
+                                        int defStyle) {
         super(context, attrs, defStyle);
     }
 

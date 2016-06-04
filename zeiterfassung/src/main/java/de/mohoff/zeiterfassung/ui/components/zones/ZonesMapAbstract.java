@@ -1,7 +1,6 @@
 package de.mohoff.zeiterfassung.ui.components.zones;
 
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
@@ -100,14 +98,16 @@ public abstract class ZonesMapAbstract extends MapAbstract {
                             context.coordinatorLayout,
                             context.getString(R.string.error_input_no_number),
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
                 }
                 if (candidateCircle != null) {
                     candidateCircle.setRadius(newRadius);
                 }
             }
+
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
+
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
         });
@@ -121,12 +121,12 @@ public abstract class ZonesMapAbstract extends MapAbstract {
                             context.coordinatorLayout,
                             context.getString(R.string.error_input_geolookup_empty),
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
                 } else {
                     try {
                         // Do the lookup
                         Address lookupResult = geocoder.getFromLocationName(addressValue.getText().toString(), 1)
-                                                       .get(0); // isRunning(0) can cause IndexOutOfBoundException
+                                .get(0); // isRunning(0) can cause IndexOutOfBoundException
                         lookupLatLng = new LatLng(lookupResult.getLatitude(), lookupResult.getLongitude());
                         MarkerOptions markerOptions = new MarkerOptions()
                                 .position(lookupLatLng)
@@ -150,13 +150,13 @@ public abstract class ZonesMapAbstract extends MapAbstract {
                                 context.coordinatorLayout,
                                 context.getString(R.string.error_geolookup),
                                 Snackbar.LENGTH_LONG)
-                        .show();
+                                .show();
                     } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
                         Snackbar.make(
                                 context.coordinatorLayout,
                                 context.getString(R.string.error_input_geolookup_invalid),
                                 Snackbar.LENGTH_LONG)
-                        .show();
+                                .show();
                     }
                 }
             }
@@ -186,7 +186,7 @@ public abstract class ZonesMapAbstract extends MapAbstract {
         super.onMapReady(googleMap);
         // Set top padding to move the compass button below the input area so it becomes visible.
         // TODO: Check if absolute pixel padding works out on other devices/resolutions.
-        googleMap.setPadding(0,350,0,0);
+        googleMap.setPadding(0, 350, 0, 0);
         // Make sure we start with an empty map. After supporting proper back/up-navigation,
         // the variable googleMap doesn't represent an empty map after navigating to this fragment
         // more than once.
@@ -231,10 +231,10 @@ public abstract class ZonesMapAbstract extends MapAbstract {
                 }
 
                 candidateMarker = map.addMarker(new MarkerOptions()
-                                .position(point)
-                                .draggable(true)
-                                .title(context.getString(R.string.map_new_zone))
-                                .icon(BitmapDescriptorFactory.fromBitmap(markerCandidateLocation))
+                        .position(point)
+                        .draggable(true)
+                        .title(context.getString(R.string.map_new_zone))
+                        .icon(BitmapDescriptorFactory.fromBitmap(markerCandidateLocation))
                 );
                 candidateCircle = map.addCircle(
                         createCircleOptions(colorCandidateLocationCircle).center(point).radius(newRadius)
@@ -244,13 +244,13 @@ public abstract class ZonesMapAbstract extends MapAbstract {
     }
 
     // If LocationService is running, it should retrieve updated list of Zones.
-    protected void updateLocationServiceZones(){
-        if(context.mService != null){
+    protected void updateLocationServiceZones() {
+        if (context.mService != null) {
             context.mService.updateAllZones();
         }
     }
 
-    protected void goBackToManageZones(){
+    protected void goBackToManageZones() {
         // Clear back stack because we're done with adding or editing a Zone.
         GeneralHelper.clearBackStack(context);
         // Go back to Zones fragment with clean back stack

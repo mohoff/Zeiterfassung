@@ -1,7 +1,7 @@
 package de.mohoff.zeiterfassung.ui.components.zones;
 
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -67,10 +67,10 @@ public class Zones extends Fragment {
     @Override
     public void onResume() {
         // TODO: What's up with that snippet? Still needed in NavigationView? -- Current status: NEEDED!
-        if(getFragmentManager().getBackStackEntryCount() > 0){
-            ((MainActivity)getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(false);
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            ((MainActivity) getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(false);
         } else {
-            ((MainActivity)getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(true);
+            ((MainActivity) getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(true);
         }
         super.onResume();
     }

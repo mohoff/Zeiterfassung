@@ -1,10 +1,9 @@
 package de.mohoff.zeiterfassung.ui.components.zones;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,9 +16,9 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import java.util.List;
 
-import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 import de.mohoff.zeiterfassung.ui.colorpicker.ColorPicker;
 
@@ -80,7 +79,7 @@ public class AddZone extends Fragment {
 
         // If activityName is passed, use it and disable corresponding AutoCompleteTextView.
         // If not passed, enable AutoCompleteTextView
-        if(getArguments() != null && getArguments().containsKey(getString(R.string.arg_activity))){
+        if (getArguments() != null && getArguments().containsKey(getString(R.string.arg_activity))) {
             inputActivityName = getArguments().getString(getString(R.string.arg_activity));
             autoCompleteTextView.setText(inputActivityName);
             autoCompleteTextView.setEnabled(false);
@@ -90,7 +89,7 @@ public class AddZone extends Fragment {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
                     AutoCompleteTextView tv = (AutoCompleteTextView) v;
-                    if(!hasFocus) {
+                    if (!hasFocus) {
                         inputActivityName = tv.getText().toString();
                         GeneralHelper.hideSoftKeyboardWithView(context, v);
                     }
@@ -102,7 +101,7 @@ public class AddZone extends Fragment {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 EditText et = (EditText) v;
-                if(!hasFocus) {
+                if (!hasFocus) {
                     inputLocationName = et.getText().toString();
                     GeneralHelper.hideSoftKeyboardWithView(context, v);
                 }
@@ -120,7 +119,7 @@ public class AddZone extends Fragment {
                 if (inputActivityName.equals("") || inputLocationName.equals("")) {
                     Snackbar.make(context.coordinatorLayout, getString(R.string.error_input_names), Snackbar.LENGTH_LONG)
                             .show();
-                } else if(!colorPicker.isColorSelected()){
+                } else if (!colorPicker.isColorSelected()) {
                     Snackbar.make(context.coordinatorLayout, getString(R.string.error_input_color), Snackbar.LENGTH_LONG)
                             .show();
                 } else {

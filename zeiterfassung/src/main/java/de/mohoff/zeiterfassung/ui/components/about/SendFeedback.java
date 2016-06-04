@@ -1,10 +1,9 @@
 package de.mohoff.zeiterfassung.ui.components.about;
 
 
-import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -29,12 +28,12 @@ public class SendFeedback extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // For mail sending intents, resultCode per design doesn't work reliably
-        if(requestCode == SEND_FEEDBACK_REQ_CODE){// && resultCode == Activity.RESULT_OK){
+        if (requestCode == SEND_FEEDBACK_REQ_CODE) {// && resultCode == Activity.RESULT_OK){
             Snackbar.make(
                     context.coordinatorLayout,
                     "Feedback sent.",
                     Snackbar.LENGTH_LONG)
-            .show();
+                    .show();
             getActivity().onBackPressed();
         }
     }
@@ -62,13 +61,13 @@ public class SendFeedback extends Fragment {
             @Override
             public void onClick(View v) {
                 String msg = feedback.getText().toString();
-                if(msg.equals("") || msg.equals("Hi, if I may speak freely: ")){
+                if (msg.equals("") || msg.equals("Hi, if I may speak freely: ")) {
                     Snackbar.make(
                             context.coordinatorLayout,
                             "Please write a message first.",
                             Snackbar.LENGTH_LONG)
-                    .show();
-                } else if(msg.length() < 50){
+                            .show();
+                } else if (msg.length() < 50) {
                     Snackbar.make(
                             context.coordinatorLayout,
                             "A few more words please...",
@@ -78,7 +77,7 @@ public class SendFeedback extends Fragment {
                     // Send feedback mail
                     Intent mail = new Intent(Intent.ACTION_SEND);
                     mail.setType("message/rfc822");
-                    mail.putExtra(Intent.EXTRA_EMAIL, new String[] { "hoffmamo@gmail.com" });
+                    mail.putExtra(Intent.EXTRA_EMAIL, new String[]{"hoffmamo@gmail.com"});
                     mail.putExtra(Intent.EXTRA_SUBJECT, "ZeiterfassungApp, Feedback");
                     mail.putExtra(Intent.EXTRA_TEXT, msg);
                     // Send intent and show custom message for app picker dialog.

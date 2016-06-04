@@ -46,7 +46,7 @@ public class EditZonesMap extends ZonesMapAbstract {
                             context.coordinatorLayout,
                             getString(R.string.error_input_no_pin),
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
                     return;
                 }
                 Loc newLoc = Loc.convertLatLngToLoc(candidateMarker.getPosition());
@@ -55,31 +55,31 @@ public class EditZonesMap extends ZonesMapAbstract {
                             context.coordinatorLayout,
                             getString(R.string.error_input_radius_min, Zone.MIN_RADIUS),
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
                 } else if (candidateMarker.getPosition().equals(editZone.getLatLng()) &&
                         newRadius == editZone.getRadius()) {
                     Snackbar.make(
                             context.coordinatorLayout,
                             getString(R.string.error_input_pin_equal),
                             Snackbar.LENGTH_LONG)
-                        .show();
+                            .show();
                 } else if (dbHelper.isIntersectingOtherZone(newLoc, newRadius, candidateZoneId)) {
                     Snackbar.make(
                             context.coordinatorLayout,
                             getString(R.string.error_input_pin_intersect),
                             Snackbar.LENGTH_LONG)
-                    .show();
+                            .show();
                 } else {
                     editZone.setRadius(newRadius);
                     //editZone.setRadius((int) candidateCircle.getRadius());
-                    editZone.setLatitude((float)candidateMarker.getPosition().latitude);
-                    editZone.setLongitude((float)candidateMarker.getPosition().longitude);
+                    editZone.setLatitude((float) candidateMarker.getPosition().latitude);
+                    editZone.setLongitude((float) candidateMarker.getPosition().longitude);
                     if (dbHelper.updateZone(editZone) == 1) {
                         Snackbar.make(
                                 context.coordinatorLayout,
                                 context.getString(R.string.update_zone_success),
                                 Snackbar.LENGTH_LONG)
-                        .show();
+                                .show();
                         updateLocationServiceZones();
                         goBackToManageZones();
                     } else {
@@ -87,7 +87,7 @@ public class EditZonesMap extends ZonesMapAbstract {
                                 context.coordinatorLayout,
                                 context.getString(R.string.update_zone_failure),
                                 Snackbar.LENGTH_LONG)
-                        .show();
+                                .show();
                     }
                 }
             }
@@ -97,7 +97,7 @@ public class EditZonesMap extends ZonesMapAbstract {
     @Override
     public void drawExistingZones() {
         super.drawExistingZones();
-        for(Zone zone : dbHelper.getAllZones()) {
+        for (Zone zone : dbHelper.getAllZones()) {
             Marker marker;
             Circle circle;
             LatLng latLng = new LatLng(zone.getLatitude(), zone.getLongitude());
@@ -125,7 +125,7 @@ public class EditZonesMap extends ZonesMapAbstract {
         }
     }
 
-    private void updateButtonColor(){
+    private void updateButtonColor() {
 
         // TODO: rework this for FAB color
 

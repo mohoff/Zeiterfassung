@@ -1,17 +1,14 @@
 package de.mohoff.zeiterfassung.ui.components.about;
 
-import android.app.Activity;
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.ui.MainActivity;
-import de.mohoff.zeiterfassung.ui.components.zones.AddZoneMap;
 
 public class About extends Fragment {
     MainActivity context;
@@ -53,10 +50,10 @@ public class About extends Fragment {
     @Override
     public void onResume() {
         // TODO: What's up with that snippet? Still needed in NavigationView? -- Current status: NEEDED!
-        if(getFragmentManager().getBackStackEntryCount() > 0){
-            ((MainActivity)getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(false);
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            ((MainActivity) getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(false);
         } else {
-            ((MainActivity)getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(true);
+            ((MainActivity) getActivity()).getDrawerToggle().setDrawerIndicatorEnabled(true);
         }
         super.onResume();
     }

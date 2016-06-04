@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.CloseableIterator;
@@ -20,15 +19,18 @@ import com.j256.ormlite.table.TableUtils;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.Stat;
-import de.mohoff.zeiterfassung.datamodel.Zone;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
-
-import java.sql.SQLException;
-import java.sql.Time;
-import java.util.*;
+import de.mohoff.zeiterfassung.datamodel.Zone;
 
 
 /**
@@ -57,41 +59,41 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION, R.raw.ormlite_config);
     }
 
-    public int getAmountOfTimeslots(){
+    public int getAmountOfTimeslots() {
         try {
             getTimeslotDAO();
-            return (int)timeslotDAO.countOf();
-        } catch(SQLException e){
+            return (int) timeslotDAO.countOf();
+        } catch (SQLException e) {
             e.printStackTrace();
             return -1;
         }
     }
 
-    public int getAmountOfZones(){
+    public int getAmountOfZones() {
         try {
             getTargetLocationAreaDAO();
-            return (int)targetareasDAO.countOf();
-        } catch(SQLException e){
+            return (int) targetareasDAO.countOf();
+        } catch (SQLException e) {
             e.printStackTrace();
             return -1;
         }
     }
 
-    public int startNewTimeslot(long millis, Zone zone){
+    public int startNewTimeslot(long millis, Zone zone) {
         getTimeslotREDAO();
 
         // check if timeslots are unsealed and already existing for passed activityName and locationName
         List<Timeslot> existingTimeslotsForActAndLoc = new ArrayList<Timeslot>();
         QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
-        try{
+        try {
             queryBuilder.where().eq("endtime", 0).and().eq("zone_id", zone);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
             existingTimeslotsForActAndLoc = timeslotREDAO.query(preparedQuery); // assumed there is only one "open" timeslot allowed for any time t
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        if(existingTimeslotsForActAndLoc.isEmpty()){
+        if (existingTimeslotsForActAndLoc.isEmpty()) {
             // timeslot not yet created/open
             Timeslot ts = new Timeslot(millis, zone);
             int result = -1;
@@ -104,19 +106,19 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int createNewZone(double latitude, double longitude, int radius, String activity, String location, int color){
+    public int createNewZone(double latitude, double longitude, int radius, String activity, String location, int color) {
         getTargetLocationAreaREDAO();
-        Zone zone = new Zone((float)latitude, (float)longitude, radius, activity, location, color);
+        Zone zone = new Zone((float) latitude, (float) longitude, radius, activity, location, color);
 
         try {
             getTargetLocationAreaDAO();
             return targetareasDAO.create(zone);
-        } catch(SQLException e){
+        } catch (SQLException e) {
             return -1;
         }
     }
 
-    public int updateZoneLocationName(int id, String newLocationName){
+    public int updateZoneLocationName(int id, String newLocationName) {
         UpdateBuilder<Zone, Integer> updateBuilder = zonesREDAO.updateBuilder();
         try {
             updateBuilder.updateColumnValue("locationName", newLocationName);
@@ -128,7 +130,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int updateZoneActivityName(String oldActivityName, String newActivityName){
+    public int updateZoneActivityName(String oldActivityName, String newActivityName) {
         UpdateBuilder<Zone, Integer> updateBuilder = zonesREDAO.updateBuilder();
         try {
             updateBuilder.updateColumnValue("activityName", newActivityName);
@@ -145,57 +147,57 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return zonesREDAO.update(zone);
     }
 
-    public Zone getZoneById(int id){
+    public Zone getZoneById(int id) {
         QueryBuilder<Zone, Integer> queryBuilder = zonesREDAO.queryBuilder();
-        try{
+        try {
             queryBuilder.where().eq("_id", id);
             PreparedQuery<Zone> preparedQuery = queryBuilder.prepare();
             return zonesREDAO.query(preparedQuery).get(0);
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public int deleteZone(String activity, String location){
+    public int deleteZone(String activity, String location) {
         DeleteBuilder<Zone, Integer> deleteBuilder = zonesREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("activityName", activity).and().eq("locationName", location);
             return deleteBuilder.delete();
-        } catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
             return -1;
         }
     }
 
-    public int deleteZoneById(int id){
+    public int deleteZoneById(int id) {
         DeleteBuilder<Zone, Integer> deleteBuilder = zonesREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("_id", id);
             return deleteBuilder.delete();
-        } catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
             return -1;
         }
     }
 
-    public int deleteZonesByActivity(String activity){
+    public int deleteZonesByActivity(String activity) {
         DeleteBuilder<Zone, Integer> deleteBuilder = zonesREDAO.deleteBuilder();
         try {
             deleteBuilder.where().eq("activityName", activity);
             return deleteBuilder.delete();
-        } catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
             return -1;
         }
     }
 
     // Use for EDIT
-    public boolean isIntersectingOtherZone(Loc newLoc, int newRadius, int editZoneId){
+    public boolean isIntersectingOtherZone(Loc newLoc, int newRadius, int editZoneId) {
         List<Zone> zones = getAllZones();
-        for(Zone z : zones){
-            if(Loc.distanceTo(newLoc, z.getLoc()) < z.getRadius() + newRadius &&
-                    editZoneId != z.get_id()){
+        for (Zone z : zones) {
+            if (Loc.distanceTo(newLoc, z.getLoc()) < z.getRadius() + newRadius &&
+                    editZoneId != z.get_id()) {
                 return true;
             }
         }
@@ -203,53 +205,53 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     // Use for ADD
-    public boolean isIntersectingAnyZone(Loc newLoc, int newRadius){
+    public boolean isIntersectingAnyZone(Loc newLoc, int newRadius) {
         List<Zone> zones = getAllZones();
-        for(Zone z : zones){
-            if(Loc.distanceTo(newLoc, z.getLoc()) < z.getRadius() + newRadius){
+        for (Zone z : zones) {
+            if (Loc.distanceTo(newLoc, z.getLoc()) < z.getRadius() + newRadius) {
                 return true;
             }
         }
         return false;
     }
 
-    public int deleteAllTimeslots(){
+    public int deleteAllTimeslots() {
         try {
             // Dropping and creating table will reset autoincrement for _id.
             TableUtils.dropTable(connectionSource, Timeslot.class, true);
             TableUtils.createTable(connectionSource, Timeslot.class);
             return 1;
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
             return -1;
         }
     }
 
-    public int deleteAllZones(){
+    public int deleteAllZones() {
         try {
             // Dropping and creating table will reset autoincrement for _id.
             TableUtils.dropTable(connectionSource, Zone.class, true);
             TableUtils.createTable(connectionSource, Zone.class);
             return 1;
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
             return -1;
         }
     }
 
-    public int deleteAllStats(){
+    public int deleteAllStats() {
         try {
             // Dropping and creating table will reset autoincrement for _id.
             TableUtils.dropTable(connectionSource, Stat.class, true);
             TableUtils.createTable(connectionSource, Stat.class);
             return 1;
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
             return -1;
         }
     }
 
-    public int sealCurrentTimeslot(long millis){ // seals newest TS
+    public int sealCurrentTimeslot(long millis) { // seals newest TS
         getTimeslotREDAO();
 
         /*
@@ -271,7 +273,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public int closeTimeslotById(int id, long millis){
+    public int closeTimeslotById(int id, long millis) {
         getTimeslotREDAO();
 
         Timeslot toClose = timeslotREDAO.queryForId(id);
@@ -279,7 +281,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return timeslotREDAO.update(toClose);
     }
 
-    public void _createSampleZones(){
+    public void _createSampleZones() {
         int status;
         status = createNewZone(48.743715, 9.095967, 50, "Home", "Vaihingen Allmandring 26d", 0xFF025167);
         status = createNewZone(48.243962, 9.928635, 75, "Home", "Burgrieden Mittelweg 10", 0xFF025167);
@@ -311,6 +313,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * This is called when your application is upgraded and it has a higher version number. This allows you to adjust
      * the various data to match the new version number.
@@ -330,6 +333,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * Returns the Database Access Object (DAO) for our SimpleData class. It will create it or just give the cached
      * value.
@@ -340,24 +344,28 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
         return timeslotDAO;
     }
+
     public Dao<Zone, Integer> getTargetLocationAreaDAO() throws SQLException {
         if (targetareasDAO == null) {
             targetareasDAO = getDao(Zone.class);
         }
         return targetareasDAO;
     }
+
     public Dao<Loc, Integer> getLocDAO() throws SQLException {
         if (locDAO == null) {
             locDAO = getDao(Loc.class);
         }
         return locDAO;
     }
+
     public Dao<Stat, Integer> getStatDAO() throws SQLException {
         if (statDAO == null) {
             statDAO = getDao(Stat.class);
         }
         return statDAO;
     }
+
     /**
      * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our SimpleData class. It will
      * create it or just give the cached value. RuntimeExceptionDao only through RuntimeExceptions.
@@ -368,24 +376,28 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
         return timeslotREDAO;
     }
+
     public RuntimeExceptionDao<Zone, Integer> getTargetLocationAreaREDAO() {
         if (zonesREDAO == null) {
             zonesREDAO = getRuntimeExceptionDao(Zone.class);
         }
         return zonesREDAO;
     }
+
     public RuntimeExceptionDao<Loc, Integer> getLocREDAO() {
         if (locREDAO == null) {
             locREDAO = getRuntimeExceptionDao(Loc.class);
         }
         return locREDAO;
     }
+
     public RuntimeExceptionDao<Stat, Integer> getStatREDAO() {
         if (statREDAO == null) {
             statREDAO = getRuntimeExceptionDao(Stat.class);
         }
         return statREDAO;
     }
+
     /**
      * Close the database connections and clear any cached DAOs.
      */
@@ -403,57 +415,57 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
 
-    public List<Timeslot> getTimeslotsBetween(int starttime, int endtime){
+    public List<Timeslot> getTimeslotsBetween(int starttime, int endtime) {
         getTimeslotREDAO();
         List<Timeslot> timeslots = new ArrayList<Timeslot>();
 
         QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
-        try{
+        try {
             queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
             timeslots = timeslotREDAO.query(preparedQuery);
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return timeslots;
     }
 
-    public Timeslot getOpenTimeslot(){
+    public Timeslot getOpenTimeslot() {
         getTimeslotREDAO();
 
         QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
-        try{
+        try {
             queryBuilder.where().eq("endtime", 0);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
             return timeslotREDAO.query(preparedQuery).get(0);
-        } catch (Exception e){
+        } catch (Exception e) {
             // (SQLException | IndexOutOfBoundsException e)
             e.printStackTrace();
             return null;
         }
     }
 
-    public HashMap<String, String> getSummedTimeForActivities(List<Timeslot> data, long frameStart, long frameEnd){
+    public HashMap<String, String> getSummedTimeForActivities(List<Timeslot> data, long frameStart, long frameEnd) {
         HashMap<String, String> result = new HashMap<>();
         HashMap<String, Long> map = new HashMap<>();
         long duration;
-        for(Timeslot t : data){
+        for (Timeslot t : data) {
             duration = 0;
             // Timeslot started in search frame but has not ended until now.
-            if(t.getStarttime() >= frameStart && t.getStarttime() < frameEnd && t.getEndtime() == 0){
+            if (t.getStarttime() >= frameStart && t.getStarttime() < frameEnd && t.getEndtime() == 0) {
                 duration = frameEnd - t.getStarttime();
             }
             // Timeslot completely contained within search frame
-            else if(t.getStarttime() >= frameStart && t.getStarttime() < frameEnd && t.getEndtime() <= frameEnd) {
+            else if (t.getStarttime() >= frameStart && t.getStarttime() < frameEnd && t.getEndtime() <= frameEnd) {
                 duration = t.getDuration();
             }
             // Timeslot started before search frame and has not ended until now.
-            else if(t.getStarttime() < frameStart && t.getEndtime() == 0){
+            else if (t.getStarttime() < frameStart && t.getEndtime() == 0) {
                 duration = frameEnd - frameStart;
             }
             // Timeslot started before search frame but has ended in search frame.
-            else if(t.getStarttime() < frameStart && frameStart < t.getEndtime() && t.getEndtime() <= frameEnd){
+            else if (t.getStarttime() < frameStart && frameStart < t.getEndtime() && t.getEndtime() <= frameEnd) {
                 duration = t.getEndtime() - frameStart;
             }
 
@@ -469,54 +481,54 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();         // pair.getKey(), pair.getValue()
             String readableDuration;
-            if(((Long) pair.getValue()).longValue() == 0){
+            if (((Long) pair.getValue()).longValue() == 0) {
                 readableDuration = "Nothing.";
             } else {
                 readableDuration = Timeslot.getReadableDuration(((Long) pair.getValue()).longValue(), true, false);
             }
-            result.put((String)pair.getKey(), readableDuration);
+            result.put((String) pair.getKey(), readableDuration);
             it.remove();
         }
 
         return result;
     }
 
-    public List<Zone> getAllZones(){
+    public List<Zone> getAllZones() {
         getTargetLocationAreaREDAO();
 
         try {
             return zonesREDAO.queryForAll();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public List<Timeslot> getAllTimeslots(){
+    public List<Timeslot> getAllTimeslots() {
         getTimeslotREDAO();
         List<Timeslot> timeslots = new ArrayList<>();
 
         try {
             timeslots = timeslotREDAO.queryForAll();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return timeslots;
     }
 
-    public List<Stat> getAllStats(){
+    public List<Stat> getAllStats() {
         getStatREDAO();
         List<Stat> stats = new ArrayList<>();
 
         try {
             stats = statREDAO.queryForAll();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return stats;
     }
 
-    public int initStatistics(){
+    public int initStatistics() {
         ArrayList<Stat> stats = new ArrayList<>();
         stats.add(new Stat("serviceUptime", "Background service uptime"));
         stats.add(new Stat("distanceTravelled", "Distance travelled"));
@@ -524,11 +536,11 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         stats.add(new Stat("numberOfZones", "Active Zones"));
 
         // Insert 'stats' in DB
-        for(Stat stat : stats){
+        for (Stat stat : stats) {
             try {
                 getStatDAO();
                 statDAO.create(stat);
-            } catch(SQLException e){
+            } catch (SQLException e) {
                 e.printStackTrace();
                 return -1;
             }
@@ -537,21 +549,21 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     // outer String is an Activity, inner String a Location.
-    public HashMap<String, HashMap<String, Long>> getTimeSpentForEachZone(){
+    public HashMap<String, HashMap<String, Long>> getTimeSpentForEachZone() {
         HashMap<String, HashMap<String, Long>> outer = new HashMap<>();
         List<Timeslot> allTimeslots = getAllTimeslots();
 
         // Iterate over all Timeslots and add durations for equal Zones
-        for(Timeslot t : allTimeslots){
+        for (Timeslot t : allTimeslots) {
             String activity = t.getZone().getActivityName();
             String location = t.getZone().getLocationName();
             Long time = Long.valueOf(0);
             HashMap inner = outer.get(activity);
 
-            if(inner == null){
+            if (inner == null) {
                 inner = new HashMap<>();
-            } else if(inner.get(location) != null){
-                time = (Long)inner.get(location);
+            } else if (inner.get(location) != null) {
+                time = (Long) inner.get(location);
             }
 
             time += t.getDuration();
@@ -561,21 +573,21 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return outer;
     }
 
-    private void checkForStat(String identifier){
+    private void checkForStat(String identifier) {
         Stat result = null;
-        try{
+        try {
             getStatDAO();
             result = statDAO.queryForEq("identifier", identifier).get(0);
-        } catch (SQLException | IndexOutOfBoundsException | NullPointerException e){
+        } catch (SQLException | IndexOutOfBoundsException | NullPointerException e) {
             e.printStackTrace();
         }
 
-        if(result == null){
+        if (result == null) {
             initStatistics();
         }
     }
 
-    public int updateStat(String identifier, int newValue){
+    public int updateStat(String identifier, int newValue) {
         checkForStat(identifier);
         getStatREDAO();
 
@@ -592,17 +604,16 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     // updateStat for Stats that can be retrieved automatically with DatabaseHelper methods and
     // thus don't need a 'newValue' parameter.
-    public int updateStat(String identifier){
+    public int updateStat(String identifier) {
         checkForStat(identifier);
         getStatREDAO();
 
         UpdateBuilder<Stat, Integer> updateBuilder = statREDAO.updateBuilder();
         int newValue;
 
-        if(identifier.equals("numberOfTimeslots")){
+        if (identifier.equals("numberOfTimeslots")) {
             newValue = getAmountOfTimeslots();
-        } else
-        if(identifier.equals("numberOfZones")){
+        } else if (identifier.equals("numberOfZones")) {
             newValue = getAmountOfZones();
         } else {
             // Do not update if identifier doesn't match any of the listed values
@@ -614,13 +625,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             updateBuilder.updateColumnValue("value", newValue);
             updateBuilder.where().eq("identifier", identifier);
             return updateBuilder.update();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
             return -1;
         }
     }
 
-    public Cursor getCursorForZones(){
+    public Cursor getCursorForZones() {
         Cursor c = null;
         QueryBuilder<Zone, Integer> queryBuilder = zonesREDAO.queryBuilder();
         //qb.where()...;
@@ -629,26 +640,26 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             PreparedQuery<Zone> query = queryBuilder.prepare();
             CloseableIterator<Zone> iterator = targetareasDAO.iterator(query);
             AndroidDatabaseResults results =
-                    (AndroidDatabaseResults)iterator.getRawResults();
+                    (AndroidDatabaseResults) iterator.getRawResults();
             c = results.getRawCursor();
             iterator.closeQuietly();
-        } catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return c;
     }
 
-    public List<String> getDistinctActivityNames(){
+    public List<String> getDistinctActivityNames() {
         getTargetLocationAreaREDAO();
         List<String> activities = new ArrayList<String>();
 
         QueryBuilder<Zone, Integer> queryBuilder = zonesREDAO.queryBuilder();
-        try{
+        try {
             List<Zone> matches = queryBuilder.distinct().selectColumns("activityName").query();
-            for(Zone zone : matches){
+            for (Zone zone : matches) {
                 activities.add(zone.getActivityName());
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return activities;
@@ -670,16 +681,16 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return timeslots;
     }*/
 
-    public List<Timeslot> getTimeslotsBetweenLocation(int starttime, int endtime, String locationName){
+    public List<Timeslot> getTimeslotsBetweenLocation(int starttime, int endtime, String locationName) {
         getTimeslotREDAO();
         List<Timeslot> timeslots = new ArrayList<Timeslot>();
 
         QueryBuilder<Timeslot, Integer> queryBuilder = timeslotREDAO.queryBuilder();
-        try{
+        try {
             queryBuilder.where().gt("starttime", starttime).and().lt("endtime", endtime).and().eq("secondLine", locationName);
             PreparedQuery<Timeslot> preparedQuery = queryBuilder.prepare();
             timeslots = timeslotREDAO.query(preparedQuery);
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -702,32 +713,32 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return timeslots;
     }*/
 
-    public int cleanLocs(){
+    public int cleanLocs() {
         try {
             // Dropping and creating table will reset autoincrement for _id.
             TableUtils.dropTable(connectionSource, Loc.class, true);
             TableUtils.createTable(connectionSource, Loc.class);
             return 1;
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
             return -1;
         }
     }
 
-    public int dumpLocs(CircularFifoQueue<Loc> cache){
+    public int dumpLocs(CircularFifoQueue<Loc> cache) {
         getLocREDAO();
 
         // Remove existing records first
-        if(cleanLocs() != 1){
+        if (cleanLocs() != 1) {
             return -1;
         }
 
         // Dump new records
-        for(Loc record : cache){
+        for (Loc record : cache) {
             try {
                 getLocDAO();
                 locDAO.create(record);
-            } catch(SQLException e){
+            } catch (SQLException e) {
                 e.printStackTrace();
                 return -1;
             }
@@ -735,7 +746,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return 1;
     }
 
-    public List<Loc> getLocs(long maxAge){
+    public List<Loc> getLocs(long maxAge) {
         getLocREDAO();
         List<Loc> locList = new ArrayList<>();
 
@@ -747,7 +758,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             queryBuilder.orderBy("timestampInMillis", true);
             PreparedQuery<Loc> preparedQuery = queryBuilder.prepare();
             locList = locREDAO.query(preparedQuery);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return locList;
         }

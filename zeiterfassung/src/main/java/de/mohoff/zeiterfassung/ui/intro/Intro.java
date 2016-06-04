@@ -75,7 +75,7 @@ public class Intro extends AppIntro {
         );*/
     }
 
-    private IntroSlide populateSlide(IntroSlide s, String title, String subtitle, Drawable slideIcon, String description){
+    private IntroSlide populateSlide(IntroSlide s, String title, String subtitle, Drawable slideIcon, String description) {
         s.setTitle(title);
         s.setSubitle(subtitle);
         s.setImage(slideIcon);

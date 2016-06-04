@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import de.mohoff.zeiterfassung.datamodel.Stat;
 import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.datamodel.Loc;
 import de.mohoff.zeiterfassung.datamodel.LocationCache;
-import de.mohoff.zeiterfassung.datamodel.Zone;
+import de.mohoff.zeiterfassung.datamodel.Stat;
 import de.mohoff.zeiterfassung.datamodel.Timeslot;
+import de.mohoff.zeiterfassung.datamodel.Zone;
+import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.MainActivity;
 
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -105,9 +105,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     // Returns service session uptime in seconds
-    public static int getServiceSessionUptime(){
-        if(SESSION_STARTTIME == 0) return 0;
-        return (int)((System.currentTimeMillis() - SESSION_STARTTIME)/1000);
+    public static int getServiceSessionUptime() {
+        if (SESSION_STARTTIME == 0) return 0;
+        return (int) ((System.currentTimeMillis() - SESSION_STARTTIME) / 1000);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                 .setContentText("Location Tracking active")
                 .setSmallIcon(R.drawable.status_locationservice)
                 .setOngoing(true)
-                        //.setLargeIcon(R.drawable.status_locationservice)
+                //.setLargeIcon(R.drawable.status_locationservice)
                 .setContentIntent(intent)
                 .setPriority(Notification.PRIORITY_MIN)
                 .build();
@@ -186,20 +186,20 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         stats = dbHelper.getAllStats();
 
         Timeslot openTimeslot = dbHelper.getOpenTimeslot();
-        if(openTimeslot != null){
+        if (openTimeslot != null) {
             inboundZone = openTimeslot.getZone();
         }
 
     }
 
-    private void updateNumericStat(String identifier, int deltaToAdd){
+    private void updateNumericStat(String identifier, int deltaToAdd) {
         // Update 'travelled distance' in DB.
-        for(Stat stat : stats){
-            if(stat.getIdentifier().equals(identifier)){
+        for (Stat stat : stats) {
+            if (stat.getIdentifier().equals(identifier)) {
                 int oldValue = stat.getIntValue();
                 try {
                     dbHelper.updateStat(identifier, oldValue + deltaToAdd);
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -220,7 +220,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         // Update relevant statistics
         updateNumericStat("distanceTravelled", SESSION_DISTANCE);
-        if(SESSION_STARTTIME != 0){
+        if (SESSION_STARTTIME != 0) {
             updateNumericStat("serviceUptime", getServiceSessionUptime());
         }
 
@@ -231,7 +231,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         super.onDestroy();
     }
 
-    public void updateAllZones(){
+    public void updateAllZones() {
         allZones = dbHelper.getAllZones();
     }
 
@@ -260,14 +260,14 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             float ratio = LocationCache.getInstance().getCurrentInBoundProxFor2(zone);
             // Only need to check for 'new inbound' and 'still inbound' here to assign foundInboundZone.
             // 'new outbound' and 'still outbound' are handled automatically when foundInboundZone is null.
-            if(
-                    // New enter event for the Zone we are iterating over: There are at
-                    // least (INBOUND_TRESHOLD*activeCache.size()) locations inbound.
+            if (
+                // New enter event for the Zone we are iterating over: There are at
+                // least (INBOUND_TRESHOLD*activeCache.size()) locations inbound.
                     (ratio >= INBOUND_TRESHOLD) ||
-                    // Still inbound of the Zone we are iterating over: There is already an inboundZone
-                    // AND its ratio isn't that low too trigger a leave-event AND inboundZone is the
-                    // same as the Zone we are just iterating over.
-                    (inboundZone != null && ratio > OUTBOUND_TRESHOLD && inboundZone.get_id() == zone.get_id())){
+                            // Still inbound of the Zone we are iterating over: There is already an inboundZone
+                            // AND its ratio isn't that low too trigger a leave-event AND inboundZone is the
+                            // same as the Zone we are just iterating over.
+                            (inboundZone != null && ratio > OUTBOUND_TRESHOLD && inboundZone.get_id() == zone.get_id())) {
 
                 foundInboundZone = zone;
                 // No need to iterate any further since we found an inbound Zone and only one is possible.
@@ -278,10 +278,10 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         // Determine if a change happened. To do so we check for all cases in which foundInboundZone
         // and inboundZone are different (only one of them is null OR both have different IDs in the
         // DB.)
-        if((foundInboundZone != null && inboundZone == null) ||       // enter event (no inbound --> inbound)
+        if ((foundInboundZone != null && inboundZone == null) ||       // enter event (no inbound --> inbound)
                 (foundInboundZone == null && inboundZone != null) ||  // leave event (inbound --> no inbound)
                 (foundInboundZone != null && (foundInboundZone.get_id() != inboundZone.get_id()))) {
-                                                                    // leave AND enter event (inbound1 --> inbound2)
+            // leave AND enter event (inbound1 --> inbound2)
 
             inboundZone = foundInboundZone;
             // 'True' indicates the calling function that a change was detected.
@@ -298,8 +298,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         // Close openTimeslot: If either there is a regular leave-event OR there is still a openTimeslot
         // while user already moved into next Zone, so inboundZone is set again.
-        if((openTimeslot != null && inboundZone == null) ||
-                (openTimeslot != null && openTimeslot.getZone().get_id() != inboundZone.get_id())){
+        if ((openTimeslot != null && inboundZone == null) ||
+                (openTimeslot != null && openTimeslot.getZone().get_id() != inboundZone.get_id())) {
             // TODO: Check for serviceRunningTime.isServiceRunningLongterm() and apply 'endtimeIsVague = true' flag.
             if (dbHelper.closeTimeslotById(openTimeslot.get_id(), getEventTimestamp()) == 1) {
                 sendTimeslotEventViaBroadcast("closed");
@@ -307,7 +307,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         }
 
         // Start new Timeslot
-        if(inboundZone != null){
+        if (inboundZone != null) {
             // TODO: Check for serviceRunningTime.isServiceRunningLongterm() and apply 'starttimeIsVague = true' flag.
             if (dbHelper.startNewTimeslot(getEventTimestamp(), inboundZone) == 1) {
                 sendTimeslotEventViaBroadcast("opened");
@@ -315,7 +315,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         }
     }
 
-    public void handleLocationUpdate(Loc loc){
+    public void handleLocationUpdate(Loc loc) {
         NO_CONNECTION = !loc.isRealUpdate();
         numberOfUpdates++;
 
@@ -329,8 +329,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
         // Update inboundZone at every LocationUpdate unless activeCache doesn't contain
         // 2 entries yet. If it was updated, also update Timeslots.
-        if((LocationCache.getInstance().getActiveCache().size() >= 2) &&
-                updateInboundZone()){
+        if ((LocationCache.getInstance().getActiveCache().size() >= 2) &&
+                updateInboundZone()) {
             updateTimeslots();
         }
 
@@ -338,11 +338,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         startLocRepeatTimer();
     }
 
-    private void resetLocRepeatTimer(){
-        if(timerTask != null){
+    private void resetLocRepeatTimer() {
+        if (timerTask != null) {
             timerTask.cancel();
         }
-        if(timer != null){
+        if (timer != null) {
             timer.cancel();
             timer.purge();
         }
@@ -350,7 +350,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         timer = null;
     }
 
-    private void startLocRepeatTimer(){
+    private void startLocRepeatTimer() {
         timerTask = new LocationUpdateTimer();
         timer = new Timer();
         // Execute timerTask after <2nd parameter> and repeat every <3rd parameter>
@@ -358,14 +358,14 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         timer.schedule(timerTask, NO_CONNECTION_INTERVAL);
     }
 
-    public void updateTravelDistance(Loc loc){
+    public void updateTravelDistance(Loc loc) {
         // TODO: Maybe add condition '&& numberOfUpdates % 2 == 0' in order to reduce update frequency
-        if(inboundZone == null && loc != null && loc.getAccuracy() <= 100){
+        if (inboundZone == null && loc != null && loc.getAccuracy() <= 100) {
             Loc mostRecentLoc = LocationCache.getInstance().getMostRecentActiveLoc();
             int distanceInMeters = loc.distanceTo(mostRecentLoc);
             // Only add distance to distanceTravelled when it's greater than some value in order to
             // prevent fluctuations which occur due to the inaccurate nature of used secondLine service.
-            if(distanceInMeters > SESSION_DISTANCE_IGNORE_TRESHOLD){
+            if (distanceInMeters > SESSION_DISTANCE_IGNORE_TRESHOLD) {
                 // TODO: Maybe add correction factor of 0.9 or similar.
                 SESSION_DISTANCE += loc.distanceTo(mostRecentLoc);
             }
@@ -380,11 +380,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         // To take that into account, we lookup the stored Loc at indexOfInterest and return its timestamp.
         // That should lead to a more accurate timestamp result.
         CircularFifoQueue<Loc> activeCache = LocationCache.getInstance().getActiveCache();
-        int indexOfInterest = (int)(INBOUND_TRESHOLD * ACTIVE_CACHE_SIZE);
-        for(; indexOfInterest >= 0; indexOfInterest--){
+        int indexOfInterest = (int) (INBOUND_TRESHOLD * ACTIVE_CACHE_SIZE);
+        for (; indexOfInterest >= 0; indexOfInterest--) {
             try {
-                return activeCache.get(activeCache.size()-indexOfInterest).getTimestampInMillis();
-            } catch (Exception e){
+                return activeCache.get(activeCache.size() - indexOfInterest).getTimestampInMillis();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -399,7 +399,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     // Broadcast for locationUpdate events
-    private void sendLocationUpdateViaBroadcast(double lat, double lng, double accuracy, boolean isRealUpdate){
+    private void sendLocationUpdateViaBroadcast(double lat, double lng, double accuracy, boolean isRealUpdate) {
         Intent intent = new Intent("locationServiceLocUpdateEvents");
         intent.putExtra("lat", String.valueOf(lat));
         intent.putExtra("lng", String.valueOf(lng));
@@ -409,16 +409,16 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     }
 
     // Broadcast for locationUpdate events
-    private void sendServiceEventViaBroadcast(String eventtype){
+    private void sendServiceEventViaBroadcast(String eventtype) {
         Intent intent = new Intent("serviceEventUpdate");
         intent.putExtra("type", eventtype);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     private class LocationUpdateTimer extends TimerTask {
-        public void run(){
+        public void run() {
             Loc loc = LocationCache.getInstance().getMostRecentActiveLoc();
-            if(loc != null){
+            if (loc != null) {
                 loc.setIsRealUpdate(false);
                 handleLocationUpdate(loc);
             }
@@ -434,7 +434,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         }
 
         @Override
-        public void onTick(long millisUntilFinished) {}
+        public void onTick(long millisUntilFinished) {
+        }
 
         @Override
         public void onFinish() {

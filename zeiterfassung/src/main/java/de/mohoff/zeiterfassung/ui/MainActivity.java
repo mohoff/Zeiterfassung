@@ -4,11 +4,19 @@ import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -21,7 +29,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -36,28 +43,27 @@ import android.widget.Button;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
-import de.mohoff.zeiterfassung.helpers.GeneralHelper;
+import de.mohoff.zeiterfassung.R;
 import de.mohoff.zeiterfassung.datamodel.Loc;
+import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
+import de.mohoff.zeiterfassung.helpers.GeneralHelper;
 import de.mohoff.zeiterfassung.locationservice.LocationChangeListener;
 import de.mohoff.zeiterfassung.locationservice.LocationService;
 import de.mohoff.zeiterfassung.locationservice.LocationServiceStatus;
 import de.mohoff.zeiterfassung.locationservice.TimeslotEventListener;
+import de.mohoff.zeiterfassung.ui.components.NavigationDrawerListener;
 import de.mohoff.zeiterfassung.ui.components.about.About;
+import de.mohoff.zeiterfassung.ui.components.maplive.MapLive;
 import de.mohoff.zeiterfassung.ui.components.overview.Overview;
 import de.mohoff.zeiterfassung.ui.components.settings.Settings;
 import de.mohoff.zeiterfassung.ui.components.statistics.Statistics;
 import de.mohoff.zeiterfassung.ui.components.zones.Zones;
-import de.mohoff.zeiterfassung.ui.components.NavigationDrawerListener;
-import de.mohoff.zeiterfassung.ui.components.maplive.MapLive;
-import de.mohoff.zeiterfassung.R;
-import de.mohoff.zeiterfassung.helpers.DatabaseHelper;
 import de.mohoff.zeiterfassung.ui.intro.Intro;
 
 // TODO: add lite version of google maps to lower area of navigation drawer and maybe 'About' page
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerListener {
     private static final int PERMISSION_REQUEST_LOCATION = 1;
-
 
     private DatabaseHelper dbHelper;
 
@@ -91,16 +97,18 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     public void setOnNewLocationListener(LocationChangeListener listen) {
         newLocationListener = listen;
     }
+
     public void setOnTimeslotEventListener(TimeslotEventListener listen) {
         newTimeslotEventListener = listen;
     }
+
     public void removeOnNewLocationListener() {
         newLocationListener = null;
     }
+
     public void removeOnTimeslotEventListener() {
         newTimeslotEventListener = null;
     }
-
 
 
     @Override
@@ -118,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 //  Initialize SharedPreferences
                 SharedPreferences getPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 boolean isFirstStart = getPrefs.getBoolean("firstStart", true);
-                if(isFirstStart){
+                if (isFirstStart) {
                     showAppIntro();
                     //  Edit preference to make it false because we don't want this to run again
                     SharedPreferences.Editor e = getPrefs.edit();
@@ -160,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         });
         // Select the first menu item at app start. Don't select first when savedInstanceState is
         // not null (e.g. when screen is rotated).
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             navigationView.getMenu().getItem(0).setChecked(true);
             navigationView.getMenu().performIdentifierAction(R.id.item_overview, 0);
         }
@@ -181,10 +189,12 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 //    nextFragmentAvailable = false;
                 //}
             }
+
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
+
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 super.onDrawerSlide(drawerView, slideOffset);
@@ -221,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
-    public void showAppIntro(){
+    public void showAppIntro() {
         Intent i = new Intent(MainActivity.this, Intro.class);
         startActivity(i);
     }
@@ -229,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     public void startAndBindToLocationService() {
         boolean bindResult;
         // Calling startService() first prevents it from being killed on unbind()
-        if(startService(new Intent(MainActivity.this, LocationService.class)) != null){
+        if (startService(new Intent(MainActivity.this, LocationService.class)) != null) {
             serviceStatus.setIsRunning(true);
             //isServiceRunning = true;
             updateServiceButtons();
@@ -238,12 +248,12 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         } else {
             throw new RuntimeException("Unable to start service.");
         }
-        if(!bindResult){
+        if (!bindResult) {
             throw new RuntimeException("Unable to start service.");
         }
     }
 
-    public void unbindAndStopService(){
+    public void unbindAndStopService() {
         // The order of following executed lines is debatable. I value UI
         // responsiveness over waiting for stopService call. Since stopService
         // does not provide any feedback about its success, I prefer UI feedback
@@ -255,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         stopService(new Intent(MainActivity.this, LocationService.class));
     }
 
-    private boolean bindLocationService(){
+    private boolean bindLocationService() {
         // It's ok when service is already bound: Will return TRUE
         serviceCon = new LocationServiceConnection();
         return bindService(
@@ -265,9 +275,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         );
     }
 
-    public void unbindLocationService(){
+    public void unbindLocationService() {
         // It's ok when service is already unbound
-        if(serviceCon != null){
+        if (serviceCon != null) {
             unbindService(serviceCon);
             serviceCon = null;
         }
@@ -277,9 +287,10 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         public void onServiceConnected(ComponentName name, IBinder service) {
             //LocationService.LocalBinder binder = (LocationService.LocalBinder) service;
             //refThis.service = (LocationService) binder.getService();
-            LocationService.LocalBinder localBinder = (LocationService.LocalBinder)service;
+            LocationService.LocalBinder localBinder = (LocationService.LocalBinder) service;
             mService = (LocationService) localBinder.getService();
         }
+
         @Override
         public void onServiceDisconnected(ComponentName name) {
             //service = null;
@@ -296,17 +307,17 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         unbindAndStopService();
     }
 
-    public void requestPermissionsAndStartService(){
+    public void requestPermissionsAndStartService() {
         // 1) Use the support library version ContextCompat.checkSelfPermission(...) to avoid
         // checking the build version since Context.checkSelfPermission(...) is only available
         // in Marshmallow
         // 2) Always check for permission (even if permission has already been granted)
         // since the user can revoke permissions at any time through Settings
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // The permission is NOT already granted.
             // Check if the user has been asked about this permission already and denied
             // it. If so, we want to give more explanation about why the permission is needed.
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 // Show our own UI to explain to the user why we need to read the contacts
                 // before actually requesting the permission and showing the default UI
                 Snackbar.make(
@@ -324,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                                 );
                             }
                         })
-                .show();
+                        .show();
             }
 
             // Fire off an async request to actually get the permission
@@ -395,8 +406,8 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
     public void onItemSelected(View view, int position) {
     }
 
-    private void updateServiceButtons(){
-        if(serviceStatus.isRunning()){
+    private void updateServiceButtons() {
+        if (serviceStatus.isRunning()) {
             // manage start button
             buttonStartService.getBackground().setColorFilter(getResources().getColor(R.color.grey_25), PorterDuff.Mode.SRC_ATOP);
             buttonStartService.setEnabled(false);
@@ -437,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         }
     }
 
-    public void selectedDrawerItem(MenuItem item){
+    public void selectedDrawerItem(MenuItem item) {
         item.setChecked(true);
         Fragment next = null;
 
@@ -464,7 +475,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 next = new Overview();*/
         }
 
-        if(next != null){
+        if (next != null) {
             replaceFragment(next, false);
             setTitle(item.getTitle());
             drawerLayout.closeDrawers();
@@ -503,11 +514,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
         // Close navigation drawer if it's open. If not, go back to previous fragment if there is one
         // on the back-stack.
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawers();
-        } else if (getFragmentManager().getBackStackEntryCount() > 0){
+        } else if (getFragmentManager().getBackStackEntryCount() > 0) {
             getFragmentManager().popBackStack();
-            if(getFragmentManager().getBackStackEntryCount() > 0){
+            if (getFragmentManager().getBackStackEntryCount() > 0) {
                 drawerToggle.setDrawerIndicatorEnabled(false);
             } else {
                 drawerToggle.setDrawerIndicatorEnabled(true);
@@ -519,7 +530,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         }
     }
 
-    public void replaceFragment(Fragment fragment, boolean addToBackStack){
+    public void replaceFragment(Fragment fragment, boolean addToBackStack) {
         // TODO: Investigate why .show() doesn't work in 'Manage Zones'
         //fab.hide();
         String backStateName = fragment.getClass().getName();
@@ -532,7 +543,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             FragmentTransaction ft = manager.beginTransaction();
             ft.replace(R.id.content_frame, fragment, fragmentTag);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-            if(addToBackStack) {
+            if (addToBackStack) {
                 ft.addToBackStack(backStateName);
             }
             //ft.commit();
@@ -542,7 +553,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         }
     }
 
-    public ActionBarDrawerToggle getDrawerToggle(){
+    public ActionBarDrawerToggle getDrawerToggle() {
         return drawerToggle;
     }
 
@@ -575,10 +586,10 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
             String receivedMessage = intent.getStringExtra("type");
-            if(receivedMessage.equals("opened")){
+            if (receivedMessage.equals("opened")) {
                 Snackbar.make(that.coordinatorLayout, getString(R.string.timeslot_opened), Snackbar.LENGTH_LONG)
                         .show();
-            } else if(receivedMessage.equals("closed")){
+            } else if (receivedMessage.equals("closed")) {
                 Snackbar.make(that.coordinatorLayout, getString(R.string.timeslot_closed), Snackbar.LENGTH_LONG)
                         .show();
             }
@@ -604,9 +615,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
         @Override
         public void onReceive(Context context, Intent intent) {
             String receivedMessage = intent.getStringExtra("type");
-            if(receivedMessage.equals("start")){
+            if (receivedMessage.equals("start")) {
                 serviceStatus.setIsRunning(true);
-            } else if(receivedMessage.equals("stop")){
+            } else if (receivedMessage.equals("stop")) {
                 serviceStatus.setIsRunning(false);
             }
         }
@@ -639,6 +650,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
 
     public static interface ClickListener {
         public void onClick(View view, int position);
+
         public void onLongClick(View view, int position);
     }
 
@@ -663,6 +675,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
                 }
             });
         }
+
         @Override
         public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
 
@@ -672,9 +685,11 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerL
             }
             return false;
         }
+
         @Override
         public void onTouchEvent(RecyclerView rv, MotionEvent e) {
         }
+
         @Override
         public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
         }

@@ -12,21 +12,25 @@ import java.util.ArrayList;
 public class LocationServiceStatus {
     private boolean isServiceRunning;
     ArrayList<ServiceChangeListener> listeners = new ArrayList<>();
-    public boolean isRunning(){
+
+    public boolean isRunning() {
         return isServiceRunning;
     }
-    public void setIsRunning(boolean newValue){
-        if(isServiceRunning != newValue){
+
+    public void setIsRunning(boolean newValue) {
+        if (isServiceRunning != newValue) {
             isServiceRunning = !isServiceRunning;
-            for(ServiceChangeListener listener : listeners){
+            for (ServiceChangeListener listener : listeners) {
                 listener.onServiceStatusEvent(isServiceRunning);
             }
         }
     }
-    public void addListener(ServiceChangeListener listener){
+
+    public void addListener(ServiceChangeListener listener) {
         listeners.add(listener);
     }
-    public void removeListener(ServiceChangeListener listener){
+
+    public void removeListener(ServiceChangeListener listener) {
         listeners.remove(listener);
     }
 }

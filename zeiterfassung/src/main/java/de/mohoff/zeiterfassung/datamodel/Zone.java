@@ -1,6 +1,5 @@
 package de.mohoff.zeiterfassung.datamodel;
 
-import android.graphics.Color;
 import com.google.android.gms.maps.model.LatLng;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -25,9 +24,9 @@ public class Zone {
     private String locationName;
     @DatabaseField(canBeNull = false)
     private int color; // e.g. 0xFF000000 as black
-    // ;
 
-    public Zone(){}
+    public Zone() {
+    }
 
     public Zone(float latitude, float longitude, int radius, String activityName, String locationName, int color) {
         this.latitude = latitude;
@@ -104,11 +103,11 @@ public class Zone {
         this.color = color;
     }
 
-    public LatLng getLatLng(){
+    public LatLng getLatLng() {
         return new LatLng(latitude, longitude);
     }
 
-    public Loc getLoc(){
+    public Loc getLoc() {
         return new Loc(latitude, longitude);
     }
 }

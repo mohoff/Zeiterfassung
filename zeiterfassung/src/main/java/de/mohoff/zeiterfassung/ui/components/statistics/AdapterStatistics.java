@@ -15,8 +15,6 @@ import android.widget.TextView;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -27,7 +25,6 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +40,7 @@ import de.mohoff.zeiterfassung.ui.colorpicker.ColorPalette;
 /**
  * Created by moo on 11/1/15.
  */
-public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ServiceChangeListener, OnChartValueSelectedListener{
+public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ServiceChangeListener, OnChartValueSelectedListener {
     private static int VIEWTYPE_BASIC = 0;
     private static int VIEWTYPE_CHART = 1;
 
@@ -56,7 +53,7 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public void onServiceStatusEvent(boolean isRunning) {
-        if(!isRunning) {
+        if (!isRunning) {
             cancelTextViewUpdater();
             data = dbHelper.getAllStats();
             notifyDataSetChanged();
@@ -67,6 +64,7 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
         // each data item is just a string in this case
         public TextView headline;
         public TextView content;
+
         public StatBasic(View v) {
             super(v);
             headline = (TextView) v.findViewById(R.id.headline);
@@ -78,6 +76,7 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
         // each data item is just a string in this case
         public TextView headline;
         public PieChart chart;
+
         public StatChart(View v) {
             super(v);
             headline = (TextView) v.findViewById(R.id.headline);
@@ -87,20 +86,20 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public AdapterStatistics(Context context, List<Stat> data) {
         getDbHelper();
-        this.context = (MainActivity)context;
+        this.context = (MainActivity) context;
         this.data = data;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                   int viewType) {
-        if(viewType == VIEWTYPE_BASIC){
+                                                      int viewType) {
+        if (viewType == VIEWTYPE_BASIC) {
             View itemView = LayoutInflater.from(parent.getContext()).
                     inflate(R.layout.fragment_statistics_element_basic, parent, false);
             return new StatBasic(itemView);
         }
-        if(viewType == VIEWTYPE_CHART){
+        if (viewType == VIEWTYPE_CHART) {
             View itemView = LayoutInflater.from(parent.getContext()).
                     inflate(R.layout.fragment_statistics_element_chart, parent, false);
             return new StatChart(itemView);
@@ -112,30 +111,30 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         // TODO: Refactor here. Too dirty
-        if(position >= 3) position -= 1;
+        if (position >= 3) position -= 1;
         final Stat stat = data.get(position);
 
-        if(holder.getItemViewType() == VIEWTYPE_BASIC) {
+        if (holder.getItemViewType() == VIEWTYPE_BASIC) {
             StatBasic statHolder = (StatBasic) holder;
             statHolder.headline.setText(stat.getDisplayString());
             statHolder.content.setText(stat.getDisplayValue());
 
-            if(stat.getDisplayValue().equals("n.a.")){
+            if (stat.getDisplayValue().equals("n.a.")) {
                 statHolder.content.setTypeface(null, Typeface.ITALIC);
             } else {
                 statHolder.content.setTypeface(null, Typeface.NORMAL);
             }
 
             // Update serviceUptime entry every second if background service is running
-            if(stat.getIdentifier().equals("serviceUptime")){
+            if (stat.getIdentifier().equals("serviceUptime")) {
                 setupTextViewUpdater(statHolder.content, stat);
             }
-            if(stat.getIdentifier().equals("distanceTravelled")){
+            if (stat.getIdentifier().equals("distanceTravelled")) {
                 statHolder.content.setText(stat.getDisplayValueWithExtraTime(LocationService.SESSION_DISTANCE));
             }
         }
 
-        if(holder.getItemViewType() == VIEWTYPE_CHART) {
+        if (holder.getItemViewType() == VIEWTYPE_CHART) {
             StatChart statHolder = (StatChart) holder;
             statHolder.headline.setText(stat.getDisplayString());
 
@@ -181,7 +180,7 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
                 context.coordinatorLayout,
                 activity + ": " + readableDuration,
                 Snackbar.LENGTH_LONG)
-        .show();
+                .show();
     }
 
     @Override
@@ -189,16 +188,16 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     }
 
-    private PieData getInitialChartData(){
-        HashMap<String, HashMap<String,Long>> map = dbHelper.getTimeSpentForEachZone();
+    private PieData getInitialChartData() {
+        HashMap<String, HashMap<String, Long>> map = dbHelper.getTimeSpentForEachZone();
         HashMap<String, Long> mapSum = new HashMap<>();
 
-        for (Map.Entry<String, HashMap<String,Long>> entry : map.entrySet()) {
+        for (Map.Entry<String, HashMap<String, Long>> entry : map.entrySet()) {
             String activity = entry.getKey();
             HashMap<String, Long> inner = entry.getValue();
 
             Long sum = Long.valueOf(0);
-            for (Long locTime : inner.values()){
+            for (Long locTime : inner.values()) {
                 sum += locTime;
             }
             mapSum.put(activity, sum);
@@ -212,7 +211,7 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
             // yValues (time duration)
             // Divide by (1000*60), so Entry only needs to stores 'minutes' instead of milliseconds.
             timesData.add(new Entry(
-                    (float) (entry.getValue()/(1000*60)),
+                    (float) (entry.getValue() / (1000 * 60)),
                     i++,
                     entry.getKey()
             ));
@@ -225,8 +224,8 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
         // Add colors from ColorPalette.GREENISH. If more colors need than there are in the array,
         // start repeating colors.
         int[] colors = new int[timesData.size()];
-        for(int j=0; j<timesData.size(); j++){
-            colors[j] = ColorPalette.GREENISH[j%(ColorPalette.GREENISH.length)];
+        for (int j = 0; j < timesData.size(); j++) {
+            colors[j] = ColorPalette.GREENISH[j % (ColorPalette.GREENISH.length)];
         }
         dataSet.setColors(colors);
         dataSet.setSliceSpace(0f);
@@ -239,14 +238,14 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
         return data;
     }
 
-    private void cancelTextViewUpdater(){
+    private void cancelTextViewUpdater() {
         // Cancel old thread
-        if(uptimeHandler != null && uptimeRunnable != null){
+        if (uptimeHandler != null && uptimeRunnable != null) {
             uptimeHandler.removeCallbacks(uptimeRunnable);
         }
     }
 
-    private void setupTextViewUpdater(final TextView tv, final Stat uptimeStat){
+    private void setupTextViewUpdater(final TextView tv, final Stat uptimeStat) {
         cancelTextViewUpdater();
 
         // Create new thread
@@ -254,7 +253,7 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
         uptimeRunnable = new Runnable() {
             @Override
             public void run() {
-                if(LocationService.IS_SERVICE_RUNNING){
+                if (LocationService.IS_SERVICE_RUNNING) {
                     String computedValue = uptimeStat.getDisplayValueWithExtraTime(LocationService.getServiceSessionUptime());
                     tv.setText(computedValue);
                 }
@@ -273,7 +272,7 @@ public class AdapterStatistics extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public int getItemViewType(int position) {
-        if(position == 2) {
+        if (position == 2) {
             return VIEWTYPE_CHART;
         } else {
             return VIEWTYPE_BASIC;

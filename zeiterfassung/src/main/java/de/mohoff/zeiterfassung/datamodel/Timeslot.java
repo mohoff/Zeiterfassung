@@ -26,14 +26,15 @@ public class Timeslot {
     @DatabaseField(canBeNull = false, foreign = true, foreignAutoRefresh = true, columnName = "zone_id")
     private Zone zone;
 
-    public Timeslot(){}
+    public Timeslot() {
+    }
 
-    public Timeslot(long starttime, Zone zone){
+    public Timeslot(long starttime, Zone zone) {
         this.starttime = starttime;
         this.zone = zone;
     }
 
-    public Timeslot(long starttime, long endtime, Zone zone){
+    public Timeslot(long starttime, long endtime, Zone zone) {
         this.starttime = starttime;
         this.endtime = endtime;
         this.zone = zone;
@@ -63,61 +64,61 @@ public class Timeslot {
         this.endtime = endtime;
     }
 
-    public Zone getZone(){
+    public Zone getZone() {
         return zone;
     }
 
-    public void setZone(Zone zone){
+    public void setZone(Zone zone) {
         this.zone = zone;
     }
 
-    private String getReadableDate(long time){
-        if (isSameDay(System.currentTimeMillis(), time)){
+    private String getReadableDate(long time) {
+        if (isSameDay(System.currentTimeMillis(), time)) {
             return "Today";
         }
-        if (isSameDay(System.currentTimeMillis() - 1000 * 60 * 60 * 24, time)){
+        if (isSameDay(System.currentTimeMillis() - 1000 * 60 * 60 * 24, time)) {
             return "Yesterday";
         }
         return new SimpleDateFormat("dd.MM.yyyy").format(new Date(time));
     }
 
-    private String getReadableTime(long time){
+    private String getReadableTime(long time) {
         return new SimpleDateFormat("HH:mm").format(new Date(time));
     }
 
-    public String getReadableStartDate(){
+    public String getReadableStartDate() {
         return getReadableDate(this.starttime);
     }
 
-    public String getReadableStartTime(){
+    public String getReadableStartTime() {
         return getReadableTime(this.starttime);
     }
 
-    public String getReadableEndDate(Context ctx){
-        if(endtime != 0){
+    public String getReadableEndDate(Context ctx) {
+        if (endtime != 0) {
             return getReadableDate(this.endtime);
         } else {
             return ctx.getString(R.string.overview_end_pending);
         }
     }
 
-    public String getReadableEndTime(Context ctx){
-        if(endtime != 0){
+    public String getReadableEndTime(Context ctx) {
+        if (endtime != 0) {
             return getReadableTime(this.endtime);
         } else {
             return ctx.getString(R.string.overview_end_pending);
         }
     }
 
-    public String getReadableDuration(boolean ignoreSeconds, boolean multiLine){
-        if(this.endtime == 0){
+    public String getReadableDuration(boolean ignoreSeconds, boolean multiLine) {
+        if (this.endtime == 0) {
             return getReadableDuration(this.starttime, System.currentTimeMillis(), ignoreSeconds, multiLine);
         } else {
-            return getReadableDuration(this.starttime,  this.endtime, ignoreSeconds, multiLine);
+            return getReadableDuration(this.starttime, this.endtime, ignoreSeconds, multiLine);
         }
     }
 
-    public static String getReadableDuration(long diff, boolean ignoreSeconds, boolean multiLine){
+    public static String getReadableDuration(long diff, boolean ignoreSeconds, boolean multiLine) {
         long secInMillis = 1000,
                 minInMillis = secInMillis * 60,
                 hourInMillis = minInMillis * 60,
@@ -137,23 +138,23 @@ public class Timeslot {
         secs = (int) (diff / secInMillis);
 
         // generate output string
-        if(years != 0){
+        if (years != 0) {
             output = addToDurationOutput(output, years, "y", multiLine);
         }
-        if(days != 0){
+        if (days != 0) {
             output = addToDurationOutput(output, days, "d", multiLine);
             /*if(!output.equals("")){
                 output += "\n";
             }
             output += days + " d";*/
         }
-        if(hours != 0){
+        if (hours != 0) {
             output = addToDurationOutput(output, hours, "h", multiLine);
         }
-        if(mins != 0){
+        if (mins != 0) {
             output = addToDurationOutput(output, mins, "min", multiLine);
         }
-        if(secs != 0 && !ignoreSeconds){
+        if (secs != 0 && !ignoreSeconds) {
             output = addToDurationOutput(output, secs, "sec", multiLine);
         }
 
@@ -162,30 +163,30 @@ public class Timeslot {
 
     // TODO: move function to central position because both Timeslot.java and Stat.java use it.
 
-    private static String addToDurationOutput(String result, int value, String unit, boolean multiLine){
-        if(multiLine && !result.equals("")){
+    private static String addToDurationOutput(String result, int value, String unit, boolean multiLine) {
+        if (multiLine && !result.equals("")) {
             result += "\n";
-        } else if(!multiLine && !result.equals("")){
+        } else if (!multiLine && !result.equals("")) {
             result += " ";
         }
         result += String.valueOf(value) + unit;
         return result;
     }
 
-    public static String getReadableDuration(long time1, long time2, boolean ignoreSeconds, boolean multiLine){
-        long diff = time1 > time2 ? time1-time2 : time2-time1;
+    public static String getReadableDuration(long time1, long time2, boolean ignoreSeconds, boolean multiLine) {
+        long diff = time1 > time2 ? time1 - time2 : time2 - time1;
         return getReadableDuration(diff, ignoreSeconds, multiLine);
     }
 
-    public long getDuration(){
-        if(endtime == 0){
+    public long getDuration() {
+        if (endtime == 0) {
             return System.currentTimeMillis() - starttime;
         } else {
             return endtime - starttime;
         }
     }
 
-    public static boolean isSameDay(long timestamp1, long timestamp2){
+    public static boolean isSameDay(long timestamp1, long timestamp2) {
         Date startDate = new Date(timestamp1);
         Date endDate = new Date(timestamp2);
 
@@ -198,30 +199,30 @@ public class Timeslot {
         return startDay == endDay;
     }
 
-    public static String getDurationReadableGeneric(long millis1, long millis2){
+    public static String getDurationReadableGeneric(long millis1, long millis2) {
         long durationInMinutes;
-        long minutes1 = millis1/(1000*60);
-        long minutes2 = millis2/(1000*60);
-        if(minutes1 >= minutes2){
+        long minutes1 = millis1 / (1000 * 60);
+        long minutes2 = millis2 / (1000 * 60);
+        if (minutes1 >= minutes2) {
             durationInMinutes = minutes1 - minutes2;
         } else {
             durationInMinutes = minutes2 - minutes1;
         }
 
-        long days = durationInMinutes / (60*24);
-        long rest = durationInMinutes % (60*24);
-        long hours = rest/60;
-        rest = rest%60;
+        long days = durationInMinutes / (60 * 24);
+        long rest = durationInMinutes % (60 * 24);
+        long hours = rest / 60;
+        rest = rest % 60;
         long minutes = rest;
 
         String output = "";
-        if(days != 0){
+        if (days != 0) {
             output += hours + "d ";
         }
-        if(hours != 0){
+        if (hours != 0) {
             output += hours + "h ";
         }
-        if(minutes != 0){
+        if (minutes != 0) {
             output += minutes + "min";
         }
 

@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -46,16 +45,19 @@ public class GeneralHelper {
         }
         return instance;
     }
-    public static GeneralHelper getInstance(){
+
+    public static GeneralHelper getInstance() {
         if (instance == null) {
             instance = new GeneralHelper();
         }
         return instance;
     }
-    private GeneralHelper(Context c){
+
+    private GeneralHelper(Context c) {
         this.context = c;
     }
-    private GeneralHelper(){
+
+    private GeneralHelper() {
         super();
     }
 
@@ -74,14 +76,16 @@ public class GeneralHelper {
             instance.service = null;
         }
     }
-    public void unbindLocationService(){
-        if(lsc != null && serviceIsRunning){
+
+    public void unbindLocationService() {
+        if (lsc != null && serviceIsRunning) {
             context.unbindService(lsc);
             lsc = null;
         }
     }
-    public void stopLocationService(){
-        if(serviceIsRunning){
+
+    public void stopLocationService() {
+        if (serviceIsRunning) {
             this.unbindLocationService();
             service.stopService(new Intent(context, LocationService.class));
             serviceIsRunning = false;
@@ -93,25 +97,25 @@ public class GeneralHelper {
         toast.show();
     }*/
 
-    public static LatLng convertLocToLatLng(Loc loc){
+    public static LatLng convertLocToLatLng(Loc loc) {
         return new LatLng(loc.getLatitude(), loc.getLongitude());
     }
 
-    public static List<LatLng> convertListLocToListLatLng(List<Loc> listLoc){
+    public static List<LatLng> convertListLocToListLatLng(List<Loc> listLoc) {
         List<LatLng> listLatLng = new ArrayList<LatLng>();
-        for(Loc loc : listLoc){
+        for (Loc loc : listLoc) {
             listLatLng.add(convertLocToLatLng(loc));
         }
         return listLatLng;
     }
 
-    public static float getOpacityFromAccuracy(double accuracy){
+    public static float getOpacityFromAccuracy(double accuracy) {
         // acc < 50m : 1        --> == opaque
         // acc 100m  : 0.8      --> == 80% opaque / 20% transparent
         // acc 200m  : 0.6      --> ...
         // acc 500m  : 0        --> == 100% transparent
         // acc 1000m : -1
-        float unclampedOpacity = 1.0f - (float) ((int)accuracy/50) /10.0f;
+        float unclampedOpacity = 1.0f - (float) ((int) accuracy / 50) / 10.0f;
 
         // clamp unclampedOpacity to interval [ 0.2 , 1 ]
         return Math.min(1.0f, Math.max(0.2f, unclampedOpacity));
@@ -120,24 +124,24 @@ public class GeneralHelper {
     public static void hideSoftKeyboard(Activity activity) {
         View v = activity.getCurrentFocus();
         if (v != null) {
-            InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
 
     public static void hideSoftKeyboardWithView(Activity activity, View v) {
-        InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 
-    public static void clearBackStack(Activity activity){
+    public static void clearBackStack(Activity activity) {
         FragmentManager fm = activity.getFragmentManager();
-        for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+        for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
             fm.popBackStack();
         }
     }
 
-    public static void setupLocationCache(DatabaseHelper dbHelper){
+    public static void setupLocationCache(DatabaseHelper dbHelper) {
         List<Loc> locs = dbHelper.getLocs(System.currentTimeMillis() - LocationService.REGULAR_UPDATE_INTERVAL * LocationService.PASSIVE_CACHE_SIZE);
         // Bring List into CircularFifoQueue
         CircularFifoQueue<Loc> tmp = new CircularFifoQueue<>(LocationService.PASSIVE_CACHE_SIZE);
@@ -145,12 +149,12 @@ public class GeneralHelper {
         LocationCache.getInstance().setPassiveCache(tmp);
     }
 
-    public static View getAlertDialogEditTextContainer(Context context, EditText et, String placeholder){
+    public static View getAlertDialogEditTextContainer(Context context, EditText et, String placeholder) {
         et.setText(placeholder);
         et.setSingleLine(true);
 
         FrameLayout container = new FrameLayout(context);
-        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         params.leftMargin = 50;
@@ -160,7 +164,7 @@ public class GeneralHelper {
         return container;
     }
 
-    public static boolean isLocationServiceRunning(Context context){
+    public static boolean isLocationServiceRunning(Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if ("LocationService".equals(service.service.getClassName())) {

@@ -1,7 +1,5 @@
 package de.mohoff.zeiterfassung.datamodel;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import de.mohoff.zeiterfassung.locationservice.LocationService;
@@ -25,14 +23,15 @@ public class LocationCache {
     private Loc interpolatedPosition;
 
     private static final LocationCache cache = new LocationCache();
-    public static LocationCache getInstance(){
-        if(cache.activeCache == null){
+
+    public static LocationCache getInstance() {
+        if (cache.activeCache == null) {
             cache.activeCache = new CircularFifoQueue<>(LocationService.ACTIVE_CACHE_SIZE);
         }
-        if(cache.passiveCache == null) {
+        if (cache.passiveCache == null) {
             cache.passiveCache = new CircularFifoQueue<>(LocationService.PASSIVE_CACHE_SIZE);
         }
-        if(cache.activeInterpolatedCache == null) {
+        if (cache.activeInterpolatedCache == null) {
             cache.activeInterpolatedCache = new CircularFifoQueue<>(LocationService.ACTIVE_CACHE_SIZE);
         }
         return cache;
@@ -51,79 +50,78 @@ public class LocationCache {
         this.interpolationVariance = interpolationVariance;
     }*/
 
-    public CircularFifoQueue<Loc> getPassiveCache(){
+    public CircularFifoQueue<Loc> getPassiveCache() {
         return passiveCache;
     }
-    public int getPassiveCacheMaxSize(){
+
+    public int getPassiveCacheMaxSize() {
         return passiveCache.maxSize();
     }
 
-    public CircularFifoQueue<Loc> getActiveCache(){
+    public CircularFifoQueue<Loc> getActiveCache() {
         return activeCache;
     }
 
-    public void setPassiveCache(CircularFifoQueue<Loc> cache){
-        if(passiveCache.isEmpty()){
+    public void setPassiveCache(CircularFifoQueue<Loc> cache) {
+        if (passiveCache.isEmpty()) {
             passiveCache = cache;
         }
     }
 
-    public int clearPassiveCache(){
+    public int clearPassiveCache() {
         passiveCache.clear();
         return 1;
     }
 
-    public float validateInBoundsForZone(Zone zone){
+    public float validateInBoundsForZone(Zone zone) {
         float positives = 0;
 
-        for(int i=0; i< activeInterpolatedCache.size(); i++){
+        for (int i = 0; i < activeInterpolatedCache.size(); i++) {
             Loc loc = (Loc) activeInterpolatedCache.get(i);
             int distanceToZoneBorder = loc.distanceTo(new Loc(zone.getLatitude(), zone.getLongitude())) - zone.getRadius();
-            if(distanceToZoneBorder < 0){
+            if (distanceToZoneBorder < 0) {
                 positives++;
             }
         }
-        return positives/(float) activeInterpolatedCache.size();
+        return positives / (float) activeInterpolatedCache.size();
     }
 
     // Uses activeInterpolatedCache
-    public float getCurrentInBoundProxFor(Zone zone){
+    public float getCurrentInBoundProxFor(Zone zone) {
         float positives = 0;
         float all = activeCache.size();
 
-        for(int i=0; i< activeInterpolatedCache.size(); i++){
+        for (int i = 0; i < activeInterpolatedCache.size(); i++) {
             Loc loc = (Loc) activeInterpolatedCache.get(i);
             //int distanceDebug = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude()));
             int distanceZoneBorderToUser = loc.distanceTo(new Loc(zone.getLatitude(), zone.getLongitude())) - zone.getRadius();
-            if(distanceZoneBorderToUser <= 0){
+            if (distanceZoneBorderToUser <= 0) {
                 positives++;
             }
         }
-        return positives/all;
+        return positives / all;
     }
 
     // Uses activeCache
-    public float getCurrentInBoundProxFor2(Zone zone){
+    public float getCurrentInBoundProxFor2(Zone zone) {
         float positives = 0;
         float all = activeCache.size();
 
-        for(int i=0; i< activeCache.size(); i++){
+        for (int i = 0; i < activeCache.size(); i++) {
             Loc loc = (Loc) activeCache.get(i);
             //int distanceDebug = loc.distanceTo(new Loc(tla.getLatitude(), tla.getLongitude()));
             int distanceZoneBorderToUser = loc.distanceTo(new Loc(zone.getLatitude(), zone.getLongitude())) - zone.getRadius();
-            if(distanceZoneBorderToUser <= 0){
+            if (distanceZoneBorderToUser <= 0) {
                 positives++;
             }
         }
-        return positives/all;
+        return positives / all;
     }
 
 
-
-
-    public void addLocationUpdate(Loc newLoc){
+    public void addLocationUpdate(Loc newLoc) {
         // Handle activeCache.
-        if(newLoc.getAccuracy() < LocationService.ACCURACY_TRESHOLD){
+        if (newLoc.getAccuracy() < LocationService.ACCURACY_TRESHOLD) {
             // Add Loc to activeCache if it suffices the accuracy minimum defined by
             // ACCURACY_TRESHOLD.
             activeCache.add(newLoc);
@@ -142,52 +140,52 @@ public class LocationCache {
             // is never triggered since LocationService's algorithm only accepts accurate updates. Now,
             // by repeating the most recent accurate Loc (hopefully within the Zone of the bar), the
             // missing enter-event is triggered properly by the algorithm.
-            if(!activeCache.isEmpty()){
-                activeCache.add(activeCache.get(activeCache.size()-1));
+            if (!activeCache.isEmpty()) {
+                activeCache.add(activeCache.get(activeCache.size() - 1));
             }
         }
 
         // Handle passiveCache.
-        if(isPassiveCacheFull()){
+        if (isPassiveCacheFull()) {
             firstPassiveCacheDropHappened = true;
         }
         // Add newLoc to passiveCache if newLoc is a real update or there was a real update added
         // in the last call of this function.
-        if(newLoc.isRealUpdate() || passiveCache.get(0).isRealUpdate()){
+        if (newLoc.isRealUpdate() || passiveCache.get(0).isRealUpdate()) {
             passiveCache.add(newLoc);
         }
     }
 
-    public boolean isActiveCacheFull(){
+    public boolean isActiveCacheFull() {
         // locationCache.isActiveCacheFull() always returns false in my case...
         return activeCache.size() == activeCache.maxSize();
     }
 
-    public boolean isPassiveCacheFull(){
+    public boolean isPassiveCacheFull() {
         // locationCache.isActiveCacheFull() always returns false in my case...
         return passiveCache.size() == passiveCache.maxSize();
     }
 
-    public boolean hasFirstPassiveQueueDropHappened(){
+    public boolean hasFirstPassiveQueueDropHappened() {
         return firstPassiveCacheDropHappened;
     }
 
-    public Loc getMostRecentPassiveLoc(){
-        for(int i=passiveCache.size()-1; i>=0; i--){
+    public Loc getMostRecentPassiveLoc() {
+        for (int i = passiveCache.size() - 1; i >= 0; i--) {
             try {
                 return passiveCache.get(i);
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         return null;
     }
 
-    public Loc getMostRecentActiveLoc(){
-        for(int i=activeCache.size()-1; i>=0; i--){
+    public Loc getMostRecentActiveLoc() {
+        for (int i = activeCache.size() - 1; i >= 0; i--) {
             try {
                 return activeCache.get(i);
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -199,11 +197,11 @@ public class LocationCache {
     }
 
     // Returns value between 0.0 (bad) and 1.0 (good).
-    public static double getNormedAgeMultiplier(long millisInPast){
-        long minsInPast = millisInPast/(1000*60);
-        if(minsInPast >= 15) return 0;
+    public static double getNormedAgeMultiplier(long millisInPast) {
+        long minsInPast = millisInPast / (1000 * 60);
+        if (minsInPast >= 15) return 0;
 
-        double x = (double)(15-minsInPast) / 15.0;
+        double x = (double) (15 - minsInPast) / 15.0;
         return Math.pow(x, 4); // x^4
 
         /*
@@ -222,11 +220,11 @@ public class LocationCache {
     }
 
     // Returns value between 0.0 (bad) and 1.0 (good).
-    public static double getNormedAccuracyMultiplier(double acc){
-        if(acc < 50) return 1;
-        if(acc > 3050) return 0;
+    public static double getNormedAccuracyMultiplier(double acc) {
+        if (acc < 50) return 1;
+        if (acc > 3050) return 0;
 
-        double x = (3050-acc)/3050;
+        double x = (3050 - acc) / 3050;
         return Math.pow(x, 4);
 
 
@@ -257,19 +255,19 @@ public class LocationCache {
         return accuracyPenalty;*/
     }
 
-    private void computeInterpolatedPosition(){
+    private void computeInterpolatedPosition() {
         double[] score = new double[activeCache.size()];
         double scoreSum = 0;
         double latSumCounter = 0, lngSumCounter = 0;
         long millisInPast = System.currentTimeMillis() - activeCache.get(0).getTimestampInMillis();
 
-        if((millisInPast < 1000) && activeCache.get(0).getAccuracy() <= 50){
+        if ((millisInPast < 1000) && activeCache.get(0).getAccuracy() <= 50) {
             interpolatedPosition = activeCache.get(0);
             activeInterpolatedCache.add(interpolatedPosition);
             return;
         }
 
-        for(int i=0; i<activeCache.size(); i++){
+        for (int i = 0; i < activeCache.size(); i++) {
             Loc loc = activeCache.get(i);
             double ageMultiplier = getNormedAgeMultiplier(millisInPast); // [0.0 - 1.0]
             double accuracyMultiplier = getNormedAccuracyMultiplier(loc.getAccuracy()); // [0.0 - 1.0]
@@ -280,7 +278,7 @@ public class LocationCache {
             latSumCounter += loc.getLatitude() * score[i];
             lngSumCounter += loc.getLongitude() * score[i];
         }
-        interpolatedPosition = new Loc(latSumCounter/scoreSum, lngSumCounter/scoreSum);
+        interpolatedPosition = new Loc(latSumCounter / scoreSum, lngSumCounter / scoreSum);
         activeInterpolatedCache.add(interpolatedPosition);
 
         /*

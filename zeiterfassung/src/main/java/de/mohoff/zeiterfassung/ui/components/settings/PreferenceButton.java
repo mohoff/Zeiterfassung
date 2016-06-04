@@ -34,7 +34,7 @@ public class PreferenceButton extends Preference {
 
     private void setOnClickListener(View preferenceView) {
         if (preferenceView != null && preferenceView instanceof ViewGroup) {
-            ViewGroup widgetFrameView = ((ViewGroup)preferenceView.findViewById(android.R.id.widget_frame));
+            ViewGroup widgetFrameView = ((ViewGroup) preferenceView.findViewById(android.R.id.widget_frame));
             if (widgetFrameView != null) {
                 // find the button
                 Button button = null;
@@ -42,7 +42,7 @@ public class PreferenceButton extends Preference {
                 for (int i = 0; i < count; i++) {
                     View view = widgetFrameView.getChildAt(i);
                     if (view instanceof Button) {
-                        button = (Button)view;
+                        button = (Button) view;
                         break;
                     }
                 }
