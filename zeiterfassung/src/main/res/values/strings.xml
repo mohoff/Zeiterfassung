@@ -83,6 +83,7 @@
     <color name="greenish_shade_6">#82025167</color>
 
     <color name="cardview_background">#FFF9F9F9</color>
+    <string name="title_activity_maps">Map</string>
 
     <!-- TODO: REWORK
     <color name="navigation_drawer_bg">@color/white</color>

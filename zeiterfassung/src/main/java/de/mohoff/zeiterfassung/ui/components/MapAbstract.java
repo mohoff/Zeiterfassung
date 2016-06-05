@@ -121,6 +121,14 @@ public class MapAbstract extends Fragment implements OnMapReadyCallback {
         mapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        /* NEW IN GOOGLE DOC (june 2016) */
+        /*
+               // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+         */
+
         return view;
     }
 
